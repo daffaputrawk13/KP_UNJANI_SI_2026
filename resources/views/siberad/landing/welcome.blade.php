@@ -151,7 +151,6 @@
     text-transform:uppercase;
     display:flex;align-items:center;gap:10px;
   }
-  .eyebrow::before{content:"";width:22px;height:1px;background:var(--gold);display:inline-block;}
 
   .hud-panel{
     position:relative;background:linear-gradient(180deg, rgba(255,255,255,.02), transparent), var(--panel);
