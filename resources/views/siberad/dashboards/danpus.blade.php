@@ -204,7 +204,6 @@
             </tbody>
           </table>
         </div>
-        <p style="margin-top:14px;font-size:12px;color:var(--text-muted);">Tampilan ini hanya untuk melihat (view only) — tidak ada tindakan yang dapat dilakukan dari sini.</p>
       </div>
     </div>
   </div>
