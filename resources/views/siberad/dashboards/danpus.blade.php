@@ -28,7 +28,14 @@
       <a href="#" class="side-link active" data-tab-link="ringkasan"><span class="dot"></span>Ringkasan</a>
       <a href="#" class="side-link" data-tab-link="laporan"><span class="dot"></span>Laporan Masuk</a>
       <a href="#" class="side-link" data-tab-link="status-satuan"><span class="dot"></span>Status Seluruh Satuan</a>
+
+      <div class="side-nav-label" style="margin-top:10px;">Tampilan</div>
+      <button type="button" class="side-link theme-toggle-single" id="themeToggleBtn" aria-pressed="false">
+        <span class="theme-toggle-icon">🌙</span>
+        <span class="theme-toggle-label">Mode Gelap</span>
+      </button>
     </nav>
+
     <div class="side-foot">
       <div class="side-user">
         <div class="side-avatar">{{ strtoupper(substr($user->name,0,2)) }}</div>
@@ -128,19 +135,19 @@
               @if(($user->jabatan ?? '') === 'Komandan')<th>Aksi</th>@endif
               </tr></thead>
               <tbody>
-                @foreach($laporanMasuk as $l)
-                <tr>
+                @foreach($laporanMasuk as $i => $l)
+                <tr id="rowLaporan{{ $i }}">
                   <td>{{ $l['satuan'] }}</td>
                   <td>{{ $l['perihal'] }}</td>
                   <td>{{ $l['diteruskan_oleh'] }}</td>
                   <td>{{ $l['tanggal'] }}</td>
                   <td><span class="status-dot {{ $l['prioritas_class'] }}">{{ $l['prioritas'] }}</span></td>
-                  <td><span class="badge {{ $l['status_class'] }}">{{ $l['status'] }}</span></td>
+                  <td id="statusLaporan{{ $i }}"><span class="badge {{ $l['status_class'] }}">{{ $l['status'] }}</span></td>
                   @if(($user->jabatan ?? '') === 'Komandan')
-                  <td>
+                  <td id="aksiLaporan{{ $i }}">
                     <div class="btn-row">
-                      <button class="btn btn-primary btn-sm" type="button">Setujui</button>
-                      <button class="btn btn-ghost-red btn-sm" type="button">Tolak</button>
+                      <button class="btn btn-primary btn-sm" type="button" onclick="bukaKonfirmasiLaporan({{ $i }}, 'setuju', '{{ addslashes($l['satuan']) }}', '{{ addslashes($l['perihal']) }}')">Setujui</button>
+                      <button class="btn btn-ghost-red btn-sm" type="button" onclick="bukaKonfirmasiLaporan({{ $i }}, 'tolak', '{{ addslashes($l['satuan']) }}', '{{ addslashes($l['perihal']) }}')">Tolak</button>
                     </div>
                   </td>
                   @endif
@@ -183,6 +190,80 @@
 
     </div>
   </main>
+
+  {{-- ===== MODAL KONFIRMASI SETUJUI / TOLAK ===== --}}
+  <div class="modal-overlay" id="modalKonfirmasiLaporan">
+    <div class="modal-box" style="max-width:480px;">
+      <div class="modal-head">
+        <div>
+          <h3 id="konfirmasiJudul">Konfirmasi</h3>
+          <p id="konfirmasiSub" style="margin:2px 0 0;font-size:12.5px;color:var(--text-muted);">-</p>
+        </div>
+        <button type="button" class="modal-close" onclick="tutupKonfirmasiLaporan()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-field full" style="margin-bottom:16px;">
+          <label for="konfirmasiCatatan">Catatan (opsional)</label>
+          <textarea id="konfirmasiCatatan" rows="3" placeholder="Tulis catatan terkait keputusan ini..."></textarea>
+        </div>
+        <div class="btn-row" style="justify-content:flex-end;">
+          <button type="button" class="btn" onclick="tutupKonfirmasiLaporan()">Batal</button>
+          <button type="button" class="btn btn-primary" id="konfirmasiBtnAksi" onclick="konfirmasiLaporanSubmit()">Konfirmasi</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let laporanAktif = null;
+
+    function bukaKonfirmasiLaporan(index, aksi, satuan, perihal){
+      laporanAktif = { index, aksi };
+      const judul = aksi === 'setuju' ? 'Setujui Laporan' : 'Tolak Laporan';
+      document.getElementById('konfirmasiJudul').textContent = judul;
+      document.getElementById('konfirmasiSub').textContent = satuan + ' \u2014 ' + perihal;
+      document.getElementById('konfirmasiCatatan').value = '';
+
+      const btnAksi = document.getElementById('konfirmasiBtnAksi');
+      btnAksi.textContent = aksi === 'setuju' ? 'Ya, Setujui' : 'Ya, Tolak';
+      btnAksi.className = aksi === 'setuju' ? 'btn btn-primary' : 'btn btn-ghost-red';
+
+      document.getElementById('modalKonfirmasiLaporan').classList.add('open');
+    }
+
+    function tutupKonfirmasiLaporan(){
+      document.getElementById('modalKonfirmasiLaporan').classList.remove('open');
+      laporanAktif = null;
+    }
+
+    function konfirmasiLaporanSubmit(){
+      if(!laporanAktif) return;
+      const { index, aksi } = laporanAktif;
+
+      const statusCell = document.getElementById('statusLaporan' + index);
+      const aksiCell = document.getElementById('aksiLaporan' + index);
+
+      if(aksi === 'setuju'){
+        statusCell.innerHTML = '<span class="badge green">Disetujui</span>';
+      } else {
+        statusCell.innerHTML = '<span class="badge red">Ditolak</span>';
+      }
+
+      if(aksiCell){
+        aksiCell.innerHTML = '<span style="font-size:11.5px;color:var(--text-dim);">Sudah diproses</span>';
+      }
+
+      // Catatan (jika ada) saat ini baru tersimpan sementara di sisi tampilan.
+      // Kalau nanti mau disimpan permanen ke database, tinggal kirim nilai
+      // document.getElementById('konfirmasiCatatan').value beserta index-nya ke route backend di sini.
+
+      tutupKonfirmasiLaporan();
+    }
+
+    document.getElementById('modalKonfirmasiLaporan').addEventListener('click', function(e){
+      if(e.target === this) tutupKonfirmasiLaporan();
+    });
+  </script>
 
   {{-- ===== MODAL DETAIL SATUAN (VIEW ONLY) ===== --}}
   <div class="modal-overlay" id="modalDetailSatuan">

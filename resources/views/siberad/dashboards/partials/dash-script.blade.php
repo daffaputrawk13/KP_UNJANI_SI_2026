@@ -27,4 +27,44 @@
       window.scrollTo({top:0, behavior:'smooth'});
     });
   });
+
+  // Ganti tema (dark / light) — 1 tombol, tersimpan di localStorage, berlaku di semua halaman
+  (function(){
+    var THEME_KEY = 'siberad-theme';
+    var btn = document.getElementById('themeToggleBtn');
+
+    function applyTheme(theme){
+      if (theme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+      }
+      if (btn) {
+        var icon = btn.querySelector('.theme-toggle-icon');
+        var label = btn.querySelector('.theme-toggle-label');
+        if (theme === 'light') {
+          if (icon) icon.textContent = '☀️';
+          if (label) label.textContent = 'Mode Terang';
+          btn.setAttribute('aria-pressed', 'true');
+        } else {
+          if (icon) icon.textContent = '🌙';
+          if (label) label.textContent = 'Mode Gelap';
+          btn.setAttribute('aria-pressed', 'false');
+        }
+      }
+    }
+
+    var saved = 'dark';
+    try { saved = localStorage.getItem(THEME_KEY) || 'dark'; } catch (e) {}
+    applyTheme(saved);
+
+    if (btn) {
+      btn.addEventListener('click', function(){
+        var current = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+        var next = current === 'light' ? 'dark' : 'light';
+        try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+        applyTheme(next);
+      });
+    }
+  })();
 </script>

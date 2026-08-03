@@ -28,7 +28,14 @@
       <a href="#" class="side-link active" data-tab-link="ringkasan"><span class="dot"></span>Ringkasan</a>
       <a href="#" class="side-link" data-tab-link="laporan"><span class="dot"></span>Laporan Masuk</a>
       <a href="#" class="side-link" data-tab-link="status-satuan"><span class="dot"></span>Status Seluruh Satuan</a>
+
+      <div class="side-nav-label" style="margin-top:10px;">Tampilan</div>
+      <button type="button" class="side-link theme-toggle-single" id="themeToggleBtn" aria-pressed="false">
+        <span class="theme-toggle-icon">🌙</span>
+        <span class="theme-toggle-label">Mode Gelap</span>
+      </button>
     </nav>
+
     <div class="side-foot">
       <div class="side-user">
         <div class="side-avatar"><?php echo e(strtoupper(substr($user->name,0,2))); ?></div>
@@ -128,19 +135,19 @@
               <?php if(($user->jabatan ?? '') === 'Komandan'): ?><th>Aksi</th><?php endif; ?>
               </tr></thead>
               <tbody>
-                <?php $__currentLoopData = $laporanMasuk; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $l): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                <tr>
+                <?php $__currentLoopData = $laporanMasuk; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i => $l): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <tr id="rowLaporan<?php echo e($i); ?>">
                   <td><?php echo e($l['satuan']); ?></td>
                   <td><?php echo e($l['perihal']); ?></td>
                   <td><?php echo e($l['diteruskan_oleh']); ?></td>
                   <td><?php echo e($l['tanggal']); ?></td>
                   <td><span class="status-dot <?php echo e($l['prioritas_class']); ?>"><?php echo e($l['prioritas']); ?></span></td>
-                  <td><span class="badge <?php echo e($l['status_class']); ?>"><?php echo e($l['status']); ?></span></td>
+                  <td id="statusLaporan<?php echo e($i); ?>"><span class="badge <?php echo e($l['status_class']); ?>"><?php echo e($l['status']); ?></span></td>
                   <?php if(($user->jabatan ?? '') === 'Komandan'): ?>
-                  <td>
+                  <td id="aksiLaporan<?php echo e($i); ?>">
                     <div class="btn-row">
-                      <button class="btn btn-primary btn-sm" type="button">Setujui</button>
-                      <button class="btn btn-ghost-red btn-sm" type="button">Tolak</button>
+                      <button class="btn btn-primary btn-sm" type="button" onclick="bukaKonfirmasiLaporan(<?php echo e($i); ?>, 'setuju', '<?php echo e(addslashes($l['satuan'])); ?>', '<?php echo e(addslashes($l['perihal'])); ?>')">Setujui</button>
+                      <button class="btn btn-ghost-red btn-sm" type="button" onclick="bukaKonfirmasiLaporan(<?php echo e($i); ?>, 'tolak', '<?php echo e(addslashes($l['satuan'])); ?>', '<?php echo e(addslashes($l['perihal'])); ?>')">Tolak</button>
                     </div>
                   </td>
                   <?php endif; ?>
@@ -183,6 +190,80 @@
 
     </div>
   </main>
+
+  
+  <div class="modal-overlay" id="modalKonfirmasiLaporan">
+    <div class="modal-box" style="max-width:480px;">
+      <div class="modal-head">
+        <div>
+          <h3 id="konfirmasiJudul">Konfirmasi</h3>
+          <p id="konfirmasiSub" style="margin:2px 0 0;font-size:12.5px;color:var(--text-muted);">-</p>
+        </div>
+        <button type="button" class="modal-close" onclick="tutupKonfirmasiLaporan()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-field full" style="margin-bottom:16px;">
+          <label for="konfirmasiCatatan">Catatan (opsional)</label>
+          <textarea id="konfirmasiCatatan" rows="3" placeholder="Tulis catatan terkait keputusan ini..."></textarea>
+        </div>
+        <div class="btn-row" style="justify-content:flex-end;">
+          <button type="button" class="btn" onclick="tutupKonfirmasiLaporan()">Batal</button>
+          <button type="button" class="btn btn-primary" id="konfirmasiBtnAksi" onclick="konfirmasiLaporanSubmit()">Konfirmasi</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let laporanAktif = null;
+
+    function bukaKonfirmasiLaporan(index, aksi, satuan, perihal){
+      laporanAktif = { index, aksi };
+      const judul = aksi === 'setuju' ? 'Setujui Laporan' : 'Tolak Laporan';
+      document.getElementById('konfirmasiJudul').textContent = judul;
+      document.getElementById('konfirmasiSub').textContent = satuan + ' \u2014 ' + perihal;
+      document.getElementById('konfirmasiCatatan').value = '';
+
+      const btnAksi = document.getElementById('konfirmasiBtnAksi');
+      btnAksi.textContent = aksi === 'setuju' ? 'Ya, Setujui' : 'Ya, Tolak';
+      btnAksi.className = aksi === 'setuju' ? 'btn btn-primary' : 'btn btn-ghost-red';
+
+      document.getElementById('modalKonfirmasiLaporan').classList.add('open');
+    }
+
+    function tutupKonfirmasiLaporan(){
+      document.getElementById('modalKonfirmasiLaporan').classList.remove('open');
+      laporanAktif = null;
+    }
+
+    function konfirmasiLaporanSubmit(){
+      if(!laporanAktif) return;
+      const { index, aksi } = laporanAktif;
+
+      const statusCell = document.getElementById('statusLaporan' + index);
+      const aksiCell = document.getElementById('aksiLaporan' + index);
+
+      if(aksi === 'setuju'){
+        statusCell.innerHTML = '<span class="badge green">Disetujui</span>';
+      } else {
+        statusCell.innerHTML = '<span class="badge red">Ditolak</span>';
+      }
+
+      if(aksiCell){
+        aksiCell.innerHTML = '<span style="font-size:11.5px;color:var(--text-dim);">Sudah diproses</span>';
+      }
+
+      // Catatan (jika ada) saat ini baru tersimpan sementara di sisi tampilan.
+      // Kalau nanti mau disimpan permanen ke database, tinggal kirim nilai
+      // document.getElementById('konfirmasiCatatan').value beserta index-nya ke route backend di sini.
+
+      tutupKonfirmasiLaporan();
+    }
+
+    document.getElementById('modalKonfirmasiLaporan').addEventListener('click', function(e){
+      if(e.target === this) tutupKonfirmasiLaporan();
+    });
+  </script>
 
   
   <div class="modal-overlay" id="modalDetailSatuan">
@@ -256,5 +337,4 @@
 </div>
 <?php echo $__env->make('siberad.dashboards.partials.dash-script', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </body>
-</html>
-<?php /**PATH D:\SEMESTER 6\KP PUSSIBERAD\KP_UNJANI_SI_2026\resources\views/siberad/dashboards/danpus.blade.php ENDPATH**/ ?>
+</html><?php /**PATH D:\SEMESTER 6\KP PUSSIBERAD\KP_UNJANI_SI_2026\resources\views/siberad/dashboards/danpus.blade.php ENDPATH**/ ?>
