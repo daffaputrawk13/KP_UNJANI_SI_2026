@@ -186,7 +186,7 @@
   .logo-text b{
     font-family:var(--display);font-weight:700;font-size:19px;letter-spacing:.03em;color:var(--text);
   }
-  .logo-text b span{color:var(--gold-bright);}
+  .logo-text b span{color:var(--gold-bright);font-size:1em;font-weight:700;}
   .logo-text small{
     font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;color:var(--text-dim);text-transform:uppercase;
   }
@@ -508,8 +508,8 @@
   .footer-brand-row{display:flex;align-items:center;gap:14px;margin-bottom:14px;}
   .footer-crest{width:44px;height:44px;border-radius:50%;overflow:hidden;border:1px solid var(--border-strong);flex-shrink:0;}
   .footer-crest img{width:100%;height:100%;object-fit:cover;}
-  .footer-brand b{font-family:var(--display);font-size:18px;letter-spacing:.02em;text-transform:uppercase;}
-  .footer-brand span{display:block;font-family:var(--mono);font-size:10.5px;color:var(--text-dim);letter-spacing:.08em;text-transform:uppercase;margin-top:2px;}
+  .footer-brand b{font-family:var(--display);font-size:21px;letter-spacing:.04em;text-transform:uppercase;line-height:1.2;}
+  .footer-brand > span{display:block;font-family:var(--mono);font-size:11px;color:var(--text-dim);letter-spacing:.1em;text-transform:uppercase;margin-top:5px;}
   .footer-desc{font-family:var(--body);font-size:13px;color:var(--text-muted);line-height:1.7;max-width:340px;}
   .footer-col-title{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--gold-bright);text-transform:uppercase;margin-bottom:16px;}
   .footer-links{list-style:none;display:flex;flex-direction:column;gap:11px;}
