@@ -56,7 +56,6 @@
     font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--gold-bright);
     text-transform:uppercase;display:flex;align-items:center;gap:9px;
   }
-  .eyebrow::before{content:"";width:18px;height:1px;background:var(--gold);display:inline-block;}
 
   .hud-panel{
     position:relative;background:linear-gradient(180deg, rgba(255,255,255,.02), transparent), var(--panel);
