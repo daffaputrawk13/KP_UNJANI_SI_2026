@@ -58,7 +58,6 @@
     </div>
 
     <div class="content">
-      <div class="notice"><b>Catatan:</b> Halaman ini adalah prototype tampilan peran DANPUS. Data di bawah masih contoh (mock) untuk keperluan demo alur kerja, mengikuti hasil rapat KP Pussiberad.</div>
 
       
       <section class="tab-panel active" data-tab-panel="ringkasan">
@@ -204,7 +203,6 @@
             </tbody>
           </table>
         </div>
-        <p style="margin-top:14px;font-size:12px;color:var(--text-muted);">Tampilan ini hanya untuk melihat (view only) — tidak ada tindakan yang dapat dilakukan dari sini.</p>
       </div>
     </div>
   </div>

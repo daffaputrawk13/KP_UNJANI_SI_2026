@@ -110,7 +110,7 @@
   /* ===== main ===== */
   .main{flex:1;min-width:0;}
   .topbar{
-    background:rgba(6,20,13,.82);backdrop-filter:blur(12px);border-bottom:1px solid var(--border-soft);padding:18px 32px;
+    background:rgba(6,20,13,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border-soft);padding:18px 32px;
     display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:30;gap:16px;
   }
   .menu-btn{display:none;background:transparent;border:1px solid var(--border);border-radius:8px;padding:8px 10px;cursor:pointer;color:var(--text);}
