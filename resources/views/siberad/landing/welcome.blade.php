@@ -424,6 +424,13 @@
     transition:transform .25s ease, box-shadow .25s ease;
   }
   .btn-top:hover{transform:translateY(-3px);}
+  .back-to-top-float{
+    position:fixed;right:24px;bottom:24px;z-index:70;
+    opacity:0;visibility:hidden;transform:translateY(12px);
+    transition:opacity .3s ease, transform .3s ease, visibility .3s ease;
+  }
+  .back-to-top-float.is-visible{opacity:1;visibility:visible;transform:translateY(0);}
+  @media (max-width:640px){ .back-to-top-float{right:16px;bottom:16px;} }
 
   /* ================= WORKFLOW ================= */
   .workflow{padding:90px 0;border-top:1px solid var(--border-soft);}
@@ -732,11 +739,6 @@
             <p>Data terjaga dengan sistem cadangan dan hak akses yang diatur sesuai kebutuhan pengguna.</p>
           </div>
         </div>
-        <div class="back-to-top-wrap" data-reveal>
-          <button class="btn-top" type="button" onclick="window.scrollTo({top:0, behavior:'smooth'});" aria-label="Kembali ke atas">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="6 11 12 5 18 11"></polyline></svg>
-          </button>
-        </div>
       </div>
     </section>
 
@@ -869,6 +871,10 @@
     </div>
   </footer>
 
+  <button id="backToTopFloat" class="back-to-top-float btn-top" type="button" onclick="window.scrollTo({top:0, behavior:'smooth'});" aria-label="Kembali ke atas">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="6 11 12 5 18 11"></polyline></svg>
+  </button>
+
 <script>
   // ---------- loader sequence (icon only) ----------
   const loader = document.getElementById('loader');
@@ -926,6 +932,15 @@
   function revealOnLoad(){
     document.querySelectorAll('.hero [data-reveal]').forEach(el=>el.classList.add('in'));
   }
+
+  // ---------- tombol back to top (muncul setelah scroll) ----------
+  const backToTopBtn = document.getElementById('backToTopFloat');
+  function toggleBackToTop(){
+    if(window.scrollY > 400){ backToTopBtn.classList.add('is-visible'); }
+    else { backToTopBtn.classList.remove('is-visible'); }
+  }
+  window.addEventListener('scroll', toggleBackToTop, {passive:true});
+  toggleBackToTop();
 
 </script>
 </body>
