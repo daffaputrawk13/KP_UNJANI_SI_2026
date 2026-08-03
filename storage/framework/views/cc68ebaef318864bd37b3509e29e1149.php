@@ -1,5 +1,5 @@
-{{-- resources/views/welcome.blade.php --}}
-{{-- Halaman landing SIBERAD — Sistem Informasi Berbasis Elektronik Angkatan Darat (PUSSIBERAD) --}}
+
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SIBERAD — Sistem Informasi Berbasis Elektronik Angkatan Darat | PUSSIBERAD</title>
 <meta name="description" content="SIBERAD — Sistem Informasi Berbasis Elektronik Angkatan Darat. Platform pelaporan dan monitoring resmi Pusat Siber Angkatan Darat (PUSSIBERAD).">
-<link rel="icon" type="image/jpeg" href="{{ asset('images/logo-pussiberad.jpg') }}">
+<link rel="icon" type="image/jpeg" href="<?php echo e(asset('images/logo-pussiberad.jpg')); ?>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -284,7 +284,7 @@
     background-image:
       linear-gradient(115deg, rgba(4,16,10,.97) 0%, rgba(4,16,10,.93) 32%, rgba(4,16,10,.72) 58%, rgba(4,16,10,.9) 100%),
       linear-gradient(to top, rgba(4,16,10,1) 0%, rgba(4,16,10,0) 26%),
-      url('{{ asset('images/hero-lapangan-mabesad.jpg') }}');
+      url('<?php echo e(asset('images/hero-lapangan-mabesad.jpg')); ?>');
     background-size:cover;
     background-position:center 58%;
     background-repeat:no-repeat;
@@ -546,7 +546,7 @@
           <circle class="ring-arc" cx="74" cy="74" r="65"></circle>
         </svg>
       </div>
-      <div class="mark-plate"><img src="{{ asset('images/logo-pussiberad.jpg') }}" alt="Lambang Pussiberad"></div>
+      <div class="mark-plate"><img src="<?php echo e(asset('images/logo-pussiberad.jpg')); ?>" alt="Lambang Pussiberad"></div>
     </div>
     <div class="loader-caption">Memverifikasi Sistem&hellip;</div>
   </div>
@@ -556,7 +556,7 @@
     <div class="wrap">
       <nav>
         <a class="logo" href="#tentang">
-          <span class="logo-badge"><img src="{{ asset('images/logo-pussiberad.jpg') }}" alt="Lambang Pussiberad"></span>
+          <span class="logo-badge"><img src="<?php echo e(asset('images/logo-pussiberad.jpg')); ?>" alt="Lambang Pussiberad"></span>
           <span class="logo-text"><b>SIBER<span>AD</span></b><small>Pussiberad &middot; TNI AD</small></span>
         </a>
         <ul class="nav-links">
@@ -580,43 +580,65 @@
   <div class="login-overlay" id="loginOverlay">
     <div class="login-card hud-panel" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
       <button class="login-close" id="loginClose" type="button" aria-label="Tutup">&times;</button>
-      <div class="login-crest"><img src="{{ asset('images/logo-pussiberad.jpg') }}" alt="Lambang Pussiberad"></div>
+      <div class="login-crest"><img src="<?php echo e(asset('images/logo-pussiberad.jpg')); ?>" alt="Lambang Pussiberad"></div>
       <div class="eyebrow">SIBERAD // AUTENTIKASI</div>
       <h3 id="loginTitle" class="login-title">Login Sistem</h3>
       <p class="login-sub">Masuk menggunakan akun personel yang terdaftar.</p>
-      <form class="login-form" id="loginForm" method="POST" action="{{ route('login') }}">
-        @csrf
+      <form class="login-form" id="loginForm" method="POST" action="<?php echo e(route('login')); ?>">
+        <?php echo csrf_field(); ?>
         <label class="login-label" for="loginSatuan">Login sebagai</label>
         <select class="login-input" id="loginSatuan" name="satuan_id" required>
-          <option value="" disabled {{ old('satuan_id') ? '' : 'selected' }}>— Pilih satuan —</option>
-          @foreach (($satuans ?? []) as $kategori => $group)
-            <optgroup label="{{ match($kategori) {
+          <option value="" disabled <?php echo e(old('satuan_id') ? '' : 'selected'); ?>>— Pilih satuan —</option>
+          <?php $__currentLoopData = ($satuans ?? []); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $kategori => $group): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <optgroup label="<?php echo e(match($kategori) {
               'satlak' => 'Satuan Pelaksana (Satlak)',
               'direktorat' => 'Direktorat (DIR)',
               'pimpinan' => 'Koordinasi & Pimpinan',
               default => ucfirst($kategori),
-            } }}">
-              @foreach ($group as $satuan)
-                <option value="{{ $satuan->id }}" {{ (string) old('satuan_id') === (string) $satuan->id ? 'selected' : '' }}>
-                  {{ $satuan->nama }}
+            }); ?>">
+              <?php $__currentLoopData = $group; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $satuan): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <option value="<?php echo e($satuan->id); ?>" <?php echo e((string) old('satuan_id') === (string) $satuan->id ? 'selected' : ''); ?>>
+                  <?php echo e($satuan->nama); ?>
+
                 </option>
-              @endforeach
+              <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </optgroup>
-          @endforeach
+          <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </select>
-        @error('satuan_id')
-          <span class="login-error">{{ $message }}</span>
-        @enderror
+        <?php $__errorArgs = ['satuan_id'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+          <span class="login-error"><?php echo e($message); ?></span>
+        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
         <label class="login-label" for="loginUser">NIP / Username</label>
-        <input class="login-input" id="loginUser" name="username" type="text" value="{{ old('username') }}" autocomplete="username" required>
-        @error('username')
-          <span class="login-error">{{ $message }}</span>
-        @enderror
+        <input class="login-input" id="loginUser" name="username" type="text" value="<?php echo e(old('username')); ?>" autocomplete="username" required>
+        <?php $__errorArgs = ['username'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+          <span class="login-error"><?php echo e($message); ?></span>
+        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
         <label class="login-label" for="loginPass">Password</label>
         <input class="login-input" id="loginPass" name="password" type="password" autocomplete="current-password" required>
-        @error('password')
-          <span class="login-error">{{ $message }}</span>
-        @enderror
+        <?php $__errorArgs = ['password'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+          <span class="login-error"><?php echo e($message); ?></span>
+        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
         <button class="btn btn-primary login-submit" type="submit">Masuk</button>
       </form>
       <div class="login-foot">
@@ -644,6 +666,7 @@
             <span class="pill"><span class="dot"></span>4 Satuan Pelaksana</span>
             <span class="pill"><span class="dot"></span>Monitoring 24/7</span>
           </div>
+          <div class="hero-motto">Satria &middot; Yudha &middot; Waskita</div>
         </div>
         <div data-reveal>
           <div class="hero-crest">
@@ -656,7 +679,7 @@
                     <circle class="ring-arc" cx="74" cy="74" r="65"></circle>
                   </svg>
                 </div>
-                <div class="mark-plate"><img src="{{ asset('images/logo-pussiberad.jpg') }}" alt="Lambang Pussiberad"></div>
+                <div class="mark-plate"><img src="<?php echo e(asset('images/logo-pussiberad.jpg')); ?>" alt="Lambang Pussiberad"></div>
               </div>
             </div>
             <div class="hero-crest-caption">Pusat Siber Angkatan Darat<br><b>&ldquo;Satria Yudha Waskita&rdquo;</b></div>
@@ -689,6 +712,22 @@
       </div>
     </section>
     </div>
+
+    <!-- ================= PROBLEM ================= -->
+    <section class="problem">
+      <div class="wrap problem-grid">
+        <div data-reveal>
+          <div class="eyebrow">Latar Belakang</div>
+          <p class="problem-quote" style="margin-top:16px;">Rekap manual lintas satuan memperlambat pengambilan keputusan dan rawan kehilangan data di lapangan.</p>
+        </div>
+        <ul class="problem-list" data-reveal>
+          <li><span><strong>Terfragmentasi</strong> — laporan tersebar di banyak format dan saluran berbeda antar satuan pelaksana.</span></li>
+          <li><span><strong>Lambat terverifikasi</strong> — proses persetujuan berjenjang memakan waktu karena masih manual.</span></li>
+          <li><span><strong>Minim visibilitas</strong> — pimpinan tidak dapat memantau status pekerjaan secara real-time.</span></li>
+          <li><span><strong>Risiko keamanan data</strong> — dokumen pendukung tersebar tanpa kontrol akses yang jelas.</span></li>
+        </ul>
+      </div>
+    </section>
 
     <!-- ================= FEATURES ================= -->
     <section class="features" id="fitur">
@@ -760,7 +799,7 @@
       <div class="wrap">
         <div class="about-top" data-reveal>
           <div class="about-crest">
-            <img src="{{ asset('images/logo-pussiberad.jpg') }}" alt="Lambang Pussiberad">
+            <img src="<?php echo e(asset('images/logo-pussiberad.jpg')); ?>" alt="Lambang Pussiberad">
           </div>
           <div>
             <div class="eyebrow">Tentang</div>
@@ -824,7 +863,7 @@
       <div class="footer-grid">
         <div>
           <div class="footer-brand-row">
-            <span class="footer-crest"><img src="{{ asset('images/logo-pussiberad.jpg') }}" alt="Lambang Pussiberad"></span>
+            <span class="footer-crest"><img src="<?php echo e(asset('images/logo-pussiberad.jpg')); ?>" alt="Lambang Pussiberad"></span>
             <div class="footer-brand">
               <b>SIBER<span style="color:var(--gold-bright);">AD</span></b>
               <span>Pusat Siber Angkatan Darat</span>
@@ -910,9 +949,9 @@
   document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeLogin(); });
   // form login dikirim langsung via POST ke route('login') — tanpa intercept JS
 
-  @if ($errors->any())
+  <?php if($errors->any()): ?>
     openLogin();
-  @endif
+  <?php endif; ?>
 
   // ---------- scroll reveal ----------
   const revealEls = document.querySelectorAll('[data-reveal]');
@@ -930,3 +969,4 @@
 </script>
 </body>
 </html>
+<?php /**PATH D:\SEMESTER 6\KP PUSSIBERAD\SISTEM SIMULASI\SISTEM V1\SISTEM_SIBERAD\SISTEM\resources\views/siberad/landing/welcome.blade.php ENDPATH**/ ?>
