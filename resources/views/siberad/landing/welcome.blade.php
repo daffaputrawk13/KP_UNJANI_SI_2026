@@ -826,7 +826,7 @@
           <div class="footer-brand-row">
             <span class="footer-crest"><img src="{{ asset('images/logo-pussiberad.jpg') }}" alt="Lambang Pussiberad"></span>
             <div class="footer-brand">
-              <b>SIBER<span style="color:var(--gold-bright);">AD</span></b>
+              <b>SIBER<span style="display:inline;color:var(--gold-bright);">AD</span></b>
               <span>Pusat Siber Angkatan Darat</span>
             </div>
           </div>

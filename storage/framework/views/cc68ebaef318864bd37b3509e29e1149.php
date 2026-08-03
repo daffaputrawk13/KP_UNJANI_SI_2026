@@ -666,7 +666,6 @@ unset($__errorArgs, $__bag); ?>
             <span class="pill"><span class="dot"></span>4 Satuan Pelaksana</span>
             <span class="pill"><span class="dot"></span>Monitoring 24/7</span>
           </div>
-          <div class="hero-motto">Satria &middot; Yudha &middot; Waskita</div>
         </div>
         <div data-reveal>
           <div class="hero-crest">
@@ -712,22 +711,6 @@ unset($__errorArgs, $__bag); ?>
       </div>
     </section>
     </div>
-
-    <!-- ================= PROBLEM ================= -->
-    <section class="problem">
-      <div class="wrap problem-grid">
-        <div data-reveal>
-          <div class="eyebrow">Latar Belakang</div>
-          <p class="problem-quote" style="margin-top:16px;">Rekap manual lintas satuan memperlambat pengambilan keputusan dan rawan kehilangan data di lapangan.</p>
-        </div>
-        <ul class="problem-list" data-reveal>
-          <li><span><strong>Terfragmentasi</strong> — laporan tersebar di banyak format dan saluran berbeda antar satuan pelaksana.</span></li>
-          <li><span><strong>Lambat terverifikasi</strong> — proses persetujuan berjenjang memakan waktu karena masih manual.</span></li>
-          <li><span><strong>Minim visibilitas</strong> — pimpinan tidak dapat memantau status pekerjaan secara real-time.</span></li>
-          <li><span><strong>Risiko keamanan data</strong> — dokumen pendukung tersebar tanpa kontrol akses yang jelas.</span></li>
-        </ul>
-      </div>
-    </section>
 
     <!-- ================= FEATURES ================= -->
     <section class="features" id="fitur">
