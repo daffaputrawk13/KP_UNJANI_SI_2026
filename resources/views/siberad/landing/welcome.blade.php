@@ -243,7 +243,7 @@
     transition:color .2s ease;
     position:relative;
   }
-  .nav-links a:hover, .nav-links a:focus-visible{color:var(--gold-bright);}
+  .nav-links a:hover, .nav-links a:focus-visible, .nav-links a.active{color:var(--gold-bright);}
 
   .btn-restricted{
     font-family:var(--mono);font-size:11px;letter-spacing:.06em;
@@ -278,6 +278,10 @@
   }
   .btn-theme:hover{border-color:var(--gold);color:var(--gold-bright);transform:translateY(-2px);}
   .btn-theme svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;}
+  .btn-theme .icon-sun circle{fill:var(--gold-dim);transition:fill .2s ease;}
+  .btn-theme .icon-moon path{fill:var(--gold-dim);transition:fill .2s ease;}
+  .btn-theme:hover .icon-sun circle{fill:var(--gold);}
+  .btn-theme:hover .icon-moon path{fill:var(--gold);}
   .btn-theme .icon-sun{display:none;}
   html[data-theme="light"] .btn-theme .icon-sun{display:block;}
   html[data-theme="light"] .btn-theme .icon-moon{display:none;}
@@ -1035,6 +1039,32 @@
   function revealOnLoad(){
     document.querySelectorAll('.hero [data-reveal]').forEach(el=>el.classList.add('in'));
   }
+
+  // ---------- nav aktif mengikuti section (scrollspy) ----------
+  const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+  const navSectionMap = new Map();
+  navLinks.forEach(link => {
+    const target = document.querySelector(link.getAttribute('href'));
+    if (target) navSectionMap.set(target, link);
+  });
+
+  function setActiveNavLink(activeLink) {
+    navLinks.forEach(a => a.classList.remove('active'));
+    if (activeLink) activeLink.classList.add('active');
+  }
+
+  const navSpyObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) setActiveNavLink(navSectionMap.get(entry.target));
+    });
+  }, { rootMargin: '-40% 0px -55% 0px', threshold: 0 });
+
+  navSectionMap.forEach((link, section) => navSpyObserver.observe(section));
+
+  // set aktif langsung saat diklik (biar kerasa instan sebelum animasi scroll selesai)
+  navLinks.forEach(link => {
+    link.addEventListener('click', () => setActiveNavLink(link));
+  });
 
   // ---------- tombol back to top (muncul setelah scroll) ----------
   const backToTopBtn = document.getElementById('backToTopFloat');

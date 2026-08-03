@@ -54,11 +54,16 @@
           <div class="topbar-sub">Satlakal (Penangkalan) &middot; Pemantauan & pemulihan website/aset digital</div>
         </div>
       </div>
+      <div class="topbar-actions">
+        <button type="button" class="btn-icon-toggle" id="themeToggleBtn" aria-pressed="false" aria-label="Ganti tema">
+          <svg class="icon-moon" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"></path></svg>
+          <svg class="icon-sun" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"></circle><path d="M12 2.5v2.4M12 19.1v2.4M4.4 4.4l1.7 1.7M17.9 17.9l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.4 19.6l1.7-1.7M17.9 6.1l1.7-1.7"></path></svg>
+        </button>
       <span class="badge">Satlak</span>
+      </div>
     </div>
 
     <div class="content">
-      <div class="notice"><b>Catatan:</b> Halaman ini adalah prototype tampilan peran Satlakal (Penangkalan). Sesuai rapat KP Pussiberad, tugas satuan ini adalah <b>memantau</b> dan <b>memulihkan</b> website yang terserang.</div>
 
       
       <section class="tab-panel active" data-tab-panel="ringkasan">
@@ -247,5 +252,4 @@
 </div>
 <?php echo $__env->make('siberad.dashboards.partials.dash-script', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </body>
-</html>
-<?php /**PATH D:\SEMESTER 6\KP PUSSIBERAD\KP_UNJANI_SI_2026\resources\views/siberad/dashboards/satlakal.blade.php ENDPATH**/ ?>
+</html><?php /**PATH D:\SEMESTER 6\KP PUSSIBERAD\KP_UNJANI_SI_2026\resources\views/siberad/dashboards/satlakal.blade.php ENDPATH**/ ?>

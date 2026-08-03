@@ -12,6 +12,13 @@ Route::get('/', function () {
     return view('siberad.landing.welcome', ['satuans' => $satuans]);
 });
 
+// Form login berada di landing page (modal), bukan halaman tersendiri.
+// Route GET ini mencegah error 405 kalau ada yang membuka /login langsung
+// atau saat middleware auth mengarahkan pengguna yang belum login ke sini.
+Route::get('/login', function () {
+    return redirect('/');
+});
+
 Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login');
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 

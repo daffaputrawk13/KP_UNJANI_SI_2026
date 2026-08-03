@@ -19,31 +19,14 @@
       <img src="<?php echo e(asset('images/logo-pussiberad.jpg')); ?>" alt="Lambang Pussiberad">
       <div class="logo">SIBER<span>AD</span></div>
     </div>
-    <div class="side-unit">
-      <div class="eyebrow">Login sebagai</div>
-      <div class="name">DANPUS — Komandan Pussiberad</div>
-    </div>
     <nav class="side-nav">
       <div class="side-nav-label">Menu</div>
       <a href="#" class="side-link active" data-tab-link="ringkasan"><span class="dot"></span>Ringkasan</a>
       <a href="#" class="side-link" data-tab-link="laporan"><span class="dot"></span>Laporan Masuk</a>
       <a href="#" class="side-link" data-tab-link="status-satuan"><span class="dot"></span>Status Seluruh Satuan</a>
-
-      <div class="side-nav-label" style="margin-top:10px;">Tampilan</div>
-      <button type="button" class="side-link theme-toggle-single" id="themeToggleBtn" aria-pressed="false">
-        <span class="theme-toggle-icon">🌙</span>
-        <span class="theme-toggle-label">Mode Gelap</span>
-      </button>
     </nav>
 
     <div class="side-foot">
-      <div class="side-user">
-        <div class="side-avatar"><?php echo e(strtoupper(substr($user->name,0,2))); ?></div>
-        <div>
-          <div class="n"><?php echo e($user->name); ?></div>
-          <div class="j"><?php echo e($user->jabatan ?? '-'); ?></div>
-        </div>
-      </div>
       <form class="logout" method="POST" action="<?php echo e(route('logout')); ?>">
         <?php echo csrf_field(); ?>
         <button type="submit">Keluar</button>
@@ -58,10 +41,14 @@
         <button class="menu-btn" id="menuBtn">☰</button>
         <div>
           <div class="topbar-title">Selamat datang, <?php echo e($user->name); ?></div>
-          <div class="topbar-sub">DANPUS &middot; Penerima laporan tertinggi dari seluruh satuan Pussiberad</div>
         </div>
       </div>
-      <span class="badge">Pimpinan</span>
+      <div class="topbar-actions">
+        <button type="button" class="btn-icon-toggle" id="themeToggleBtn" aria-pressed="false" aria-label="Ganti tema">
+          <svg class="icon-moon" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"></path></svg>
+          <svg class="icon-sun" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"></circle><path d="M12 2.5v2.4M12 19.1v2.4M4.4 4.4l1.7 1.7M17.9 17.9l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.4 19.6l1.7-1.7M17.9 6.1l1.7-1.7"></path></svg>
+        </button>
+      </div>
     </div>
 
     <div class="content">
@@ -166,7 +153,7 @@
           <p>Pemantauan kondisi setiap Satlak dan Direktorat di bawah Pussiberad.</p>
         </div>
         <div class="panel">
-          <div class="tbl-wrap">
+          <div class="tbl-wrap" data-row-limit="5">
             <table class="dtbl">
               <thead><tr><th>Kode</th><th>Nama Satuan</th><th>Kategori</th><th>Status</th><th>Update Terakhir</th><th>Detail</th></tr></thead>
               <tbody>

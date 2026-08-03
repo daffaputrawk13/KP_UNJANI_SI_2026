@@ -32,7 +32,7 @@ class SatuanSeeder extends Seeder
             // --- Koordinasi / Pimpinan ---
             ['kode' => 'SDIR',   'nama' => 'SDIR (Sekretaris Direktorat)',  'kategori' => Satuan::KATEGORI_PIMPINAN, 'deskripsi' => 'Koordinasi antar Satlak, pelaporan ke DANPUS.', 'urutan' => 90],
             ['kode' => 'WADAN',  'nama' => 'WADAN (Wakil Komandan)',       'kategori' => Satuan::KATEGORI_PIMPINAN, 'deskripsi' => 'Penerima laporan dari SDIR/Satlak.',            'urutan' => 100],
-            ['kode' => 'DANPUS', 'nama' => 'DANPUS (Komandan Pussiberad)', 'kategori' => Satuan::KATEGORI_PIMPINAN, 'deskripsi' => 'Penerima laporan tertinggi dari seluruh satuan.', 'urutan' => 110],
+            ['kode' => 'DANPUS', 'nama' => 'DANPUS', 'kategori' => Satuan::KATEGORI_PIMPINAN, 'deskripsi' => 'Penerima laporan tertinggi dari seluruh satuan.', 'urutan' => 110],
         ];
 
         foreach ($satuans as $data) {
