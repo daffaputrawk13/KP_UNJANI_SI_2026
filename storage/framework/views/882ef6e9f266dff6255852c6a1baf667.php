@@ -308,7 +308,7 @@
     color:var(--text-muted);cursor:pointer;
   }
   .login-close:hover{color:var(--gold-bright);}
-  .login-crest{width:64px;height:64px;border-radius:50%;overflow:hidden;border:1px solid var(--border-strong);margin:0 auto 16px;}
+  .login-crest{width:84px;height:84px;border-radius:50%;overflow:hidden;border:1px solid var(--border-strong);margin:0 auto 16px;}
   .login-crest img{width:100%;height:100%;object-fit:cover;}
   .login-title{font-family:var(--display);font-size:26px;font-weight:700;margin-top:6px;letter-spacing:.01em;}
   .login-sub{color:var(--text-muted);font-size:13px;margin-top:8px;line-height:1.6;}
@@ -702,35 +702,6 @@
       <p class="login-sub">Masuk menggunakan akun personel yang terdaftar.</p>
       <form class="login-form" id="loginForm" method="POST" action="<?php echo e(route('login')); ?>">
         <?php echo csrf_field(); ?>
-        <label class="login-label" for="loginSatuan">Login sebagai</label>
-        <select class="login-input" id="loginSatuan" name="satuan_id" required>
-          <option value="" disabled <?php echo e(old('satuan_id') ? '' : 'selected'); ?>>— Pilih satuan —</option>
-          <?php $__currentLoopData = ($satuans ?? []); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $kategori => $group): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-            <optgroup label="<?php echo e(match($kategori) {
-              'satlak' => 'Satuan Pelaksana (Satlak)',
-              'direktorat' => 'Direktorat (DIR)',
-              'pimpinan' => 'Koordinasi & Pimpinan',
-              default => ucfirst($kategori),
-            }); ?>">
-              <?php $__currentLoopData = $group; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $satuan): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                <option value="<?php echo e($satuan->id); ?>" <?php echo e((string) old('satuan_id') === (string) $satuan->id ? 'selected' : ''); ?>>
-                  <?php echo e($satuan->nama); ?>
-
-                </option>
-              <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-            </optgroup>
-          <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-        </select>
-        <?php $__errorArgs = ['satuan_id'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?>
-          <span class="login-error"><?php echo e($message); ?></span>
-        <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>
         <label class="login-label" for="loginUser">NIP / Username</label>
         <input class="login-input" id="loginUser" name="username" type="text" value="<?php echo e(old('username')); ?>" autocomplete="username" required>
         <?php $__errorArgs = ['username'];

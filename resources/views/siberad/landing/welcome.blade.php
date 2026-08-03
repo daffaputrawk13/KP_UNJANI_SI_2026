@@ -308,7 +308,7 @@
     color:var(--text-muted);cursor:pointer;
   }
   .login-close:hover{color:var(--gold-bright);}
-  .login-crest{width:64px;height:64px;border-radius:50%;overflow:hidden;border:1px solid var(--border-strong);margin:0 auto 16px;}
+  .login-crest{width:84px;height:84px;border-radius:50%;overflow:hidden;border:1px solid var(--border-strong);margin:0 auto 16px;}
   .login-crest img{width:100%;height:100%;object-fit:cover;}
   .login-title{font-family:var(--display);font-size:26px;font-weight:700;margin-top:6px;letter-spacing:.01em;}
   .login-sub{color:var(--text-muted);font-size:13px;margin-top:8px;line-height:1.6;}
@@ -702,27 +702,6 @@
       <p class="login-sub">Masuk menggunakan akun personel yang terdaftar.</p>
       <form class="login-form" id="loginForm" method="POST" action="{{ route('login') }}">
         @csrf
-        <label class="login-label" for="loginSatuan">Login sebagai</label>
-        <select class="login-input" id="loginSatuan" name="satuan_id" required>
-          <option value="" disabled {{ old('satuan_id') ? '' : 'selected' }}>— Pilih satuan —</option>
-          @foreach (($satuans ?? []) as $kategori => $group)
-            <optgroup label="{{ match($kategori) {
-              'satlak' => 'Satuan Pelaksana (Satlak)',
-              'direktorat' => 'Direktorat (DIR)',
-              'pimpinan' => 'Koordinasi & Pimpinan',
-              default => ucfirst($kategori),
-            } }}">
-              @foreach ($group as $satuan)
-                <option value="{{ $satuan->id }}" {{ (string) old('satuan_id') === (string) $satuan->id ? 'selected' : '' }}>
-                  {{ $satuan->nama }}
-                </option>
-              @endforeach
-            </optgroup>
-          @endforeach
-        </select>
-        @error('satuan_id')
-          <span class="login-error">{{ $message }}</span>
-        @enderror
         <label class="login-label" for="loginUser">NIP / Username</label>
         <input class="login-input" id="loginUser" name="username" type="text" value="{{ old('username') }}" autocomplete="username" required>
         @error('username')
