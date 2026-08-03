@@ -1,0 +1,51 @@
+name: Laravel CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout kode
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, dom, fileinfo, mysql, sqlite3
+          coverage: none
+
+      - name: Copy .env
+        run: cp .env.example .env
+
+      - name: Install dependency Composer
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Generate application key
+        run: php artisan key:generate
+
+      - name: Siapkan database SQLite untuk testing
+        run: |
+          mkdir -p database
+          touch database/database.sqlite
+
+      - name: Jalankan migration
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
+        run: php artisan migrate --force
+
+      - name: Set permission folder storage & cache
+        run: chmod -R 777 storage bootstrap/cache
+
+      - name: Jalankan test
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
+        run: php artisan test
