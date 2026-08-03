@@ -15,10 +15,6 @@
       <img src="{{ asset('images/logo-pussiberad.jpg') }}" alt="Lambang Pussiberad">
       <div class="logo">SIBER<span>AD</span></div>
     </div>
-    <div class="side-unit">
-      <div class="eyebrow">Login sebagai</div>
-      <div class="name">Satlakal (Penangkalan)</div>
-    </div>
     <nav class="side-nav">
       <div class="side-nav-label">Menu</div>
       <a href="#" class="side-link active" data-tab-link="ringkasan"><span class="dot"></span>Ringkasan</a>
@@ -31,13 +27,6 @@
       @endif
     </nav>
     <div class="side-foot">
-      <div class="side-user">
-        <div class="side-avatar">{{ strtoupper(substr($user->name,0,2)) }}</div>
-        <div>
-          <div class="n">{{ $user->name }}</div>
-          <div class="j">{{ $user->jabatan ?? '-' }}</div>
-        </div>
-      </div>
       <form class="logout" method="POST" action="{{ route('logout') }}">
         @csrf
         <button type="submit">Keluar</button>
@@ -51,7 +40,6 @@
         <button class="menu-btn" id="menuBtn">☰</button>
         <div>
           <div class="topbar-title">Selamat datang, {{ $user->name }}</div>
-          <div class="topbar-sub">Satlakal (Penangkalan) &middot; Pemantauan & pemulihan website/aset digital</div>
         </div>
       </div>
       <div class="topbar-actions">
@@ -59,7 +47,6 @@
           <svg class="icon-moon" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"></path></svg>
           <svg class="icon-sun" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"></circle><path d="M12 2.5v2.4M12 19.1v2.4M4.4 4.4l1.7 1.7M17.9 17.9l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.4 19.6l1.7-1.7M17.9 6.1l1.7-1.7"></path></svg>
         </button>
-      <span class="badge">Satlak</span>
       </div>
     </div>
 
