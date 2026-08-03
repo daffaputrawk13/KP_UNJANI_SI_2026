@@ -765,20 +765,6 @@ unset($__errorArgs, $__bag); ?>
     </section>
 
 
-    <!-- ================= TRUST / SECURITY STRIP ================= -->
-    <section class="stack">
-      <div class="wrap">
-        <div class="stack-label" data-reveal>Standar Keamanan &amp; Kontrol Akses</div>
-        <div class="stack-row" data-reveal>
-          <span class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Autentikasi Personel</span>
-          <span class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 3v6c0 5-3.4 8.4-8 11-4.6-2.6-8-6-8-11V5l8-3z"/></svg>Enkripsi Data</span>
-          <span class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Hak Akses Berjenjang</span>
-          <span class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>Audit &amp; Log Aktivitas</span>
-          <span class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/></svg>Cadangan Data Berkala</span>
-        </div>
-      </div>
-    </section>
-
     <!-- ================= TENTANG PUSSIBERAD ================= -->
     <section class="about" id="tentang-pussiberad">
       <div class="wrap">
@@ -873,7 +859,6 @@ unset($__errorArgs, $__bag); ?>
             <li><a href="https://x.com/tni_ad" target="_blank" rel="noopener noreferrer"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.9 3H22l-7.5 8.6L23 21h-6.6l-5.2-6.6L5.2 21H2l8.1-9.3L2 3h6.7l4.7 6 5.5-6z"/></svg>X (Twitter) @tni_ad</a></li>
             <li><a href="https://web.facebook.com/TNIAngkatanDarat" target="_blank" rel="noopener noreferrer"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 21v-8h2.7l.4-3.1h-3.1V8c0-.9.3-1.5 1.6-1.5h1.7V3.7C16.5 3.6 15.6 3.5 14.6 3.5c-2.4 0-4 1.5-4 4.1v2.3H7.9V13h2.7v8h2.9z"/></svg>Facebook TNI Angkatan Darat</a></li>
             <li><a href="https://id.wikipedia.org/wiki/Pusat_Sandi_dan_Siber_Angkatan_Darat" target="_blank" rel="noopener noreferrer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 3.8 5.7 3.8 9s-1.3 6.5-3.8 9c-2.5-2.5-3.8-5.7-3.8-9s1.3-6.5 3.8-9z"/></svg>Profil Resmi</a></li>
-            <li><a href="#login">Login Personel</a></li>
           </ul>
         </div>
         <div>
