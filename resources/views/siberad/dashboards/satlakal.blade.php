@@ -25,6 +25,7 @@
       @else
       <a href="#" class="side-link" data-tab-link="lapor"><span class="dot"></span>Verifikasi Laporan</a>
       @endif
+      <a href="#" class="side-link" data-tab-link="danpus"><span class="dot"></span>Lapor ke DANPUS</a>
     </nav>
     <div class="side-foot">
       <form class="logout" method="POST" action="{{ route('logout') }}">
@@ -244,6 +245,122 @@
         </div>
 
       </section>
+
+      {{-- ===== LAPOR LANGSUNG KE DANPUS ===== --}}
+      <section class="tab-panel" data-tab-panel="danpus">
+        <div class="section-head">
+          <h2>Lapor ke DANPUS</h2>
+          <p>Laporan insiden yang dikirim langsung ke DANPUS, lengkap dengan lampiran bukti dalam format PDF.</p>
+        </div>
+        <div class="panel">
+          <form class="form-grid" id="formDanpus" novalidate>
+            <div class="form-field">
+              <label for="asetDanpus">Aset / Website Terdampak</label>
+              <select id="asetDanpus" required>
+                @foreach($asetMonitoring as $a)
+                  <option>{{ $a['nama'] }}</option>
+                @endforeach
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="prioritasDanpus">Prioritas</label>
+              <select id="prioritasDanpus" required>
+                <option>Tinggi</option><option>Sedang</option><option>Rendah</option>
+              </select>
+            </div>
+            <div class="form-field full">
+              <label for="perihalDanpus">Perihal</label>
+              <input id="perihalDanpus" type="text" placeholder="Contoh: Website diserang DDoS" required>
+            </div>
+            <div class="form-field full">
+              <label for="deskripsiDanpus">Deskripsi Kejadian</label>
+              <textarea id="deskripsiDanpus" rows="4" placeholder="Jelaskan kronologi dan dampak insiden..." required></textarea>
+            </div>
+            <div class="form-field full">
+              <label for="lampiranDanpus">Lampiran (bukti / dokumentasi)</label>
+              <input id="lampiranDanpus" type="file" accept="application/pdf,.pdf">
+              <span class="form-hint">Format PDF, maksimal 20 MB, dikirim langsung ke DANPUS.</span>
+              <span class="form-hint" id="lampiranDanpusInfo" style="display:none;"></span>
+              <span class="form-hint" id="lampiranDanpusError" style="display:none;color:var(--red);"></span>
+            </div>
+            <div class="form-field full">
+              <button class="btn btn-primary" type="submit">Kirim Laporan ke DANPUS</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <script>
+      (function () {
+        var MAX_SIZE_MB = 20;
+        var MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
+
+        var form = document.getElementById('formDanpus');
+        var fileInput = document.getElementById('lampiranDanpus');
+        var infoEl = document.getElementById('lampiranDanpusInfo');
+        var errorEl = document.getElementById('lampiranDanpusError');
+
+        if (!form || !fileInput) return;
+
+        function resetFileMessages() {
+          infoEl.style.display = 'none';
+          infoEl.textContent = '';
+          errorEl.style.display = 'none';
+          errorEl.textContent = '';
+        }
+
+        function formatSize(bytes) {
+          return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+        }
+
+        function validateFile() {
+          resetFileMessages();
+
+          var file = fileInput.files && fileInput.files[0];
+          if (!file) return null;
+
+          var isPdfType = file.type === 'application/pdf';
+          var isPdfExt = /\.pdf$/i.test(file.name);
+
+          if (!isPdfType && !isPdfExt) {
+            errorEl.textContent = 'File "' + file.name + '" ditolak: hanya format PDF yang diperbolehkan.';
+            errorEl.style.display = 'block';
+            fileInput.value = '';
+            return null;
+          }
+
+          if (file.size > MAX_SIZE_BYTES) {
+            errorEl.textContent = 'File "' + file.name + '" (' + formatSize(file.size) + ') melebihi batas maksimal ' + MAX_SIZE_MB + ' MB.';
+            errorEl.style.display = 'block';
+            fileInput.value = '';
+            return null;
+          }
+
+          infoEl.textContent = 'Lampiran dipilih: ' + file.name + ' (' + formatSize(file.size) + ')';
+          infoEl.style.display = 'block';
+          return file;
+        }
+
+        fileInput.addEventListener('change', validateFile);
+
+        form.addEventListener('submit', function (e) {
+          e.preventDefault();
+
+          if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+          }
+
+          var file = validateFile();
+          if (fileInput.files.length > 0 && !file) {
+            // File dipilih tapi tidak lolos validasi
+            return;
+          }
+
+          alert('Prototype — form ini belum tersambung ke database. ' + (file ? 'Lampiran "' + file.name + '" siap dikirim.' : 'Tidak ada lampiran.'));
+        });
+      })();
+      </script>
 
     </div>
   </main>
