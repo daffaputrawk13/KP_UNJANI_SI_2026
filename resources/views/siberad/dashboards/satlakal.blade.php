@@ -26,7 +26,7 @@
       <a href="#" class="side-link" data-tab-link="danpus"><span class="dot"></span>Lapor ke DANPUS</a>
     </nav>
     <div class="side-foot">
-      <form class="logout" method="POST" action="{{ route('logout') }}">
+      <form class="logout logout-form" method="POST" action="{{ route('logout') }}">
         @csrf
         <button type="submit">Keluar</button>
       </form>
@@ -83,7 +83,7 @@
 
               <div class="profile-dropdown-divider"></div>
 
-              <form method="POST" action="{{ route('logout') }}">
+              <form class="logout-form" method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit" class="profile-dropdown-item danger" role="menuitem">
                   <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>
@@ -549,7 +549,61 @@
 
     </div>
   </main>
+
+  {{-- ===== KONFIRMASI KELUAR ===== --}}
+  <div class="confirm-overlay" id="logoutConfirmOverlay">
+    <div class="confirm-box" role="alertdialog" aria-modal="true" aria-labelledby="logoutConfirmTitle">
+      <div class="confirm-icon">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>
+      </div>
+      <h3 id="logoutConfirmTitle">Keluar dari akun?</h3>
+      <p>Sesi kamu akan diakhiri dan kamu perlu login kembali untuk mengakses SIBERAD.</p>
+      <div class="confirm-actions">
+        <button type="button" class="btn" id="logoutCancelBtn">Batal</button>
+        <button type="button" class="btn btn-ghost-red" id="logoutConfirmBtn">Ya, Keluar</button>
+      </div>
+    </div>
+  </div>
 </div>
+
+<script>
+(function () {
+  var overlay = document.getElementById('logoutConfirmOverlay');
+  var cancelBtn = document.getElementById('logoutCancelBtn');
+  var confirmBtn = document.getElementById('logoutConfirmBtn');
+  var pendingForm = null;
+
+  if (!overlay || !cancelBtn || !confirmBtn) return;
+
+  function openConfirm(targetForm) {
+    pendingForm = targetForm;
+    overlay.classList.add('open');
+  }
+  function closeConfirm() {
+    overlay.classList.remove('open');
+    pendingForm = null;
+  }
+
+  document.querySelectorAll('.logout-form').forEach(function (logoutForm) {
+    logoutForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      openConfirm(logoutForm);
+    });
+  });
+
+  cancelBtn.addEventListener('click', closeConfirm);
+  overlay.addEventListener('click', function (e) {
+    if (e.target === overlay) closeConfirm();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && overlay.classList.contains('open')) closeConfirm();
+  });
+  confirmBtn.addEventListener('click', function () {
+    if (pendingForm) pendingForm.submit();
+  });
+})();
+</script>
+
 @include('siberad.dashboards.partials.dash-script')
 </body>
 </html>

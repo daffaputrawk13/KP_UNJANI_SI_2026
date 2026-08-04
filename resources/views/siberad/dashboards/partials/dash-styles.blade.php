@@ -320,6 +320,33 @@
   .status-dot.warn{color:var(--amber);}
   .status-dot.bad{color:var(--red);}
 
+  /* ===== konfirmasi keluar ===== */
+  .confirm-overlay{
+    position:fixed;inset:0;z-index:80;
+    background:rgba(4,16,10,.6);backdrop-filter:blur(3px);
+    display:flex;align-items:center;justify-content:center;padding:20px;
+    opacity:0;pointer-events:none;transition:opacity .2s ease;
+  }
+  :root[data-theme="light"] .confirm-overlay{background:rgba(60,50,20,.35);}
+  .confirm-overlay.open{opacity:1;pointer-events:auto;}
+  .confirm-box{
+    width:100%;max-width:360px;background:var(--panel-2);border:1px solid var(--border);border-radius:14px;
+    padding:28px 26px 24px;text-align:center;
+    transform:translateY(10px) scale(.98);transition:transform .2s ease;
+    box-shadow:0 20px 50px -20px rgba(0,0,0,.5);
+  }
+  .confirm-overlay.open .confirm-box{transform:translateY(0) scale(1);}
+  .confirm-icon{
+    width:52px;height:52px;margin:0 auto 14px;border-radius:50%;
+    background:var(--red-dim);color:var(--red);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .confirm-icon svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.9;}
+  .confirm-box h3{font-family:var(--display);font-size:19px;font-weight:700;margin:0 0 8px;}
+  .confirm-box p{font-size:13px;color:var(--text-muted);line-height:1.6;margin:0;}
+  .confirm-actions{display:flex;gap:10px;margin-top:22px;}
+  .confirm-actions .btn{flex:1;justify-content:center;}
+
   /* ===== buttons ===== */
   .btn{
     font-family:var(--mono);font-weight:600;font-size:11.5px;letter-spacing:.04em;padding:9px 15px;border-radius:8px;
