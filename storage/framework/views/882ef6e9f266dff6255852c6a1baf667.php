@@ -1,5 +1,5 @@
-{{-- resources/views/welcome.blade.php --}}
-{{-- Halaman landing SIBERAD — Sistem Informasi Berbasis Elektronik Angkatan Darat (PUSSIBERAD) --}}
+
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SIBERAD — Sistem Informasi Berbasis Elektronik Angkatan Darat | PUSSIBERAD</title>
 <meta name="description" content="SIBERAD — Sistem Informasi Berbasis Elektronik Angkatan Darat. Platform pelaporan dan monitoring resmi Pusat Siber Angkatan Darat (PUSSIBERAD).">
-<link rel="icon" type="image/jpeg" href="{{ asset('images/logo-pussiberad.jpg') }}">
+<link rel="icon" type="image/jpeg" href="<?php echo e(asset('images/logo-pussiberad.jpg')); ?>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -361,7 +361,7 @@
     background-image:
       linear-gradient(115deg, var(--hero-ov-1) 0%, var(--hero-ov-2) 32%, var(--hero-ov-3) 58%, var(--hero-ov-4) 100%),
       linear-gradient(to top, var(--hero-ov-top) 0%, var(--hero-ov-top-fade) 26%),
-      url('{{ asset('images/hero-lapangan-mabesad.jpg') }}');
+      url('<?php echo e(asset('images/hero-lapangan-mabesad.jpg')); ?>');
     background-size:cover;
     background-position:center 58%;
     background-repeat:no-repeat;
@@ -644,7 +644,7 @@
   })();
 </script>
 
-@vite(['resources/js/app.js'])
+<?php echo app('Illuminate\Foundation\Vite')(['resources/js/app.js']); ?>
 </head>
 <body class="is-loading">
 
@@ -660,7 +660,7 @@
           <circle class="ring-arc" cx="74" cy="74" r="65"></circle>
         </svg>
       </div>
-      <div class="mark-plate"><img src="{{ asset('images/logo-pussiberad.jpg') }}" alt="Lambang Pussiberad"></div>
+      <div class="mark-plate"><img src="<?php echo e(asset('images/logo-pussiberad.jpg')); ?>" alt="Lambang Pussiberad"></div>
     </div>
     <div class="loader-caption">Memverifikasi Sistem&hellip;</div>
   </div>
@@ -670,7 +670,7 @@
     <div class="wrap">
       <nav>
         <a class="logo" href="#tentang">
-          <span class="logo-badge"><img src="{{ asset('images/logo-pussiberad.jpg') }}" alt="Lambang Pussiberad"></span>
+          <span class="logo-badge"><img src="<?php echo e(asset('images/logo-pussiberad.jpg')); ?>" alt="Lambang Pussiberad"></span>
           <span class="logo-text"><b>SIBER<span>AD</span></b><small>Pussiberad &middot; TNI AD</small></span>
         </a>
         <ul class="nav-links">
@@ -699,16 +699,23 @@
   <div class="login-overlay" id="loginOverlay">
     <div class="login-card hud-panel" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
       <button class="login-close" id="loginClose" type="button" aria-label="Tutup">&times;</button>
-      <div class="login-crest"><img src="{{ asset('images/logo-pussiberad.jpg') }}" alt="Lambang Pussiberad"></div>
+      <div class="login-crest"><img src="<?php echo e(asset('images/logo-pussiberad.jpg')); ?>" alt="Lambang Pussiberad"></div>
       <h3 id="loginTitle" class="login-title">Login Sistem</h3>
       <p class="login-sub">Masuk menggunakan akun personel yang terdaftar.</p>
-      <form class="login-form" id="loginForm" method="POST" action="{{ route('login') }}">
-        @csrf
+      <form class="login-form" id="loginForm" method="POST" action="<?php echo e(route('login')); ?>">
+        <?php echo csrf_field(); ?>
         <label class="login-label" for="loginUser">NIP / Username</label>
-        <input class="login-input" id="loginUser" name="username" type="text" value="{{ old('username') }}" autocomplete="username" required>
-        @error('username')
-          <span class="login-error">{{ $message }}</span>
-        @enderror
+        <input class="login-input" id="loginUser" name="username" type="text" value="<?php echo e(old('username')); ?>" autocomplete="username" required>
+        <?php $__errorArgs = ['username'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+          <span class="login-error"><?php echo e($message); ?></span>
+        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
         <label class="login-label" for="loginPass">Password</label>
         <div class="login-field">
           <input class="login-input" id="loginPass" name="password" type="password" autocomplete="current-password" required>
@@ -717,9 +724,16 @@
             <svg class="icon-eye-off" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18"/><path d="M10.6 5.1A10.9 10.9 0 0 1 12 5c7 0 10.5 7 10.5 7a13.6 13.6 0 0 1-3.2 4.1M6.6 6.6C3.5 8.5 1.5 12 1.5 12s3.5 7 10.5 7a10.6 10.6 0 0 0 4.2-.85"/><path d="M9.5 9.7a3.2 3.2 0 0 0 4.5 4.5"/></svg>
           </button>
         </div>
-        @error('password')
-          <span class="login-error">{{ $message }}</span>
-        @enderror
+        <?php $__errorArgs = ['password'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+          <span class="login-error"><?php echo e($message); ?></span>
+        <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
         <button class="btn btn-primary login-submit" type="submit">Masuk</button>
       </form>
       <div class="login-foot">
@@ -759,7 +773,7 @@
                     <circle class="ring-arc" cx="74" cy="74" r="65"></circle>
                   </svg>
                 </div>
-                <div class="mark-plate"><img src="{{ asset('images/logo-pussiberad.jpg') }}" alt="Lambang Pussiberad"></div>
+                <div class="mark-plate"><img src="<?php echo e(asset('images/logo-pussiberad.jpg')); ?>" alt="Lambang Pussiberad"></div>
               </div>
             </div>
             <div class="hero-crest-caption">Pusat Siber Angkatan Darat<br><b>&ldquo;Satria Yudha Waskita&rdquo;</b></div>
@@ -844,7 +858,7 @@
       <div class="wrap">
         <div class="about-top" data-reveal>
           <div class="about-crest">
-            <img src="{{ asset('images/logo-pussiberad.jpg') }}" alt="Lambang Pussiberad">
+            <img src="<?php echo e(asset('images/logo-pussiberad.jpg')); ?>" alt="Lambang Pussiberad">
           </div>
           <div>
             <div class="eyebrow">Tentang</div>
@@ -908,7 +922,7 @@
       <div class="footer-grid">
         <div>
           <div class="footer-brand-row">
-            <span class="footer-crest"><img src="{{ asset('images/logo-pussiberad.jpg') }}" alt="Lambang Pussiberad"></span>
+            <span class="footer-crest"><img src="<?php echo e(asset('images/logo-pussiberad.jpg')); ?>" alt="Lambang Pussiberad"></span>
             <div class="footer-brand">
               <b>SIBER<span style="display:inline;color:var(--gold-bright);">AD</span></b>
               <span>Pusat Siber Angkatan Darat</span>
@@ -1021,9 +1035,9 @@
     });
   });
 
-  @if ($errors->any())
+  <?php if($errors->any()): ?>
     openLogin();
-  @endif
+  <?php endif; ?>
 
   // ---------- scroll reveal ----------
   const revealEls = document.querySelectorAll('[data-reveal]');
@@ -1104,4 +1118,4 @@
 
 </script>
 </body>
-</html>
+</html><?php /**PATH D:\SEMESTER 6\KP PUSSIBERAD\KP_UNJANI_SI_2026\resources\views/siberad/landing/welcome.blade.php ENDPATH**/ ?>

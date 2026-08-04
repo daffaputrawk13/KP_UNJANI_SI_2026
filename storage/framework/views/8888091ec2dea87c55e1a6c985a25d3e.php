@@ -3,26 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Binkum — SIBERAD</title>
-<link rel="icon" type="image/jpeg" href="{{ asset('images/logo-pussiberad.jpg') }}">
-@include('siberad.dashboards.partials.dash-styles')
+<title>Satlakal (Penangkalan) — SIBERAD</title>
+<link rel="icon" type="image/jpeg" href="<?php echo e(asset('images/logo-pussiberad.jpg')); ?>">
+<?php echo $__env->make('siberad.dashboards.partials.dash-styles', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </head>
 <body>
+
+
+
 <div class="profile-modal-overlay" id="profileModalOverlay">
   <div class="profile-modal-card" id="profileModalCard" role="dialog" aria-modal="true" aria-label="Detail profil">
     <button type="button" class="profile-modal-close" id="profileModalCloseBtn" aria-label="Tutup">
       <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
     </button>
 
-    {{-- ===== VIEW PROFIL SAYA ===== --}}
+    
     <div class="profile-dropdown-view" id="profilePhotoView" style="display:none;">
       <div class="profile-dropdown-head-lg">
         <div class="profile-dropdown-avatar-lg">
-          <span class="profile-initial" id="profileInitialLarge">{{ strtoupper(mb_substr($user->name ?? 'U', 0, 1)) }}</span>
-          <img class="profile-photo" id="profilePhotoLarge" alt="Foto profil {{ $user->name }}">
+          <span class="profile-initial" id="profileInitialLarge"><?php echo e(strtoupper(mb_substr($user->name ?? 'U', 0, 1))); ?></span>
+          <img class="profile-photo" id="profilePhotoLarge" alt="Foto profil <?php echo e($user->name); ?>">
         </div>
-        <div class="profile-dropdown-name">{{ $user->name }}</div>
-        <div class="profile-dropdown-role">{{ $user->jabatan ?? 'Pengguna' }}</div>
+        <div class="profile-dropdown-name"><?php echo e($user->name); ?></div>
+        <div class="profile-dropdown-role"><?php echo e($user->jabatan ?? 'Pengguna'); ?></div>
       </div>
 
       <button type="button" class="profile-dropdown-item" id="gantiFotoBtn" role="menuitem">
@@ -36,7 +39,7 @@
       <input type="file" id="fotoProfilInput" accept="image/png,image/jpeg,image/webp" hidden>
     </div>
 
-    {{-- ===== VIEW PENGATURAN AKUN ===== --}}
+    
     <div class="profile-dropdown-view" id="profileSettingsView" style="display:none;">
       <div class="profile-modal-title">Pengaturan Akun</div>
 
@@ -62,7 +65,7 @@
       </form>
     </div>
 
-    {{-- ===== VIEW BANTUAN & PANDUAN ===== --}}
+    
     <div class="profile-dropdown-view" id="profileHelpView" style="display:none;">
       <div class="profile-modal-title">Bantuan &amp; Panduan</div>
       <p class="profile-help-text">
@@ -78,19 +81,19 @@
 
   <aside class="sidebar" id="sidebar">
     <div class="side-brand">
-      <img src="{{ asset('images/logo-pussiberad.jpg') }}" alt="Lambang Pussiberad">
+      <img src="<?php echo e(asset('images/logo-pussiberad.jpg')); ?>" alt="Lambang Pussiberad">
       <div class="logo">SIBER<span>AD</span></div>
     </div>
     <nav class="side-nav">
       <div class="side-nav-label">Menu</div>
       <a href="#" class="side-link active" data-tab-link="ringkasan"><span class="dot"></span>Ringkasan</a>
-      <a href="#" class="side-link" data-tab-link="pengawasan"><span class="dot"></span>Pengawasan Satuan</a>
-      <a href="#" class="side-link" data-tab-link="lomba"><span class="dot"></span>Lomba Internal</a>
       <a href="#" class="side-link" data-tab-link="lapor"><span class="dot"></span>Verifikasi Laporan</a>
+      <a href="#" class="side-link" data-tab-link="danpus"><span class="dot"></span>Lapor ke DANPUS</a>
+      <a href="#" class="side-link" data-tab-link="sdir"><span class="dot"></span>Koordinasi SDIR</a>
     </nav>
     <div class="side-foot">
-      <form class="logout logout-form" method="POST" action="{{ route('logout') }}">
-        @csrf
+      <form class="logout logout-form" method="POST" action="<?php echo e(route('logout')); ?>">
+        <?php echo csrf_field(); ?>
         <button type="submit">Keluar</button>
       </form>
     </div>
@@ -129,22 +132,23 @@
             </div>
           </div>
         </div>
+
         <div class="profile-menu" id="profileMenu">
           <button type="button" class="profile-menu-btn" id="profileMenuBtn" aria-haspopup="menu" aria-expanded="false" aria-label="Menu profil">
-            <span class="profile-initial" id="profileInitial">{{ strtoupper(mb_substr($user->name ?? 'U', 0, 1)) }}</span>
-            <img class="profile-photo" id="profilePhotoBtn" alt="Foto profil {{ $user->name }}">
+            <span class="profile-initial" id="profileInitial"><?php echo e(strtoupper(mb_substr($user->name ?? 'U', 0, 1))); ?></span>
+            <img class="profile-photo" id="profilePhotoBtn" alt="Foto profil <?php echo e($user->name); ?>">
           </button>
 
           <div class="profile-dropdown" id="profileDropdown" role="menu" aria-label="Menu profil">
 
             <div class="profile-dropdown-head">
               <div class="profile-dropdown-avatar">
-                <span class="profile-initial" id="profileInitialDropdown">{{ strtoupper(mb_substr($user->name ?? 'U', 0, 1)) }}</span>
-                <img class="profile-photo" id="profilePhotoDropdown" alt="Foto profil {{ $user->name }}">
+                <span class="profile-initial" id="profileInitialDropdown"><?php echo e(strtoupper(mb_substr($user->name ?? 'U', 0, 1))); ?></span>
+                <img class="profile-photo" id="profilePhotoDropdown" alt="Foto profil <?php echo e($user->name); ?>">
               </div>
               <div>
-                <div class="profile-dropdown-name">{{ $user->name }}</div>
-                <div class="profile-dropdown-role">{{ $user->jabatan ?? 'Pengguna' }}</div>
+                <div class="profile-dropdown-name"><?php echo e($user->name); ?></div>
+                <div class="profile-dropdown-role"><?php echo e($user->jabatan ?? 'Pengguna'); ?></div>
               </div>
             </div>
 
@@ -163,8 +167,8 @@
 
             <div class="profile-dropdown-divider"></div>
 
-            <form class="logout-form" method="POST" action="{{ route('logout') }}">
-              @csrf
+            <form class="logout-form" method="POST" action="<?php echo e(route('logout')); ?>">
+              <?php echo csrf_field(); ?>
               <button type="submit" class="profile-dropdown-item danger" role="menuitem">
                 <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>
                 Keluar
@@ -175,150 +179,148 @@
       </div>
     </div>
 
-    
     <div class="content">
 
-      {{-- ===== RINGKASAN ===== --}}
+      
       <section class="tab-panel active" data-tab-panel="ringkasan">
         <div class="section-head">
-          <h2>Ringkasan Pembinaan Umum</h2>
-          <p>Status pengawasan dan kegiatan pembinaan yang ditangani Binkum saat ini.</p>
+          <h2>Ringkasan Pemantauan</h2>
+          <p>Status aset/website yang dipantau Satlakal (Penangkalan) hari ini.</p>
         </div>
         <div class="stat-grid">
           <div class="stat-card">
-            <div class="lbl">Satuan Diawasi</div>
-            <div class="val">{{ $stats['satuan_diawasi'] }}</div>
-            <div class="sub">Seluruh satuan Pussiberad</div>
+            <div class="lbl">Total Aset Dipantau</div>
+            <div class="val"><?php echo e($stats['total_aset']); ?></div>
+            <div class="sub">Website & layanan digital</div>
           </div>
           <div class="stat-card">
-            <div class="lbl">Lomba Aktif</div>
-            <div class="val" style="color:var(--amber);">{{ $stats['lomba_aktif'] }}</div>
-            <div class="sub">Sedang berlangsung</div>
+            <div class="lbl">Status Normal</div>
+            <div class="val" style="color:var(--green);"><?php echo e($stats['normal']); ?></div>
+            <div class="sub">Berjalan baik</div>
           </div>
           <div class="stat-card">
-            <div class="lbl">Personel Baru Diverifikasi</div>
-            <div class="val" style="color:var(--green);">{{ $stats['personel_baru_diverifikasi'] }}</div>
-            <div class="sub">Bulan ini</div>
+            <div class="lbl">Sedang Diserang</div>
+            <div class="val" style="color:var(--red);"><?php echo e($stats['diserang']); ?></div>
+            <div class="sub">Butuh penanganan segera</div>
           </div>
           <div class="stat-card">
-            <div class="lbl">Pelanggaran Tercatat</div>
-            <div class="val" style="color:var(--red);">{{ $stats['pelanggaran_tercatat'] }}</div>
-            <div class="sub">Perlu ditindaklanjuti</div>
+            <div class="lbl">Dalam Pemulihan</div>
+            <div class="val" style="color:var(--amber);"><?php echo e($stats['pemulihan']); ?></div>
+            <div class="sub">Sedang ditangani</div>
           </div>
         </div>
 
         <div class="panel">
-          <div class="panel-head"><div><h3>Aktivitas Terbaru</h3><p>Temuan dan kegiatan pengawasan yang baru berlangsung.</p></div></div>
+          <div class="panel-head"><div><h3>Insiden Terbaru</h3><p>Serangan atau gangguan yang baru terdeteksi.</p></div></div>
           <div class="tbl-wrap">
             <table class="dtbl">
-              <thead><tr><th>Satuan</th><th>Kegiatan</th><th>Waktu</th><th>Status</th></tr></thead>
+              <thead><tr><th>Aset</th><th>Jenis Gangguan</th><th>Terdeteksi</th><th>Status</th></tr></thead>
               <tbody>
-                @foreach($aktivitasTerbaru as $i)
+                <?php $__currentLoopData = $insidenTerbaru; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <tr>
-                  <td>{{ $i['satuan'] }}</td>
-                  <td>{{ $i['kegiatan'] }}</td>
-                  <td>{{ $i['waktu'] }}</td>
-                  <td><span class="status-dot {{ $i['status_class'] }}">{{ $i['status'] }}</span></td>
+                  <td><?php echo e($i['aset']); ?></td>
+                  <td><?php echo e($i['jenis']); ?></td>
+                  <td><?php echo e($i['waktu']); ?></td>
+                  <td><span class="status-dot <?php echo e($i['status_class']); ?>"><?php echo e($i['status']); ?></span></td>
                 </tr>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
               </tbody>
             </table>
           </div>
         </div>
       </section>
 
-      {{-- ===== PENGAWASAN SATUAN ===== --}}
-      <section class="tab-panel" data-tab-panel="pengawasan">
-        <div class="section-head">
-          <h2>Pengawasan Satuan</h2>
-          <p>Hasil evaluasi dan pengawasan terhadap satuan-satuan di lingkungan Pussiberad.</p>
-        </div>
-        <div class="panel">
-          <div class="tbl-wrap">
-            <table class="dtbl">
-              <thead><tr><th>Satuan</th><th>Aspek yang Diawasi</th><th>Hasil</th><th>Tanggal</th><th>Aksi</th></tr></thead>
-              <tbody>
-                @foreach($pengawasanSatuan as $p)
-                <tr>
-                  <td>{{ $p['satuan'] }}</td>
-                  <td style="color:var(--text-muted);">{{ $p['aspek'] }}</td>
-                  <td><span class="status-dot {{ $p['hasil_class'] }}">{{ $p['hasil'] }}</span></td>
-                  <td>{{ $p['tanggal'] }}</td>
-                  <td>
-                    <div class="btn-row">
-                      @if($p['hasil_class'] === 'bad')
-                        <button class="btn btn-primary btn-sm" type="button">Tindak Lanjuti</button>
-                      @else
-                        <button class="btn btn-sm" type="button">Lihat Detail</button>
-                      @endif
-                    </div>
-                  </td>
-                </tr>
-                @endforeach
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      {{-- ===== LOMBA INTERNAL ===== --}}
-      <section class="tab-panel" data-tab-panel="lomba">
-        <div class="section-head">
-          <h2>Lomba Internal</h2>
-          <p>Daftar lomba internal antar satuan yang dikelola Binkum.</p>
-        </div>
-        <div class="panel">
-          <div class="tbl-wrap">
-            <table class="dtbl">
-              <thead><tr><th>Nama Lomba</th><th>Peserta</th><th>Periode</th><th>Status</th></tr></thead>
-              <tbody>
-                @foreach($lombaInternal as $l)
-                <tr>
-                  <td>{{ $l['nama'] }}</td>
-                  <td style="color:var(--text-muted);">{{ $l['peserta'] }}</td>
-                  <td>{{ $l['periode'] }}</td>
-                  <td><span class="badge {{ $l['status_class'] }}">{{ $l['status'] }}</span></td>
-                </tr>
-                @endforeach
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      {{-- ===== LAPOR / VERIFIKASI ===== --}}
+      
       <section class="tab-panel" data-tab-panel="lapor">
           <div class="section-head">
             <h2>Verifikasi &amp; Teruskan Laporan</h2>
-            <p>Laporan temuan pengawasan yang menunggu diteruskan ke WADAN.</p>
+            <p>Laporan insiden yang menunggu diteruskan langsung ke DANPUS.</p>
           </div>
           <div class="panel">
             <div class="tbl-wrap">
               <table class="dtbl">
-                <thead><tr><th>Satuan</th><th>Perihal</th><th>Dilaporkan Oleh</th><th>Tanggal</th><th>Prioritas</th><th>Aksi</th></tr></thead>
+                <thead><tr><th>Aset</th><th>Perihal</th><th>Dilaporkan Oleh</th><th>Tanggal</th><th>Prioritas</th><th>Aksi</th></tr></thead>
                 <tbody>
-                  @foreach($laporanPiket as $l)
+                  <?php $__currentLoopData = $laporanPiket; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $l): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                   <tr>
-                    <td>{{ $l['satuan'] }}</td>
-                    <td>{{ $l['perihal'] }}</td>
-                    <td>{{ $l['pelapor'] }}</td>
-                    <td>{{ $l['tanggal'] }}</td>
-                    <td><span class="status-dot {{ $l['prioritas_class'] }}">{{ $l['prioritas'] }}</span></td>
+                    <td><?php echo e($l['aset']); ?></td>
+                    <td><?php echo e($l['perihal']); ?></td>
+                    <td><?php echo e($l['pelapor']); ?></td>
+                    <td><?php echo e($l['tanggal']); ?></td>
+                    <td><span class="status-dot <?php echo e($l['prioritas_class']); ?>"><?php echo e($l['prioritas']); ?></span></td>
                     <td>
                       <div class="btn-row">
-                        <button class="btn btn-primary btn-sm" type="button">Verifikasi & Teruskan</button>
+                        <button class="btn btn-primary btn-sm" type="button">Verifikasi & Teruskan ke DANPUS</button>
                         <button class="btn btn-ghost-red btn-sm" type="button">Tolak</button>
                       </div>
                     </td>
                   </tr>
-                  @endforeach
+                  <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </tbody>
               </table>
             </div>
           </div>
+
       </section>
 
-    </div>
+      
+      <section class="tab-panel" data-tab-panel="sdir">
+        <div class="section-head">
+          <h2>Koordinasi dengan SDIR</h2>
+          <p>Ajukan permintaan koordinasi (bukan laporan insiden) ke SDIR bila diperlukan.</p>
+        </div>
+        <div class="panel">
+          <div class="form-grid" style="padding:22px;">
+            <div class="form-field full">
+              <button class="btn btn-sm" type="button" onclick="alert('Prototype — form koordinasi ke SDIR belum tersambung ke database.')">Ajukan Koordinasi ke SDIR</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      
+      <section class="tab-panel" data-tab-panel="danpus">
+        <div class="section-head">
+          <h2>Lapor ke DANPUS</h2>
+          <p>Laporan insiden yang dikirim langsung ke DANPUS, lengkap dengan lampiran bukti dalam format PDF.</p>
+        </div>
+        <div class="panel">
+          <form class="form-grid" id="formDanpus" novalidate>
+            <div class="form-field">
+              <label for="asetDanpus">Aset / Website Terdampak</label>
+              <select id="asetDanpus" required>
+                <?php $__currentLoopData = $asetMonitoring; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $a): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                  <option><?php echo e($a['nama']); ?></option>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="prioritasDanpus">Prioritas</label>
+              <select id="prioritasDanpus" required>
+                <option>Tinggi</option><option>Sedang</option><option>Rendah</option>
+              </select>
+            </div>
+            <div class="form-field full">
+              <label for="perihalDanpus">Perihal</label>
+              <input id="perihalDanpus" type="text" placeholder="Contoh: Website diserang DDoS" required>
+            </div>
+            <div class="form-field full">
+              <label for="deskripsiDanpus">Deskripsi Kejadian</label>
+              <textarea id="deskripsiDanpus" rows="4" placeholder="Jelaskan kronologi dan dampak insiden..." required></textarea>
+            </div>
+            <div class="form-field full">
+              <label for="lampiranDanpus">Lampiran (bukti / dokumentasi)</label>
+              <input id="lampiranDanpus" type="file" accept="application/pdf,.pdf">
+              <span class="form-hint">Format PDF, maksimal 20 MB, dikirim langsung ke DANPUS.</span>
+              <span class="form-hint" id="lampiranDanpusInfo" style="display:none;"></span>
+              <span class="form-hint" id="lampiranDanpusError" style="display:none;color:var(--red);"></span>
+            </div>
+            <div class="form-field full">
+              <button class="btn btn-primary" type="submit">Kirim Laporan ke DANPUS</button>
+            </div>
+          </form>
+        </div>
+      </section>
 
       <script>
       (function () {
@@ -448,7 +450,7 @@
         var MAX_PHOTO_MB = 5;
         var MAX_PHOTO_BYTES = MAX_PHOTO_MB * 1024 * 1024;
         var ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-        var STORAGE_KEY = 'siberad-profile-photo-{{ $user->id ?? "default" }}';
+        var STORAGE_KEY = 'siberad-profile-photo-<?php echo e($user->id ?? "default"); ?>';
 
         var fileInput = document.getElementById('fotoProfilInput');
         var gantiBtn = document.getElementById('gantiFotoBtn');
@@ -550,6 +552,79 @@
 
       <script>
       (function () {
+        var MAX_SIZE_MB = 20;
+        var MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
+
+        var form = document.getElementById('formDanpus');
+        var fileInput = document.getElementById('lampiranDanpus');
+        var infoEl = document.getElementById('lampiranDanpusInfo');
+        var errorEl = document.getElementById('lampiranDanpusError');
+
+        if (!form || !fileInput) return;
+
+        function resetFileMessages() {
+          infoEl.style.display = 'none';
+          infoEl.textContent = '';
+          errorEl.style.display = 'none';
+          errorEl.textContent = '';
+        }
+
+        function formatSize(bytes) {
+          return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+        }
+
+        function validateFile() {
+          resetFileMessages();
+
+          var file = fileInput.files && fileInput.files[0];
+          if (!file) return null;
+
+          var isPdfType = file.type === 'application/pdf';
+          var isPdfExt = /\.pdf$/i.test(file.name);
+
+          if (!isPdfType && !isPdfExt) {
+            errorEl.textContent = 'File "' + file.name + '" ditolak: hanya format PDF yang diperbolehkan.';
+            errorEl.style.display = 'block';
+            fileInput.value = '';
+            return null;
+          }
+
+          if (file.size > MAX_SIZE_BYTES) {
+            errorEl.textContent = 'File "' + file.name + '" (' + formatSize(file.size) + ') melebihi batas maksimal ' + MAX_SIZE_MB + ' MB.';
+            errorEl.style.display = 'block';
+            fileInput.value = '';
+            return null;
+          }
+
+          infoEl.textContent = 'Lampiran dipilih: ' + file.name + ' (' + formatSize(file.size) + ')';
+          infoEl.style.display = 'block';
+          return file;
+        }
+
+        fileInput.addEventListener('change', validateFile);
+
+        form.addEventListener('submit', function (e) {
+          e.preventDefault();
+
+          if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+          }
+
+          var file = validateFile();
+          if (fileInput.files.length > 0 && !file) {
+            // File dipilih tapi tidak lolos validasi
+            return;
+          }
+
+          alert('Prototype — form ini belum tersambung ke database. ' + (file ? 'Lampiran "' + file.name + '" siap dikirim.' : 'Tidak ada lampiran.'));
+        });
+      })();
+      </script>
+
+    </div>
+      <script>
+      (function () {
         var notifBtn = document.getElementById('notifBtn');
         var dropdown = document.getElementById('notifDropdown');
         var wrapper = document.getElementById('notifMenu');
@@ -598,7 +673,7 @@
 
   </main>
 
-  {{-- ===== KONFIRMASI KELUAR ===== --}}
+  
   <div class="confirm-overlay" id="logoutConfirmOverlay">
     <div class="confirm-box" role="alertdialog" aria-modal="true" aria-labelledby="logoutConfirmTitle">
       <div class="confirm-icon">
@@ -652,6 +727,6 @@
 })();
 </script>
 
-@include('siberad.dashboards.partials.dash-script')
+<?php echo $__env->make('siberad.dashboards.partials.dash-script', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </body>
-</html>
+</html><?php /**PATH D:\SEMESTER 6\KP PUSSIBERAD\KP_UNJANI_SI_2026\resources\views/siberad/dashboards/satlakal.blade.php ENDPATH**/ ?>
