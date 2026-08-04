@@ -4,31 +4,28 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Satlakal (Penangkalan) — SIBERAD</title>
-<link rel="icon" type="image/jpeg" href="{{ asset('images/logo-pussiberad.jpg') }}">
-@include('siberad.dashboards.partials.dash-styles')
+<link rel="icon" type="image/jpeg" href="<?php echo e(asset('images/logo-pussiberad.jpg')); ?>">
+<?php echo $__env->make('siberad.dashboards.partials.dash-styles', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </head>
 <body>
 
-{{-- ===== POPUP DETAIL PROFIL (muncul di tengah layar) ===== --}}
-{{-- Ditaruh di luar .shell/.topbar karena .topbar pakai backdrop-filter, yang
-     membuat position:fixed di dalamnya ke-scope ke box .topbar saja, bukan ke
-     seluruh layar. Popup ini baru muncul saat item di dropdown kecil
-     (Profil Saya / Pengaturan Akun / Bantuan & Panduan) diklik. --}}
+
+
 <div class="profile-modal-overlay" id="profileModalOverlay">
   <div class="profile-modal-card" id="profileModalCard" role="dialog" aria-modal="true" aria-label="Detail profil">
     <button type="button" class="profile-modal-close" id="profileModalCloseBtn" aria-label="Tutup">
       <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
     </button>
 
-    {{-- ===== VIEW PROFIL SAYA ===== --}}
+    
     <div class="profile-dropdown-view" id="profilePhotoView" style="display:none;">
       <div class="profile-dropdown-head-lg">
         <div class="profile-dropdown-avatar-lg">
-          <span class="profile-initial" id="profileInitialLarge">{{ strtoupper(mb_substr($user->name ?? 'U', 0, 1)) }}</span>
-          <img class="profile-photo" id="profilePhotoLarge" alt="Foto profil {{ $user->name }}">
+          <span class="profile-initial" id="profileInitialLarge"><?php echo e(strtoupper(mb_substr($user->name ?? 'U', 0, 1))); ?></span>
+          <img class="profile-photo" id="profilePhotoLarge" alt="Foto profil <?php echo e($user->name); ?>">
         </div>
-        <div class="profile-dropdown-name">{{ $user->name }}</div>
-        <div class="profile-dropdown-role">{{ $user->jabatan ?? 'Pengguna' }}</div>
+        <div class="profile-dropdown-name"><?php echo e($user->name); ?></div>
+        <div class="profile-dropdown-role"><?php echo e($user->jabatan ?? 'Pengguna'); ?></div>
       </div>
 
       <button type="button" class="profile-dropdown-item" id="gantiFotoBtn" role="menuitem">
@@ -42,7 +39,7 @@
       <input type="file" id="fotoProfilInput" accept="image/png,image/jpeg,image/webp" hidden>
     </div>
 
-    {{-- ===== VIEW PENGATURAN AKUN ===== --}}
+    
     <div class="profile-dropdown-view" id="profileSettingsView" style="display:none;">
       <div class="profile-modal-title">Pengaturan Akun</div>
 
@@ -68,7 +65,7 @@
       </form>
     </div>
 
-    {{-- ===== VIEW BANTUAN & PANDUAN ===== --}}
+    
     <div class="profile-dropdown-view" id="profileHelpView" style="display:none;">
       <div class="profile-modal-title">Bantuan &amp; Panduan</div>
       <p class="profile-help-text">
@@ -84,22 +81,22 @@
 
   <aside class="sidebar" id="sidebar">
     <div class="side-brand">
-      <img src="{{ asset('images/logo-pussiberad.jpg') }}" alt="Lambang Pussiberad">
+      <img src="<?php echo e(asset('images/logo-pussiberad.jpg')); ?>" alt="Lambang Pussiberad">
       <div class="logo">SIBER<span>AD</span></div>
     </div>
     <nav class="side-nav">
       <div class="side-nav-label">Menu</div>
       <a href="#" class="side-link active" data-tab-link="ringkasan"><span class="dot"></span>Ringkasan</a>
-      @if(($user->jabatan ?? '') === 'Piket')
+      <?php if(($user->jabatan ?? '') === 'Piket'): ?>
       <a href="#" class="side-link" data-tab-link="lapor"><span class="dot"></span>Buat Laporan</a>
-      @else
+      <?php else: ?>
       <a href="#" class="side-link" data-tab-link="lapor"><span class="dot"></span>Verifikasi Laporan</a>
-      @endif
+      <?php endif; ?>
       <a href="#" class="side-link" data-tab-link="danpus"><span class="dot"></span>Lapor ke DANPUS</a>
     </nav>
     <div class="side-foot">
-      <form class="logout logout-form" method="POST" action="{{ route('logout') }}">
-        @csrf
+      <form class="logout logout-form" method="POST" action="<?php echo e(route('logout')); ?>">
+        <?php echo csrf_field(); ?>
         <button type="submit">Keluar</button>
       </form>
     </div>
@@ -110,7 +107,7 @@
       <div style="display:flex;align-items:center;gap:12px;">
         <button class="menu-btn" id="menuBtn">☰</button>
         <div>
-          <div class="topbar-title">Selamat datang, {{ $user->name }}</div>
+          <div class="topbar-title">Selamat datang, <?php echo e($user->name); ?></div>
         </div>
       </div>
       <div class="topbar-actions">
@@ -121,20 +118,20 @@
 
         <div class="profile-menu" id="profileMenu">
           <button type="button" class="profile-menu-btn" id="profileMenuBtn" aria-haspopup="menu" aria-expanded="false" aria-label="Menu profil">
-            <span class="profile-initial" id="profileInitial">{{ strtoupper(mb_substr($user->name ?? 'U', 0, 1)) }}</span>
-            <img class="profile-photo" id="profilePhotoBtn" alt="Foto profil {{ $user->name }}">
+            <span class="profile-initial" id="profileInitial"><?php echo e(strtoupper(mb_substr($user->name ?? 'U', 0, 1))); ?></span>
+            <img class="profile-photo" id="profilePhotoBtn" alt="Foto profil <?php echo e($user->name); ?>">
           </button>
 
           <div class="profile-dropdown" id="profileDropdown" role="menu" aria-label="Menu profil">
 
             <div class="profile-dropdown-head">
               <div class="profile-dropdown-avatar">
-                <span class="profile-initial" id="profileInitialDropdown">{{ strtoupper(mb_substr($user->name ?? 'U', 0, 1)) }}</span>
-                <img class="profile-photo" id="profilePhotoDropdown" alt="Foto profil {{ $user->name }}">
+                <span class="profile-initial" id="profileInitialDropdown"><?php echo e(strtoupper(mb_substr($user->name ?? 'U', 0, 1))); ?></span>
+                <img class="profile-photo" id="profilePhotoDropdown" alt="Foto profil <?php echo e($user->name); ?>">
               </div>
               <div>
-                <div class="profile-dropdown-name">{{ $user->name }}</div>
-                <div class="profile-dropdown-role">{{ $user->jabatan ?? 'Pengguna' }}</div>
+                <div class="profile-dropdown-name"><?php echo e($user->name); ?></div>
+                <div class="profile-dropdown-role"><?php echo e($user->jabatan ?? 'Pengguna'); ?></div>
               </div>
             </div>
 
@@ -153,8 +150,8 @@
 
             <div class="profile-dropdown-divider"></div>
 
-            <form class="logout-form" method="POST" action="{{ route('logout') }}">
-              @csrf
+            <form class="logout-form" method="POST" action="<?php echo e(route('logout')); ?>">
+              <?php echo csrf_field(); ?>
               <button type="submit" class="profile-dropdown-item danger" role="menuitem">
                 <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>
                 Keluar
@@ -167,7 +164,7 @@
 
     <div class="content">
 
-      {{-- ===== RINGKASAN ===== --}}
+      
       <section class="tab-panel active" data-tab-panel="ringkasan">
         <div class="section-head">
           <h2>Ringkasan Pemantauan</h2>
@@ -176,22 +173,22 @@
         <div class="stat-grid">
           <div class="stat-card">
             <div class="lbl">Total Aset Dipantau</div>
-            <div class="val">{{ $stats['total_aset'] }}</div>
+            <div class="val"><?php echo e($stats['total_aset']); ?></div>
             <div class="sub">Website & layanan digital</div>
           </div>
           <div class="stat-card">
             <div class="lbl">Status Normal</div>
-            <div class="val" style="color:var(--green);">{{ $stats['normal'] }}</div>
+            <div class="val" style="color:var(--green);"><?php echo e($stats['normal']); ?></div>
             <div class="sub">Berjalan baik</div>
           </div>
           <div class="stat-card">
             <div class="lbl">Sedang Diserang</div>
-            <div class="val" style="color:var(--red);">{{ $stats['diserang'] }}</div>
+            <div class="val" style="color:var(--red);"><?php echo e($stats['diserang']); ?></div>
             <div class="sub">Butuh penanganan segera</div>
           </div>
           <div class="stat-card">
             <div class="lbl">Dalam Pemulihan</div>
-            <div class="val" style="color:var(--amber);">{{ $stats['pemulihan'] }}</div>
+            <div class="val" style="color:var(--amber);"><?php echo e($stats['pemulihan']); ?></div>
             <div class="sub">Sedang ditangani</div>
           </div>
         </div>
@@ -202,23 +199,23 @@
             <table class="dtbl">
               <thead><tr><th>Aset</th><th>Jenis Gangguan</th><th>Terdeteksi</th><th>Status</th></tr></thead>
               <tbody>
-                @foreach($insidenTerbaru as $i)
+                <?php $__currentLoopData = $insidenTerbaru; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <tr>
-                  <td>{{ $i['aset'] }}</td>
-                  <td>{{ $i['jenis'] }}</td>
-                  <td>{{ $i['waktu'] }}</td>
-                  <td><span class="status-dot {{ $i['status_class'] }}">{{ $i['status'] }}</span></td>
+                  <td><?php echo e($i['aset']); ?></td>
+                  <td><?php echo e($i['jenis']); ?></td>
+                  <td><?php echo e($i['waktu']); ?></td>
+                  <td><span class="status-dot <?php echo e($i['status_class']); ?>"><?php echo e($i['status']); ?></span></td>
                 </tr>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
               </tbody>
             </table>
           </div>
         </div>
       </section>
 
-      {{-- ===== LAPOR / VERIFIKASI ===== --}}
+      
       <section class="tab-panel" data-tab-panel="lapor">
-        @if(($user->jabatan ?? '') === 'Piket')
+        <?php if(($user->jabatan ?? '') === 'Piket'): ?>
           <div class="section-head">
             <h2>Buat Laporan Insiden</h2>
             <p>Form untuk Piket melaporkan insiden ke Komandan Satlakal (Penangkalan).</p>
@@ -228,9 +225,9 @@
               <div class="form-field">
                 <label for="asetLapor">Aset / Website Terdampak</label>
                 <select id="asetLapor">
-                  @foreach($asetMonitoring as $a)
-                    <option>{{ $a['nama'] }}</option>
-                  @endforeach
+                  <?php $__currentLoopData = $asetMonitoring; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $a): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <option><?php echo e($a['nama']); ?></option>
+                  <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </select>
               </div>
               <div class="form-field">
@@ -257,7 +254,7 @@
               </div>
             </form>
           </div>
-        @else
+        <?php else: ?>
           <div class="section-head">
             <h2>Verifikasi Laporan dari Piket</h2>
             <p>Laporan insiden yang dikirim Piket dan menunggu verifikasi Komandan sebelum diteruskan langsung ke DANPUS.</p>
@@ -267,13 +264,13 @@
               <table class="dtbl">
                 <thead><tr><th>Aset</th><th>Perihal</th><th>Dilaporkan Oleh</th><th>Tanggal</th><th>Prioritas</th><th>Aksi</th></tr></thead>
                 <tbody>
-                  @foreach($laporanPiket as $l)
+                  <?php $__currentLoopData = $laporanPiket; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $l): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                   <tr>
-                    <td>{{ $l['aset'] }}</td>
-                    <td>{{ $l['perihal'] }}</td>
-                    <td>{{ $l['pelapor'] }}</td>
-                    <td>{{ $l['tanggal'] }}</td>
-                    <td><span class="status-dot {{ $l['prioritas_class'] }}">{{ $l['prioritas'] }}</span></td>
+                    <td><?php echo e($l['aset']); ?></td>
+                    <td><?php echo e($l['perihal']); ?></td>
+                    <td><?php echo e($l['pelapor']); ?></td>
+                    <td><?php echo e($l['tanggal']); ?></td>
+                    <td><span class="status-dot <?php echo e($l['prioritas_class']); ?>"><?php echo e($l['prioritas']); ?></span></td>
                     <td>
                       <div class="btn-row">
                         <button class="btn btn-primary btn-sm" type="button">Verifikasi & Teruskan ke DANPUS</button>
@@ -281,12 +278,12 @@
                       </div>
                     </td>
                   </tr>
-                  @endforeach
+                  <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </tbody>
               </table>
             </div>
           </div>
-        @endif
+        <?php endif; ?>
         <div class="panel" style="margin-top:20px;">
           <div class="panel-head">
             <div><h3>Koordinasi dengan SDIR</h3><p>Ajukan permintaan koordinasi (bukan laporan insiden) ke SDIR bila diperlukan.</p></div>
@@ -300,7 +297,7 @@
 
       </section>
 
-      {{-- ===== LAPOR LANGSUNG KE DANPUS ===== --}}
+      
       <section class="tab-panel" data-tab-panel="danpus">
         <div class="section-head">
           <h2>Lapor ke DANPUS</h2>
@@ -311,9 +308,9 @@
             <div class="form-field">
               <label for="asetDanpus">Aset / Website Terdampak</label>
               <select id="asetDanpus" required>
-                @foreach($asetMonitoring as $a)
-                  <option>{{ $a['nama'] }}</option>
-                @endforeach
+                <?php $__currentLoopData = $asetMonitoring; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $a): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                  <option><?php echo e($a['nama']); ?></option>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
               </select>
             </div>
             <div class="form-field">
@@ -462,7 +459,7 @@
         var MAX_PHOTO_MB = 5;
         var MAX_PHOTO_BYTES = MAX_PHOTO_MB * 1024 * 1024;
         var ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-        var STORAGE_KEY = 'siberad-profile-photo-{{ $user->id ?? "default" }}';
+        var STORAGE_KEY = 'siberad-profile-photo-<?php echo e($user->id ?? "default"); ?>';
 
         var fileInput = document.getElementById('fotoProfilInput');
         var gantiBtn = document.getElementById('gantiFotoBtn');
@@ -637,7 +634,7 @@
     </div>
   </main>
 
-  {{-- ===== KONFIRMASI KELUAR ===== --}}
+  
   <div class="confirm-overlay" id="logoutConfirmOverlay">
     <div class="confirm-box" role="alertdialog" aria-modal="true" aria-labelledby="logoutConfirmTitle">
       <div class="confirm-icon">
@@ -691,6 +688,6 @@
 })();
 </script>
 
-@include('siberad.dashboards.partials.dash-script')
+<?php echo $__env->make('siberad.dashboards.partials.dash-script', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </body>
-</html>
+</html><?php /**PATH D:\SEMESTER 6\KP PUSSIBERAD\KP_UNJANI_SI_2026\resources\views/siberad/dashboards/satlakal.blade.php ENDPATH**/ ?>
