@@ -80,25 +80,6 @@
   </div>
 </div>
 
-<div class="profile-modal-overlay" id="notifModalOverlay">
-  <div class="profile-modal-card" id="notifModalCard" role="dialog" aria-modal="true" aria-label="Notifikasi">
-    <button type="button" class="profile-modal-close" id="notifModalCloseBtn" aria-label="Tutup">
-      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
-    </button>
-
-    <div class="profile-dropdown-view" style="display:block;">
-      <div class="profile-modal-title">Notifikasi</div>
-      <div style="text-align:center;padding:26px 6px 6px;">
-        <svg viewBox="0 0 24 24" width="42" height="42" fill="none" stroke="var(--text-dim)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 16px;display:block;">
-          <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path>
-          <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-        </svg>
-        <p style="margin:0;font-size:13.5px;line-height:1.6;color:var(--text-muted);">Belum ada notifikasi saat ini.<br>Fitur pusat notifikasi masih prototype dan belum tersambung ke database.</p>
-      </div>
-    </div>
-  </div>
-</div>
-
 <div class="shell">
 
   <aside class="sidebar" id="sidebar">
@@ -132,13 +113,28 @@
           <svg class="icon-sun" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"></circle><path d="M12 2.5v2.4M12 19.1v2.4M4.4 4.4l1.7 1.7M17.9 17.9l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.4 19.6l1.7-1.7M17.9 6.1l1.7-1.7"></path></svg>
         </button>
 
-        <button type="button" class="btn-icon-toggle" id="notifBtn" aria-label="Notifikasi" aria-haspopup="dialog" aria-expanded="false" style="position:relative;">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--gold-bright) !important;color:var(--gold-bright) !important;">
-            <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" style="fill:var(--gold-dim) !important;stroke:var(--gold-bright) !important;"></path>
-            <path d="M13.73 21a2 2 0 0 1-3.46 0" style="fill:none !important;stroke:var(--gold-bright) !important;"></path>
-          </svg>
-          <span style="position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--red);box-shadow:0 0 0 2px var(--panel,#0c2417);"></span>
-        </button>
+        <div class="profile-menu" id="notifMenu">
+          <button type="button" class="btn-icon-toggle" id="notifBtn" aria-label="Notifikasi" aria-haspopup="menu" aria-expanded="false" style="position:relative;">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--gold-bright) !important;color:var(--gold-bright) !important;">
+              <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" style="fill:var(--gold-dim) !important;stroke:var(--gold-bright) !important;"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0" style="fill:none !important;stroke:var(--gold-bright) !important;"></path>
+            </svg>
+            <span style="position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--red);box-shadow:0 0 0 2px var(--panel,#0c2417);"></span>
+          </button>
+
+          <div class="profile-dropdown" id="notifDropdown" role="menu" aria-label="Notifikasi">
+            <div class="profile-dropdown-head" style="border-bottom:1px solid var(--border-soft);">
+              <div class="profile-dropdown-name" style="font-size:14px;">Notifikasi</div>
+            </div>
+            <div style="text-align:center;padding:20px 6px 8px;">
+              <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="var(--text-dim)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 14px;display:block;">
+                <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+              </svg>
+              <p style="margin:0;font-size:12.5px;line-height:1.6;color:var(--text-muted);">Belum ada notifikasi saat ini.<br>Fitur pusat notifikasi masih prototype dan belum tersambung ke database.</p>
+            </div>
+          </div>
+        </div>
 
         <div class="profile-menu" id="profileMenu">
           <button type="button" class="profile-menu-btn" id="profileMenuBtn" aria-haspopup="menu" aria-expanded="false" aria-label="Menu profil">
@@ -346,6 +342,16 @@
         }
 
         function openMenu() {
+          // Tutup dropdown notifikasi kalau lagi kebuka, biar cuma satu yang tampil
+          var notifDropdown = document.getElementById('notifDropdown');
+          var notifBtnEl = document.getElementById('notifBtn');
+          if (notifDropdown && notifDropdown.classList.contains('open')) {
+            notifDropdown.classList.remove('open');
+            if (notifBtnEl) {
+              notifBtnEl.classList.remove('open');
+              notifBtnEl.setAttribute('aria-expanded', 'false');
+            }
+          }
           dropdown.classList.add('open');
           menuBtn.classList.add('open');
           menuBtn.setAttribute('aria-expanded', 'true');
@@ -623,40 +629,47 @@
       <script>
       (function () {
         var notifBtn = document.getElementById('notifBtn');
-        var overlay = document.getElementById('notifModalOverlay');
-        var card = document.getElementById('notifModalCard');
-        var closeBtn = document.getElementById('notifModalCloseBtn');
-        if (!notifBtn || !overlay || !card) return;
+        var dropdown = document.getElementById('notifDropdown');
+        var wrapper = document.getElementById('notifMenu');
+        if (!notifBtn || !dropdown || !wrapper) return;
+
+        function closeNotif() {
+          dropdown.classList.remove('open');
+          notifBtn.classList.remove('open');
+          notifBtn.setAttribute('aria-expanded', 'false');
+        }
 
         function openNotif() {
-          overlay.classList.add('open');
+          // Tutup dropdown profil kalau lagi kebuka, biar cuma satu yang tampil
+          var profileDropdown = document.getElementById('profileDropdown');
+          var profileMenuBtn = document.getElementById('profileMenuBtn');
+          if (profileDropdown && profileDropdown.classList.contains('open')) {
+            profileDropdown.classList.remove('open');
+            if (profileMenuBtn) {
+              profileMenuBtn.classList.remove('open');
+              profileMenuBtn.setAttribute('aria-expanded', 'false');
+            }
+          }
+          dropdown.classList.add('open');
+          notifBtn.classList.add('open');
           notifBtn.setAttribute('aria-expanded', 'true');
-          document.body.style.overflow = 'hidden';
-        }
-        function closeNotif() {
-          overlay.classList.remove('open');
-          notifBtn.setAttribute('aria-expanded', 'false');
-          document.body.style.overflow = '';
         }
 
         notifBtn.addEventListener('click', function (e) {
           e.stopPropagation();
-          openNotif();
-        });
-        if (closeBtn) {
-          closeBtn.addEventListener('click', function (e) {
-            e.stopPropagation();
+          if (dropdown.classList.contains('open')) {
             closeNotif();
-          });
-        }
-        overlay.addEventListener('click', function (e) {
-          if (e.target === overlay) closeNotif();
+          } else {
+            openNotif();
+          }
         });
-        card.addEventListener('click', function (e) {
-          e.stopPropagation();
+
+        document.addEventListener('click', function (e) {
+          if (!wrapper.contains(e.target)) closeNotif();
         });
+
         document.addEventListener('keydown', function (e) {
-          if (e.key === 'Escape' && overlay.classList.contains('open')) closeNotif();
+          if (e.key === 'Escape') closeNotif();
         });
       })();
       </script>

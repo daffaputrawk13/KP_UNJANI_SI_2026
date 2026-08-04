@@ -680,10 +680,6 @@
           <li><a href="#tim">Kontak</a></li>
         </ul>
         <div class="nav-cta">
-          <button class="btn-restricted" type="button">
-            AKSES TERBATAS
-            <span class="tooltip">Khusus personel terverifikasi PUSSIBERAD</span>
-          </button>
           <button class="btn-theme" type="button" id="themeToggle" aria-label="Ganti tema">
             <svg class="icon-moon" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"></path>
