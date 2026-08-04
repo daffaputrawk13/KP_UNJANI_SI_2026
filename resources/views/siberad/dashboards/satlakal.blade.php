@@ -18,8 +18,6 @@
     <nav class="side-nav">
       <div class="side-nav-label">Menu</div>
       <a href="#" class="side-link active" data-tab-link="ringkasan"><span class="dot"></span>Ringkasan</a>
-      <a href="#" class="side-link" data-tab-link="monitoring"><span class="dot"></span>Monitoring Aset</a>
-      <a href="#" class="side-link" data-tab-link="insiden"><span class="dot"></span>Log Insiden</a>
       @if(($user->jabatan ?? '') === 'Piket')
       <a href="#" class="side-link" data-tab-link="lapor"><span class="dot"></span>Buat Laporan</a>
       @else
@@ -169,66 +167,6 @@
                   <td>{{ $i['jenis'] }}</td>
                   <td>{{ $i['waktu'] }}</td>
                   <td><span class="status-dot {{ $i['status_class'] }}">{{ $i['status'] }}</span></td>
-                </tr>
-                @endforeach
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      {{-- ===== MONITORING ASET ===== --}}
-      <section class="tab-panel" data-tab-panel="monitoring">
-        <div class="section-head">
-          <h2>Monitoring Aset / Website</h2>
-          <p>Daftar seluruh aset digital yang dipantau beserta status terkininya.</p>
-        </div>
-        <div class="panel">
-          <div class="tbl-wrap">
-            <table class="dtbl">
-              <thead><tr><th>Nama Aset</th><th>URL</th><th>Status</th><th>Pengecekan Terakhir</th><th>Aksi</th></tr></thead>
-              <tbody>
-                @foreach($asetMonitoring as $a)
-                <tr>
-                  <td>{{ $a['nama'] }}</td>
-                  <td style="font-family:var(--mono);font-size:12px;color:var(--text-muted);">{{ $a['url'] }}</td>
-                  <td><span class="status-dot {{ $a['status_class'] }}">{{ $a['status'] }}</span></td>
-                  <td>{{ $a['cek_terakhir'] }}</td>
-                  <td>
-                    <div class="btn-row">
-                      @if($a['status_class'] === 'bad')
-                        <button class="btn btn-primary btn-sm" type="button">Tandai Dipulihkan</button>
-                      @else
-                        <button class="btn btn-sm" type="button">Cek Ulang</button>
-                      @endif
-                    </div>
-                  </td>
-                </tr>
-                @endforeach
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      {{-- ===== LOG INSIDEN ===== --}}
-      <section class="tab-panel" data-tab-panel="insiden">
-        <div class="section-head">
-          <h2>Log Insiden & Pemulihan</h2>
-          <p>Riwayat lengkap serangan dan tindakan pemulihan yang sudah dilakukan.</p>
-        </div>
-        <div class="panel">
-          <div class="tbl-wrap">
-            <table class="dtbl">
-              <thead><tr><th>Aset</th><th>Jenis Gangguan</th><th>Waktu Insiden</th><th>Tindakan Pemulihan</th><th>Status</th></tr></thead>
-              <tbody>
-                @foreach($logInsiden as $l)
-                <tr>
-                  <td>{{ $l['aset'] }}</td>
-                  <td>{{ $l['jenis'] }}</td>
-                  <td>{{ $l['waktu'] }}</td>
-                  <td>{{ $l['tindakan'] }}</td>
-                  <td><span class="badge {{ $l['status_class'] }}">{{ $l['status'] }}</span></td>
                 </tr>
                 @endforeach
               </tbody>

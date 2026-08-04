@@ -35,6 +35,52 @@
     --display:'Rajdhani', sans-serif;
     --mono:'JetBrains Mono', monospace;
     --body:'Inter', sans-serif;
+
+    --header-bg:rgba(6,20,13,.82);
+    --overlay-bg:rgba(3,10,6,.72);
+    --hero-ov-1:rgba(4,16,10,.97);
+    --hero-ov-2:rgba(4,16,10,.93);
+    --hero-ov-3:rgba(4,16,10,.72);
+    --hero-ov-4:rgba(4,16,10,.9);
+    --hero-ov-top:rgba(4,16,10,1);
+    --hero-ov-top-fade:rgba(4,16,10,0);
+    --chip-bg:transparent;
+    --chip-border:transparent;
+    --chip-shadow:none;
+  }
+
+  html[data-theme="light"]{
+    --bg:#f3efe1;
+    --bg-deep:#e9e2cd;
+    --panel:#ffffff;
+    --panel-2:#fffdf7;
+    --panel-alt:#f6f1e2;
+    --border:rgba(150,110,20,.28);
+    --border-soft:rgba(150,110,20,.16);
+    --border-strong:rgba(150,110,20,.48);
+    --gold:#e0900d;
+    --gold-bright:#c4720a;
+    --gold-dim:rgba(224,144,13,.16);
+    --green:#1f7a48;
+    --green-bright:#166238;
+    --green-dim:rgba(31,122,72,.14);
+    --red:#b5342f;
+    --red-dim:rgba(181,52,47,.12);
+    --text:#1b2620;
+    --text-muted:#465a4d;
+    --text-dim:#6c7d70;
+
+    --header-bg:rgba(255,253,247,.86);
+    --overlay-bg:rgba(233,226,205,.78);
+    --hero-ov-1:rgba(243,239,225,.96);
+    --hero-ov-2:rgba(243,239,225,.9);
+    --hero-ov-3:rgba(243,239,225,.55);
+    --hero-ov-4:rgba(243,239,225,.9);
+    --hero-ov-top:rgba(243,239,225,1);
+    --hero-ov-top-fade:rgba(243,239,225,0);
+    --chip-bg:rgba(255,253,247,.72);
+    --chip-border:rgba(150,110,20,.18);
+    --chip-shadow:0 3px 12px rgba(0,0,0,.07);
   }
 
   *{margin:0;padding:0;box-sizing:border-box;}
@@ -151,7 +197,6 @@
     text-transform:uppercase;
     display:flex;align-items:center;gap:10px;
   }
-  .eyebrow::before{content:"";width:22px;height:1px;background:var(--gold);display:inline-block;}
 
   .hud-panel{
     position:relative;background:linear-gradient(180deg, rgba(255,255,255,.02), transparent), var(--panel);
@@ -166,7 +211,7 @@
   /* ================= NAV ================= */
   header{
     position:sticky;top:0;z-index:20;
-    background:rgba(6,20,13,.82);backdrop-filter:blur(12px);
+    background:var(--header-bg);backdrop-filter:blur(12px);
     border-bottom:1px solid var(--border-soft);
   }
   nav{
@@ -198,7 +243,7 @@
     transition:color .2s ease;
     position:relative;
   }
-  .nav-links a:hover, .nav-links a:focus-visible{color:var(--gold-bright);}
+  .nav-links a:hover, .nav-links a:focus-visible, .nav-links a.active{color:var(--gold-bright);}
 
   .btn-restricted{
     font-family:var(--mono);font-size:11px;letter-spacing:.06em;
@@ -223,12 +268,30 @@
   .nav-cta{display:flex;align-items:center;gap:12px;}
   .btn-nav{padding:0 20px;height:42px;font-size:12px;box-sizing:border-box;}
 
+  .btn-theme{
+    font-family:var(--mono);font-size:11px;letter-spacing:.06em;
+    color:var(--text-muted);border:1px solid var(--border);
+    width:42px;height:42px;background:transparent;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    border-radius:8px;box-sizing:border-box;flex-shrink:0;
+    transition:border-color .2s ease, color .2s ease, transform .2s ease;
+  }
+  .btn-theme:hover{border-color:var(--gold);color:var(--gold-bright);transform:translateY(-2px);}
+  .btn-theme svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;}
+  .btn-theme .icon-sun circle{fill:var(--gold-dim);transition:fill .2s ease;}
+  .btn-theme .icon-moon path{fill:var(--gold-dim);transition:fill .2s ease;}
+  .btn-theme:hover .icon-sun circle{fill:var(--gold);}
+  .btn-theme:hover .icon-moon path{fill:var(--gold);}
+  .btn-theme .icon-sun{display:none;}
+  html[data-theme="light"] .btn-theme .icon-sun{display:block;}
+  html[data-theme="light"] .btn-theme .icon-moon{display:none;}
+
   @media (max-width:560px){ .btn-restricted{display:none;} }
 
   /* ================= LOGIN MODAL ================= */
   .login-overlay{
     position:fixed;inset:0;z-index:60;
-    background:rgba(3,10,6,.72);backdrop-filter:blur(3px);
+    background:var(--overlay-bg);backdrop-filter:blur(3px);
     display:flex;align-items:center;justify-content:center;
     padding:24px;
     opacity:0;pointer-events:none;
@@ -249,7 +312,7 @@
     color:var(--text-muted);cursor:pointer;
   }
   .login-close:hover{color:var(--gold-bright);}
-  .login-crest{width:46px;height:46px;border-radius:50%;overflow:hidden;border:1px solid var(--border-strong);margin-bottom:14px;}
+  .login-crest{width:84px;height:84px;border-radius:50%;overflow:hidden;border:1px solid var(--border-strong);margin:0 auto 16px;}
   .login-crest img{width:100%;height:100%;object-fit:cover;}
   .login-title{font-family:var(--display);font-size:26px;font-weight:700;margin-top:6px;letter-spacing:.01em;}
   .login-sub{color:var(--text-muted);font-size:13px;margin-top:8px;line-height:1.6;}
@@ -267,6 +330,20 @@
   }
   .login-input:focus{outline:none;border-color:var(--gold);}
   .login-input option{background:var(--panel-2);color:var(--text);}
+  .login-field{position:relative;margin-bottom:18px;}
+  .login-field .login-input{padding-right:42px;width:100%;margin-bottom:0;}
+  .field-toggle{
+    position:absolute;top:0;bottom:0;right:2px;margin:auto 0;
+    height:36px;width:36px;padding:0;line-height:0;box-sizing:border-box;
+    display:flex;align-items:center;justify-content:center;
+    background:none;border:none;cursor:pointer;color:var(--text-dim);
+    transition:color .2s ease;
+  }
+  .field-toggle:hover{color:var(--gold-bright);}
+  .field-toggle svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7;}
+  .field-toggle .icon-eye-off{display:none;}
+  .field-toggle.is-visible .icon-eye{display:none;}
+  .field-toggle.is-visible .icon-eye-off{display:block;}
   .login-error{
     display:block;font-family:var(--mono);font-size:11px;color:#e07a72;
     margin-top:-12px;margin-bottom:14px;
@@ -282,8 +359,8 @@
   .hero-stats-bg{
     position:relative;overflow:hidden;
     background-image:
-      linear-gradient(115deg, rgba(4,16,10,.97) 0%, rgba(4,16,10,.93) 32%, rgba(4,16,10,.72) 58%, rgba(4,16,10,.9) 100%),
-      linear-gradient(to top, rgba(4,16,10,1) 0%, rgba(4,16,10,0) 26%),
+      linear-gradient(115deg, var(--hero-ov-1) 0%, var(--hero-ov-2) 32%, var(--hero-ov-3) 58%, var(--hero-ov-4) 100%),
+      linear-gradient(to top, var(--hero-ov-top) 0%, var(--hero-ov-top-fade) 26%),
       url('<?php echo e(asset('images/hero-lapangan-mabesad.jpg')); ?>');
     background-size:cover;
     background-position:center 58%;
@@ -359,6 +436,28 @@
     letter-spacing:.14em;text-transform:uppercase;line-height:1.8;
   }
   .hero-crest-caption b{color:var(--gold-bright);font-weight:600;}
+
+  /* teks kecil di atas foto hero: chip transparan + lebih tebal biar kebaca.
+     Ukuran/padding/border SAMA di kedua tema (cuma warnanya beda via variabel)
+     supaya tidak ada pergeseran layout saat ganti tema. */
+  .hero-stats-bg .eyebrow{
+    background:var(--chip-bg);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+    border:1px solid var(--chip-border);border-radius:7px;
+    padding:5px 11px;width:fit-content;font-weight:600;
+    box-shadow:var(--chip-shadow);
+  }
+  .hero-stats-bg .pill{
+    background:var(--chip-bg);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+    font-weight:600;box-shadow:var(--chip-shadow);
+  }
+  .hero-stats-bg .hero-crest-caption{
+    display:inline-block;background:var(--chip-bg);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+    border:1px solid var(--chip-border);border-radius:10px;
+    padding:10px 18px;box-shadow:var(--chip-shadow);
+    font-weight:500;
+  }
+  .hero-stats-bg .hero-crest-caption b{font-weight:700;}
+  .hero-stats-bg .hero-crest{text-align:center;}
 
   /* ================= STATS ================= */
   .stats{padding:6px 0 84px;}
@@ -538,6 +637,14 @@
     *{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important;}
   }
 </style>
+<script>
+  (function(){
+    var saved = localStorage.getItem('siberad-theme');
+    if(saved === 'light'){ document.documentElement.setAttribute('data-theme','light'); }
+  })();
+</script>
+
+<?php echo app('Illuminate\Foundation\Vite')(['resources/js/app.js']); ?>
 </head>
 <body class="is-loading">
 
@@ -577,6 +684,15 @@
             AKSES TERBATAS
             <span class="tooltip">Khusus personel terverifikasi PUSSIBERAD</span>
           </button>
+          <button class="btn-theme" type="button" id="themeToggle" aria-label="Ganti tema">
+            <svg class="icon-moon" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"></path>
+            </svg>
+            <svg class="icon-sun" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="4.2"></circle>
+              <path d="M12 2.5v2.4M12 19.1v2.4M4.4 4.4l1.7 1.7M17.9 17.9l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.4 19.6l1.7-1.7M17.9 6.1l1.7-1.7"></path>
+            </svg>
+          </button>
           <a class="btn btn-primary btn-nav" href="#login">Login</a>
         </div>
       </nav>
@@ -588,40 +704,10 @@
     <div class="login-card hud-panel" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
       <button class="login-close" id="loginClose" type="button" aria-label="Tutup">&times;</button>
       <div class="login-crest"><img src="<?php echo e(asset('images/logo-pussiberad.jpg')); ?>" alt="Lambang Pussiberad"></div>
-      <div class="eyebrow">SIBERAD // AUTENTIKASI</div>
       <h3 id="loginTitle" class="login-title">Login Sistem</h3>
       <p class="login-sub">Masuk menggunakan akun personel yang terdaftar.</p>
       <form class="login-form" id="loginForm" method="POST" action="<?php echo e(route('login')); ?>">
         <?php echo csrf_field(); ?>
-        <label class="login-label" for="loginSatuan">Login sebagai</label>
-        <select class="login-input" id="loginSatuan" name="satuan_id" required>
-          <option value="" disabled <?php echo e(old('satuan_id') ? '' : 'selected'); ?>>— Pilih satuan —</option>
-          <?php $__currentLoopData = ($satuans ?? []); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $kategori => $group): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-            <optgroup label="<?php echo e(match($kategori) {
-              'satlak' => 'Satuan Pelaksana (Satlak)',
-              'direktorat' => 'Direktorat (DIR)',
-              'pimpinan' => 'Koordinasi & Pimpinan',
-              default => ucfirst($kategori),
-            }); ?>">
-              <?php $__currentLoopData = $group; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $satuan): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                <option value="<?php echo e($satuan->id); ?>" <?php echo e((string) old('satuan_id') === (string) $satuan->id ? 'selected' : ''); ?>>
-                  <?php echo e($satuan->nama); ?>
-
-                </option>
-              <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-            </optgroup>
-          <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-        </select>
-        <?php $__errorArgs = ['satuan_id'];
-$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
-if ($__bag->has($__errorArgs[0])) :
-if (isset($message)) { $__messageOriginal = $message; }
-$message = $__bag->first($__errorArgs[0]); ?>
-          <span class="login-error"><?php echo e($message); ?></span>
-        <?php unset($message);
-if (isset($__messageOriginal)) { $message = $__messageOriginal; }
-endif;
-unset($__errorArgs, $__bag); ?>
         <label class="login-label" for="loginUser">NIP / Username</label>
         <input class="login-input" id="loginUser" name="username" type="text" value="<?php echo e(old('username')); ?>" autocomplete="username" required>
         <?php $__errorArgs = ['username'];
@@ -635,7 +721,13 @@ if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>
         <label class="login-label" for="loginPass">Password</label>
-        <input class="login-input" id="loginPass" name="password" type="password" autocomplete="current-password" required>
+        <div class="login-field">
+          <input class="login-input" id="loginPass" name="password" type="password" autocomplete="current-password" required>
+          <button class="field-toggle" type="button" data-target="loginPass" aria-label="Tampilkan Password">
+            <svg class="icon-eye" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z"/><circle cx="12" cy="12" r="3.2"/></svg>
+            <svg class="icon-eye-off" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18"/><path d="M10.6 5.1A10.9 10.9 0 0 1 12 5c7 0 10.5 7 10.5 7a13.6 13.6 0 0 1-3.2 4.1M6.6 6.6C3.5 8.5 1.5 12 1.5 12s3.5 7 10.5 7a10.6 10.6 0 0 0 4.2-.85"/><path d="M9.5 9.7a3.2 3.2 0 0 0 4.5 4.5"/></svg>
+          </button>
+        </div>
         <?php $__errorArgs = ['password'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
@@ -904,6 +996,19 @@ unset($__errorArgs, $__bag); ?>
     }, reduceMotion ? 0 : 260);
   }, duration);
 
+  // ---------- ganti tema (gelap/terang) ----------
+  const themeToggle = document.getElementById('themeToggle');
+  themeToggle.addEventListener('click', ()=>{
+    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    if(isLight){
+      document.documentElement.removeAttribute('data-theme');
+      localStorage.setItem('siberad-theme', 'dark');
+    } else {
+      document.documentElement.setAttribute('data-theme', 'light');
+      localStorage.setItem('siberad-theme', 'light');
+    }
+  });
+
   // ---------- login modal ----------
   const loginOverlay = document.getElementById('loginOverlay');
   const loginTriggers = document.querySelectorAll('a[href="#login"]');
@@ -923,6 +1028,17 @@ unset($__errorArgs, $__bag); ?>
   document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeLogin(); });
   // form login dikirim langsung via POST ke route('login') — tanpa intercept JS
 
+  // ---------- toggle tampilkan/sembunyikan NIP/Username & Password ----------
+  document.querySelectorAll('.field-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const input = document.getElementById(btn.dataset.target);
+      const isHidden = input.type === 'password';
+      input.type = isHidden ? 'text' : 'password';
+      btn.classList.toggle('is-visible', isHidden);
+      btn.setAttribute('aria-label', isHidden ? 'Sembunyikan' : 'Tampilkan');
+    });
+  });
+
   <?php if($errors->any()): ?>
     openLogin();
   <?php endif; ?>
@@ -940,6 +1056,32 @@ unset($__errorArgs, $__bag); ?>
     document.querySelectorAll('.hero [data-reveal]').forEach(el=>el.classList.add('in'));
   }
 
+  // ---------- nav aktif mengikuti section (scrollspy) ----------
+  const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+  const navSectionMap = new Map();
+  navLinks.forEach(link => {
+    const target = document.querySelector(link.getAttribute('href'));
+    if (target) navSectionMap.set(target, link);
+  });
+
+  function setActiveNavLink(activeLink) {
+    navLinks.forEach(a => a.classList.remove('active'));
+    if (activeLink) activeLink.classList.add('active');
+  }
+
+  const navSpyObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) setActiveNavLink(navSectionMap.get(entry.target));
+    });
+  }, { rootMargin: '-40% 0px -55% 0px', threshold: 0 });
+
+  navSectionMap.forEach((link, section) => navSpyObserver.observe(section));
+
+  // set aktif langsung saat diklik (biar kerasa instan sebelum animasi scroll selesai)
+  navLinks.forEach(link => {
+    link.addEventListener('click', () => setActiveNavLink(link));
+  });
+
   // ---------- tombol back to top (muncul setelah scroll) ----------
   const backToTopBtn = document.getElementById('backToTopFloat');
   function toggleBackToTop(){
@@ -951,5 +1093,4 @@ unset($__errorArgs, $__bag); ?>
 
 </script>
 </body>
-</html>
-<?php /**PATH D:\Unjani\Kerja Praktek\kelompok5\KP_UNJANI_SI_2026\resources\views/siberad/landing/welcome.blade.php ENDPATH**/ ?>
+</html><?php /**PATH D:\Unjani\Kerja Praktek\kelompok5\KP_UNJANI_SI_2026\resources\views/siberad/landing/welcome.blade.php ENDPATH**/ ?>

@@ -18,8 +18,6 @@
     <nav class="side-nav">
       <div class="side-nav-label">Menu</div>
       <a href="#" class="side-link active" data-tab-link="ringkasan"><span class="dot"></span>Ringkasan</a>
-      <a href="#" class="side-link" data-tab-link="monitoring"><span class="dot"></span>Monitoring Aset</a>
-      <a href="#" class="side-link" data-tab-link="insiden"><span class="dot"></span>Log Insiden</a>
       <?php if(($user->jabatan ?? '') === 'Piket'): ?>
       <a href="#" class="side-link" data-tab-link="lapor"><span class="dot"></span>Buat Laporan</a>
       <?php else: ?>
@@ -56,49 +54,71 @@
           </button>
 
           <div class="profile-dropdown" id="profileDropdown" role="menu" aria-label="Menu profil">
-            <div class="profile-dropdown-head">
-              <div class="profile-dropdown-avatar">
-                <span class="profile-initial" id="profileInitialDropdown"><?php echo e(strtoupper(mb_substr($user->name ?? 'U', 0, 1))); ?></span>
-                <img class="profile-photo" id="profilePhotoDropdown" alt="Foto profil <?php echo e($user->name); ?>">
+
+            
+            <div class="profile-dropdown-view" id="profileMainView">
+              <div class="profile-dropdown-head">
+                <div class="profile-dropdown-avatar">
+                  <span class="profile-initial" id="profileInitialDropdown"><?php echo e(strtoupper(mb_substr($user->name ?? 'U', 0, 1))); ?></span>
+                  <img class="profile-photo" id="profilePhotoDropdown" alt="Foto profil <?php echo e($user->name); ?>">
+                </div>
+                <div>
+                  <div class="profile-dropdown-name"><?php echo e($user->name); ?></div>
+                  <div class="profile-dropdown-role"><?php echo e($user->jabatan ?? 'Pengguna'); ?></div>
+                </div>
               </div>
-              <div>
+
+              <button type="button" class="profile-dropdown-item" id="openProfilSayaBtn" role="menuitem">
+                <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"></circle><path d="M5 20c1.2-4 4.2-6 7-6s5.8 2 7 6"></path></svg>
+                Profil Saya
+              </button>
+              <a href="#" class="profile-dropdown-item" role="menuitem" onclick="alert('Prototype — pengaturan akun belum tersambung.'); return false;">
+                <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.5-2-3.4-2.3.9a7.6 7.6 0 0 0-2.6-1.5L14 2.5h-4l-.5 2.5a7.6 7.6 0 0 0-2.6 1.5l-2.3-.9-2 3.4 2 1.5a7.6 7.6 0 0 0 0 3l-2 1.5 2 3.4 2.3-.9a7.6 7.6 0 0 0 2.6 1.5l.5 2.5h4l.5-2.5a7.6 7.6 0 0 0 2.6-1.5l2.3.9 2-3.4Z"></path></svg>
+                Pengaturan Akun
+              </a>
+              <a href="#" class="profile-dropdown-item" role="menuitem" onclick="alert('Prototype — pusat bantuan belum tersambung.'); return false;">
+                <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"></circle><path d="M9.2 9.2a2.8 2.8 0 1 1 3.9 2.6c-.8.4-1.1 1-1.1 1.9"></path><path d="M12 17.2h.01"></path></svg>
+                Bantuan &amp; Panduan
+              </a>
+
+              <div class="profile-dropdown-divider"></div>
+
+              <form method="POST" action="<?php echo e(route('logout')); ?>">
+                <?php echo csrf_field(); ?>
+                <button type="submit" class="profile-dropdown-item danger" role="menuitem">
+                  <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>
+                  Keluar
+                </button>
+              </form>
+            </div>
+
+            
+            <div class="profile-dropdown-view" id="profilePhotoView" style="display:none;">
+              <button type="button" class="profile-dropdown-back" id="backToMainBtn">
+                <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg>
+                Profil Saya
+              </button>
+
+              <div class="profile-dropdown-head-lg">
+                <div class="profile-dropdown-avatar-lg">
+                  <span class="profile-initial" id="profileInitialLarge"><?php echo e(strtoupper(mb_substr($user->name ?? 'U', 0, 1))); ?></span>
+                  <img class="profile-photo" id="profilePhotoLarge" alt="Foto profil <?php echo e($user->name); ?>">
+                </div>
                 <div class="profile-dropdown-name"><?php echo e($user->name); ?></div>
                 <div class="profile-dropdown-role"><?php echo e($user->jabatan ?? 'Pengguna'); ?></div>
               </div>
+
+              <button type="button" class="profile-dropdown-item" id="gantiFotoBtn" role="menuitem">
+                <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2l1-2h7l1 2h2A1.5 1.5 0 0 1 20 8.5v9A1.5 1.5 0 0 1 18.5 19h-13A1.5 1.5 0 0 1 4 17.5Z"></path><circle cx="12" cy="13" r="3.4"></circle></svg>
+                <span id="gantiFotoLabel">Ganti Foto Profil</span>
+              </button>
+              <button type="button" class="profile-dropdown-item" id="hapusFotoBtn" role="menuitem" style="display:none;">
+                <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"></path><path d="M9 7V4.5A1.5 1.5 0 0 1 10.5 3h3A1.5 1.5 0 0 1 15 4.5V7"></path><path d="M18 7l-.8 12.1a1.8 1.8 0 0 1-1.8 1.7H8.6a1.8 1.8 0 0 1-1.8-1.7L6 7"></path></svg>
+                Hapus Foto Profil
+              </button>
+              <input type="file" id="fotoProfilInput" accept="image/png,image/jpeg,image/webp" hidden>
             </div>
 
-            <button type="button" class="profile-dropdown-item" id="gantiFotoBtn" role="menuitem">
-              <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2l1-2h7l1 2h2A1.5 1.5 0 0 1 20 8.5v9A1.5 1.5 0 0 1 18.5 19h-13A1.5 1.5 0 0 1 4 17.5Z"></path><circle cx="12" cy="13" r="3.4"></circle></svg>
-              <span id="gantiFotoLabel">Ganti Foto Profil</span>
-            </button>
-            <button type="button" class="profile-dropdown-item" id="hapusFotoBtn" role="menuitem" style="display:none;">
-              <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"></path><path d="M9 7V4.5A1.5 1.5 0 0 1 10.5 3h3A1.5 1.5 0 0 1 15 4.5V7"></path><path d="M18 7l-.8 12.1a1.8 1.8 0 0 1-1.8 1.7H8.6a1.8 1.8 0 0 1-1.8-1.7L6 7"></path></svg>
-              Hapus Foto Profil
-            </button>
-            <input type="file" id="fotoProfilInput" accept="image/png,image/jpeg,image/webp" hidden>
-
-            <a href="#" class="profile-dropdown-item" role="menuitem" onclick="alert('Prototype — halaman profil belum tersambung.'); return false;">
-              <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"></circle><path d="M5 20c1.2-4 4.2-6 7-6s5.8 2 7 6"></path></svg>
-              Profil Saya
-            </a>
-            <a href="#" class="profile-dropdown-item" role="menuitem" onclick="alert('Prototype — pengaturan akun belum tersambung.'); return false;">
-              <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.5-2-3.4-2.3.9a7.6 7.6 0 0 0-2.6-1.5L14 2.5h-4l-.5 2.5a7.6 7.6 0 0 0-2.6 1.5l-2.3-.9-2 3.4 2 1.5a7.6 7.6 0 0 0 0 3l-2 1.5 2 3.4 2.3-.9a7.6 7.6 0 0 0 2.6 1.5l.5 2.5h4l.5-2.5a7.6 7.6 0 0 0 2.6-1.5l2.3.9 2-3.4Z"></path></svg>
-              Pengaturan Akun
-            </a>
-            <a href="#" class="profile-dropdown-item" role="menuitem" onclick="alert('Prototype — pusat bantuan belum tersambung.'); return false;">
-              <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"></circle><path d="M9.2 9.2a2.8 2.8 0 1 1 3.9 2.6c-.8.4-1.1 1-1.1 1.9"></path><path d="M12 17.2h.01"></path></svg>
-              Bantuan &amp; Panduan
-            </a>
-
-            <div class="profile-dropdown-divider"></div>
-
-            <form method="POST" action="<?php echo e(route('logout')); ?>">
-              <?php echo csrf_field(); ?>
-              <button type="submit" class="profile-dropdown-item danger" role="menuitem">
-                <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>
-                Keluar
-              </button>
-            </form>
           </div>
         </div>
       </div>
@@ -147,66 +167,6 @@
                   <td><?php echo e($i['jenis']); ?></td>
                   <td><?php echo e($i['waktu']); ?></td>
                   <td><span class="status-dot <?php echo e($i['status_class']); ?>"><?php echo e($i['status']); ?></span></td>
-                </tr>
-                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      
-      <section class="tab-panel" data-tab-panel="monitoring">
-        <div class="section-head">
-          <h2>Monitoring Aset / Website</h2>
-          <p>Daftar seluruh aset digital yang dipantau beserta status terkininya.</p>
-        </div>
-        <div class="panel">
-          <div class="tbl-wrap">
-            <table class="dtbl">
-              <thead><tr><th>Nama Aset</th><th>URL</th><th>Status</th><th>Pengecekan Terakhir</th><th>Aksi</th></tr></thead>
-              <tbody>
-                <?php $__currentLoopData = $asetMonitoring; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $a): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                <tr>
-                  <td><?php echo e($a['nama']); ?></td>
-                  <td style="font-family:var(--mono);font-size:12px;color:var(--text-muted);"><?php echo e($a['url']); ?></td>
-                  <td><span class="status-dot <?php echo e($a['status_class']); ?>"><?php echo e($a['status']); ?></span></td>
-                  <td><?php echo e($a['cek_terakhir']); ?></td>
-                  <td>
-                    <div class="btn-row">
-                      <?php if($a['status_class'] === 'bad'): ?>
-                        <button class="btn btn-primary btn-sm" type="button">Tandai Dipulihkan</button>
-                      <?php else: ?>
-                        <button class="btn btn-sm" type="button">Cek Ulang</button>
-                      <?php endif; ?>
-                    </div>
-                  </td>
-                </tr>
-                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      
-      <section class="tab-panel" data-tab-panel="insiden">
-        <div class="section-head">
-          <h2>Log Insiden & Pemulihan</h2>
-          <p>Riwayat lengkap serangan dan tindakan pemulihan yang sudah dilakukan.</p>
-        </div>
-        <div class="panel">
-          <div class="tbl-wrap">
-            <table class="dtbl">
-              <thead><tr><th>Aset</th><th>Jenis Gangguan</th><th>Waktu Insiden</th><th>Tindakan Pemulihan</th><th>Status</th></tr></thead>
-              <tbody>
-                <?php $__currentLoopData = $logInsiden; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $l): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                <tr>
-                  <td><?php echo e($l['aset']); ?></td>
-                  <td><?php echo e($l['jenis']); ?></td>
-                  <td><?php echo e($l['waktu']); ?></td>
-                  <td><?php echo e($l['tindakan']); ?></td>
-                  <td><span class="badge <?php echo e($l['status_class']); ?>"><?php echo e($l['status']); ?></span></td>
                 </tr>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
               </tbody>
@@ -348,12 +308,27 @@
         var menuBtn = document.getElementById('profileMenuBtn');
         var dropdown = document.getElementById('profileDropdown');
         var wrapper = document.getElementById('profileMenu');
+        var mainView = document.getElementById('profileMainView');
+        var photoView = document.getElementById('profilePhotoView');
+        var openProfilBtn = document.getElementById('openProfilSayaBtn');
+        var backBtn = document.getElementById('backToMainBtn');
         if (!menuBtn || !dropdown || !wrapper) return;
+
+        function showMainView() {
+          if (mainView) mainView.style.display = 'block';
+          if (photoView) photoView.style.display = 'none';
+        }
+
+        function showPhotoView() {
+          if (mainView) mainView.style.display = 'none';
+          if (photoView) photoView.style.display = 'block';
+        }
 
         function closeMenu() {
           dropdown.classList.remove('open');
           menuBtn.classList.remove('open');
           menuBtn.setAttribute('aria-expanded', 'false');
+          showMainView();
         }
 
         function openMenu() {
@@ -370,6 +345,20 @@
             openMenu();
           }
         });
+
+        if (openProfilBtn) {
+          openProfilBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            showPhotoView();
+          });
+        }
+
+        if (backBtn) {
+          backBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            showMainView();
+          });
+        }
 
         document.addEventListener('click', function (e) {
           if (!wrapper.contains(e.target)) closeMenu();
@@ -395,28 +384,36 @@
 
         var photoBtn = document.getElementById('profilePhotoBtn');
         var photoDropdown = document.getElementById('profilePhotoDropdown');
+        var photoLarge = document.getElementById('profilePhotoLarge');
         var initialBtn = document.getElementById('profileInitial');
         var initialDropdown = document.getElementById('profileInitialDropdown');
+        var initialLarge = document.getElementById('profileInitialLarge');
 
         if (!fileInput || !gantiBtn || !hapusBtn) return;
 
         function showPhoto(dataUrl) {
           photoBtn.src = dataUrl;
           photoDropdown.src = dataUrl;
+          photoLarge.src = dataUrl;
           photoBtn.classList.add('visible');
           photoDropdown.classList.add('visible');
+          photoLarge.classList.add('visible');
           initialBtn.classList.add('hidden');
           initialDropdown.classList.add('hidden');
+          initialLarge.classList.add('hidden');
           hapusBtn.style.display = 'flex';
         }
 
         function clearPhoto() {
           photoBtn.classList.remove('visible');
           photoDropdown.classList.remove('visible');
+          photoLarge.classList.remove('visible');
           photoBtn.removeAttribute('src');
           photoDropdown.removeAttribute('src');
+          photoLarge.removeAttribute('src');
           initialBtn.classList.remove('hidden');
           initialDropdown.classList.remove('hidden');
+          initialLarge.classList.remove('hidden');
           hapusBtn.style.display = 'none';
         }
 
@@ -555,4 +552,4 @@
 </div>
 <?php echo $__env->make('siberad.dashboards.partials.dash-script', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </body>
-</html><?php /**PATH D:\SEMESTER 6\KP PUSSIBERAD\KP_UNJANI_SI_2026\resources\views/siberad/dashboards/satlakal.blade.php ENDPATH**/ ?>
+</html><?php /**PATH D:\Unjani\Kerja Praktek\kelompok5\KP_UNJANI_SI_2026\resources\views/siberad/dashboards/satlakal.blade.php ENDPATH**/ ?>
