@@ -20,11 +20,7 @@
       <a href="#" class="side-link active" data-tab-link="ringkasan"><span class="dot"></span>Ringkasan</a>
       <a href="#" class="side-link" data-tab-link="proyek"><span class="dot"></span>Proyek Riset</a>
       <a href="#" class="side-link" data-tab-link="uji"><span class="dot"></span>Log Uji & Pengembangan</a>
-      @if(($user->jabatan ?? '') === 'Piket')
-      <a href="#" class="side-link" data-tab-link="lapor"><span class="dot"></span>Buat Laporan</a>
-      @else
       <a href="#" class="side-link" data-tab-link="lapor"><span class="dot"></span>Verifikasi Laporan</a>
-      @endif
     </nav>
     <div class="side-foot">
       <form class="logout" method="POST" action="{{ route('logout') }}">
@@ -155,49 +151,9 @@
 
       {{-- ===== LAPOR / VERIFIKASI ===== --}}
       <section class="tab-panel" data-tab-panel="lapor">
-        @if(($user->jabatan ?? '') === 'Piket')
           <div class="section-head">
-            <h2>Buat Laporan / Pengajuan</h2>
-            <p>Form untuk Piket melaporkan kendala atau mengajukan kebutuhan proyek ke Komandan Satlok Duktek (Dukungan Teknologi).</p>
-          </div>
-          <div class="panel">
-            <form class="form-grid" onsubmit="event.preventDefault(); alert('Prototype — form ini belum tersambung ke database.');">
-              <div class="form-field">
-                <label for="proyekLapor">Proyek Terkait</label>
-                <select id="proyekLapor">
-                  @foreach($proyekRiset as $p)
-                    <option>{{ $p['nama'] }}</option>
-                  @endforeach
-                </select>
-              </div>
-              <div class="form-field">
-                <label for="prioritasLapor">Prioritas</label>
-                <select id="prioritasLapor">
-                  <option>Tinggi</option><option>Sedang</option><option>Rendah</option>
-                </select>
-              </div>
-              <div class="form-field full">
-                <label for="perihalLapor">Perihal</label>
-                <input id="perihalLapor" type="text" placeholder="Contoh: Pengajuan anggaran komponen drone">
-              </div>
-              <div class="form-field full">
-                <label for="deskripsiLapor">Deskripsi</label>
-                <textarea id="deskripsiLapor" rows="4" placeholder="Jelaskan kebutuhan, kendala, atau hasil uji terkait..."></textarea>
-              </div>
-              <div class="form-field full">
-                <label for="lampiranLapor">Lampiran (dokumentasi / data uji)</label>
-                <input id="lampiranLapor" type="file" accept=".pdf">
-                <span class="form-hint">Format PDF, maksimal 20 MB, dikirim langsung ke DANPUS.</span>
-              </div>
-              <div class="form-field full">
-                <button class="btn btn-primary" type="submit">Kirim ke Komandan</button>
-              </div>
-            </form>
-          </div>
-        @else
-          <div class="section-head">
-            <h2>Verifikasi Laporan dari Piket</h2>
-            <p>Laporan atau pengajuan yang dikirim Piket dan menunggu verifikasi Komandan sebelum diteruskan langsung ke DANPUS.</p>
+            <h2>Verifikasi &amp; Teruskan Laporan</h2>
+            <p>Laporan atau pengajuan yang menunggu diteruskan langsung ke DANPUS.</p>
           </div>
           <div class="panel">
             <div class="tbl-wrap">
@@ -223,7 +179,6 @@
               </table>
             </div>
           </div>
-        @endif
         <div class="panel" style="margin-top:20px;">
           <div class="panel-head">
             <div><h3>Koordinasi dengan SDIR</h3><p>Ajukan permintaan koordinasi (bukan laporan insiden) ke SDIR bila diperlukan.</p></div>

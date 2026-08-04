@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('username')->unique()->after('name'); // NIP / username login
             $table->foreignId('satuan_id')->nullable()->after('username')
                 ->constrained('satuans')->nullOnDelete();
-            $table->string('jabatan')->nullable()->after('satuan_id'); // mis. Komandan, Piket
+            $table->string('jabatan')->nullable()->after('satuan_id'); // opsional, tidak lagi dipakai untuk membedakan role tampilan
         });
     }
 

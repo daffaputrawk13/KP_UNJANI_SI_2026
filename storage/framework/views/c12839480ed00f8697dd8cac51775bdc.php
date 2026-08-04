@@ -4,15 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Satlak Sibersos — SIBERAD</title>
-<link rel="icon" type="image/jpeg" href="{{ asset('images/logo-pussiberad.jpg') }}">
-@include('siberad.dashboards.partials.dash-styles')
+<link rel="icon" type="image/jpeg" href="<?php echo e(asset('images/logo-pussiberad.jpg')); ?>">
+<?php echo $__env->make('siberad.dashboards.partials.dash-styles', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </head>
 <body>
 <div class="shell">
 
   <aside class="sidebar" id="sidebar">
     <div class="side-brand">
-      <img src="{{ asset('images/logo-pussiberad.jpg') }}" alt="Lambang Pussiberad">
+      <img src="<?php echo e(asset('images/logo-pussiberad.jpg')); ?>" alt="Lambang Pussiberad">
       <div class="logo">SIBER<span>AD</span></div>
     </div>
     <nav class="side-nav">
@@ -23,8 +23,8 @@
       <a href="#" class="side-link" data-tab-link="lapor"><span class="dot"></span>Verifikasi Laporan</a>
     </nav>
     <div class="side-foot">
-      <form class="logout" method="POST" action="{{ route('logout') }}">
-        @csrf
+      <form class="logout" method="POST" action="<?php echo e(route('logout')); ?>">
+        <?php echo csrf_field(); ?>
         <button type="submit">Keluar</button>
       </form>
     </div>
@@ -35,7 +35,7 @@
       <div style="display:flex;align-items:center;gap:12px;">
         <button class="menu-btn" id="menuBtn">☰</button>
         <div>
-          <div class="topbar-title">Selamat datang, {{ $user->name }}</div>
+          <div class="topbar-title">Selamat datang, <?php echo e($user->name); ?></div>
         </div>
       </div>
       <div class="topbar-actions">
@@ -48,7 +48,7 @@
 
     <div class="content">
 
-      {{-- ===== RINGKASAN ===== --}}
+      
       <section class="tab-panel active" data-tab-panel="ringkasan">
         <div class="section-head">
           <h2>Ringkasan Pemantauan Medsos</h2>
@@ -57,22 +57,22 @@
         <div class="stat-grid">
           <div class="stat-card">
             <div class="lbl">Akun Dipantau</div>
-            <div class="val">{{ $stats['akun_dipantau'] }}</div>
+            <div class="val"><?php echo e($stats['akun_dipantau']); ?></div>
             <div class="sub">Seluruh platform</div>
           </div>
           <div class="stat-card">
             <div class="lbl">Isu Aktif</div>
-            <div class="val" style="color:var(--red);">{{ $stats['isu_aktif'] }}</div>
+            <div class="val" style="color:var(--red);"><?php echo e($stats['isu_aktif']); ?></div>
             <div class="sub">Perlu ditindaklanjuti</div>
           </div>
           <div class="stat-card">
             <div class="lbl">Wilayah Terpantau</div>
-            <div class="val" style="color:var(--green-bright);">{{ $stats['wilayah'] }}</div>
+            <div class="val" style="color:var(--green-bright);"><?php echo e($stats['wilayah']); ?></div>
             <div class="sub">Cakupan daerah</div>
           </div>
           <div class="stat-card">
             <div class="lbl">Laporan Bulan Ini</div>
-            <div class="val">{{ $stats['laporan_bulan_ini'] }}</div>
+            <div class="val"><?php echo e($stats['laporan_bulan_ini']); ?></div>
             <div class="sub">Sudah tercatat bulan ini</div>
           </div>
         </div>
@@ -83,22 +83,22 @@
             <table class="dtbl">
               <thead><tr><th>Platform</th><th>Wilayah</th><th>Ringkasan Isu</th><th>Terdeteksi</th><th>Status</th></tr></thead>
               <tbody>
-                @foreach($isuTerbaru as $i)
+                <?php $__currentLoopData = $isuTerbaru; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <tr>
-                  <td>{{ $i['platform'] }}</td>
-                  <td>{{ $i['wilayah'] }}</td>
-                  <td>{{ $i['ringkasan'] }}</td>
-                  <td>{{ $i['waktu'] }}</td>
-                  <td><span class="status-dot {{ $i['status_class'] }}">{{ $i['status'] }}</span></td>
+                  <td><?php echo e($i['platform']); ?></td>
+                  <td><?php echo e($i['wilayah']); ?></td>
+                  <td><?php echo e($i['ringkasan']); ?></td>
+                  <td><?php echo e($i['waktu']); ?></td>
+                  <td><span class="status-dot <?php echo e($i['status_class']); ?>"><?php echo e($i['status']); ?></span></td>
                 </tr>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
               </tbody>
             </table>
           </div>
         </div>
       </section>
 
-      {{-- ===== MONITORING MEDSOS ===== --}}
+      
       <section class="tab-panel" data-tab-panel="monitoring">
         <div class="section-head">
           <h2>Monitoring Akun Media Sosial</h2>
@@ -109,22 +109,22 @@
             <table class="dtbl">
               <thead><tr><th>Nama Akun</th><th>Platform</th><th>Wilayah</th><th>Status</th><th>Pantauan Terakhir</th></tr></thead>
               <tbody>
-                @foreach($akunMonitoring as $a)
+                <?php $__currentLoopData = $akunMonitoring; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $a): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <tr>
-                  <td>{{ $a['nama'] }}</td>
-                  <td>{{ $a['platform'] }}</td>
-                  <td>{{ $a['wilayah'] }}</td>
-                  <td><span class="status-dot {{ $a['status_class'] }}">{{ $a['status'] }}</span></td>
-                  <td>{{ $a['terakhir'] }}</td>
+                  <td><?php echo e($a['nama']); ?></td>
+                  <td><?php echo e($a['platform']); ?></td>
+                  <td><?php echo e($a['wilayah']); ?></td>
+                  <td><span class="status-dot <?php echo e($a['status_class']); ?>"><?php echo e($a['status']); ?></span></td>
+                  <td><?php echo e($a['terakhir']); ?></td>
                 </tr>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
               </tbody>
             </table>
           </div>
         </div>
       </section>
 
-      {{-- ===== ISU TERDETEKSI ===== --}}
+      
       <section class="tab-panel" data-tab-panel="isu">
         <div class="section-head">
           <h2>Isu Terdeteksi</h2>
@@ -135,22 +135,22 @@
             <table class="dtbl">
               <thead><tr><th>Platform</th><th>Wilayah</th><th>Ringkasan Isu</th><th>Prioritas</th><th>Status Penanganan</th></tr></thead>
               <tbody>
-                @foreach($riwayatIsu as $r)
+                <?php $__currentLoopData = $riwayatIsu; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $r): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <tr>
-                  <td>{{ $r['platform'] }}</td>
-                  <td>{{ $r['wilayah'] }}</td>
-                  <td>{{ $r['ringkasan'] }}</td>
-                  <td><span class="status-dot {{ $r['prioritas_class'] }}">{{ $r['prioritas'] }}</span></td>
-                  <td><span class="badge {{ $r['status_class'] }}">{{ $r['status'] }}</span></td>
+                  <td><?php echo e($r['platform']); ?></td>
+                  <td><?php echo e($r['wilayah']); ?></td>
+                  <td><?php echo e($r['ringkasan']); ?></td>
+                  <td><span class="status-dot <?php echo e($r['prioritas_class']); ?>"><?php echo e($r['prioritas']); ?></span></td>
+                  <td><span class="badge <?php echo e($r['status_class']); ?>"><?php echo e($r['status']); ?></span></td>
                 </tr>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
               </tbody>
             </table>
           </div>
         </div>
       </section>
 
-      {{-- ===== LAPOR / VERIFIKASI ===== --}}
+      
       <section class="tab-panel" data-tab-panel="lapor">
           <div class="section-head">
             <h2>Verifikasi &amp; Teruskan Laporan</h2>
@@ -161,13 +161,13 @@
               <table class="dtbl">
                 <thead><tr><th>Platform</th><th>Wilayah</th><th>Ringkasan</th><th>Dilaporkan Oleh</th><th>Prioritas</th><th>Aksi</th></tr></thead>
                 <tbody>
-                  @foreach($laporanPiket as $l)
+                  <?php $__currentLoopData = $laporanPiket; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $l): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                   <tr>
-                    <td>{{ $l['platform'] }}</td>
-                    <td>{{ $l['wilayah'] }}</td>
-                    <td>{{ $l['ringkasan'] }}</td>
-                    <td>{{ $l['pelapor'] }}</td>
-                    <td><span class="status-dot {{ $l['prioritas_class'] }}">{{ $l['prioritas'] }}</span></td>
+                    <td><?php echo e($l['platform']); ?></td>
+                    <td><?php echo e($l['wilayah']); ?></td>
+                    <td><?php echo e($l['ringkasan']); ?></td>
+                    <td><?php echo e($l['pelapor']); ?></td>
+                    <td><span class="status-dot <?php echo e($l['prioritas_class']); ?>"><?php echo e($l['prioritas']); ?></span></td>
                     <td>
                       <div class="btn-row">
                         <button class="btn btn-primary btn-sm" type="button">Verifikasi & Teruskan ke DANPUS</button>
@@ -175,7 +175,7 @@
                       </div>
                     </td>
                   </tr>
-                  @endforeach
+                  <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </tbody>
               </table>
             </div>
@@ -196,6 +196,6 @@
     </div>
   </main>
 </div>
-@include('siberad.dashboards.partials.dash-script')
+<?php echo $__env->make('siberad.dashboards.partials.dash-script', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </body>
-</html>
+</html><?php /**PATH D:\Unjani\Kerja Praktek\kelompok5\KP_UNJANI_SI_2026\resources\views/siberad/dashboards/satlaksibersos.blade.php ENDPATH**/ ?>

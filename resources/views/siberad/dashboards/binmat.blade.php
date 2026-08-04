@@ -20,11 +20,7 @@
       <a href="#" class="side-link active" data-tab-link="ringkasan"><span class="dot"></span>Ringkasan</a>
       <a href="#" class="side-link" data-tab-link="inventaris"><span class="dot"></span>Data Inventaris</a>
       <a href="#" class="side-link" data-tab-link="pengadaan"><span class="dot"></span>Permintaan Pengadaan</a>
-      @if(($user->jabatan ?? '') === 'Piket')
-      <a href="#" class="side-link" data-tab-link="lapor"><span class="dot"></span>Buat Laporan</a>
-      @else
       <a href="#" class="side-link" data-tab-link="lapor"><span class="dot"></span>Verifikasi Laporan</a>
-      @endif
     </nav>
     <div class="side-foot">
       <form class="logout" method="POST" action="{{ route('logout') }}">
@@ -164,49 +160,9 @@
 
       {{-- ===== LAPOR / VERIFIKASI ===== --}}
       <section class="tab-panel" data-tab-panel="lapor">
-        @if(($user->jabatan ?? '') === 'Piket')
           <div class="section-head">
-            <h2>Buat Laporan Material</h2>
-            <p>Form untuk Piket melaporkan kondisi material atau mengajukan pengadaan ke Komandan Binmat.</p>
-          </div>
-          <div class="panel">
-            <form class="form-grid" onsubmit="event.preventDefault(); alert('Prototype — form ini belum tersambung ke database.');">
-              <div class="form-field">
-                <label for="itemLapor">Item Terkait</label>
-                <select id="itemLapor">
-                  @foreach($inventaris as $inv)
-                    <option>{{ $inv['nama'] }}</option>
-                  @endforeach
-                </select>
-              </div>
-              <div class="form-field">
-                <label for="prioritasLapor">Prioritas</label>
-                <select id="prioritasLapor">
-                  <option>Tinggi</option><option>Sedang</option><option>Rendah</option>
-                </select>
-              </div>
-              <div class="form-field full">
-                <label for="perihalLapor">Perihal</label>
-                <input id="perihalLapor" type="text" placeholder="Contoh: Kerusakan hardware pada server">
-              </div>
-              <div class="form-field full">
-                <label for="deskripsiLapor">Deskripsi</label>
-                <textarea id="deskripsiLapor" rows="4" placeholder="Jelaskan kondisi material dan kebutuhan penanganan..."></textarea>
-              </div>
-              <div class="form-field full">
-                <label for="lampiranLapor">Lampiran (foto / dokumentasi)</label>
-                <input id="lampiranLapor" type="file" accept=".pdf,.jpg,.png">
-                <span class="form-hint">Format PDF/JPG/PNG, maksimal 25 MB sesuai ketentuan rapat.</span>
-              </div>
-              <div class="form-field full">
-                <button class="btn btn-primary" type="submit">Kirim Laporan ke Komandan</button>
-              </div>
-            </form>
-          </div>
-        @else
-          <div class="section-head">
-            <h2>Verifikasi Laporan dari Piket</h2>
-            <p>Laporan kondisi material yang dikirim Piket dan menunggu verifikasi Komandan sebelum diteruskan ke WADAN.</p>
+            <h2>Verifikasi &amp; Teruskan Laporan</h2>
+            <p>Laporan kondisi material yang menunggu diteruskan ke WADAN.</p>
           </div>
           <div class="panel">
             <div class="tbl-wrap">
@@ -232,7 +188,6 @@
               </table>
             </div>
           </div>
-        @endif
       </section>
 
     </div>

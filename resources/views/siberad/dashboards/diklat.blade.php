@@ -20,11 +20,7 @@
       <a href="#" class="side-link active" data-tab-link="ringkasan"><span class="dot"></span>Ringkasan</a>
       <a href="#" class="side-link" data-tab-link="program"><span class="dot"></span>Program Diklat</a>
       <a href="#" class="side-link" data-tab-link="jadwal"><span class="dot"></span>Jadwal Latihan</a>
-      @if(($user->jabatan ?? '') === 'Piket')
-      <a href="#" class="side-link" data-tab-link="lapor"><span class="dot"></span>Buat Laporan</a>
-      @else
       <a href="#" class="side-link" data-tab-link="lapor"><span class="dot"></span>Verifikasi Laporan</a>
-      @endif
     </nav>
     <div class="side-foot">
       <form class="logout" method="POST" action="{{ route('logout') }}">
@@ -156,49 +152,9 @@
 
       {{-- ===== LAPOR / VERIFIKASI ===== --}}
       <section class="tab-panel" data-tab-panel="lapor">
-        @if(($user->jabatan ?? '') === 'Piket')
           <div class="section-head">
-            <h2>Buat Laporan / Pengajuan</h2>
-            <p>Form untuk Piket melaporkan kendala atau mengajukan kebutuhan program ke Komandan Diklat.</p>
-          </div>
-          <div class="panel">
-            <form class="form-grid" onsubmit="event.preventDefault(); alert('Prototype — form ini belum tersambung ke database.');">
-              <div class="form-field">
-                <label for="programLapor">Program Terkait</label>
-                <select id="programLapor">
-                  @foreach($programDiklat as $p)
-                    <option>{{ $p['nama'] }}</option>
-                  @endforeach
-                </select>
-              </div>
-              <div class="form-field">
-                <label for="prioritasLapor">Prioritas</label>
-                <select id="prioritasLapor">
-                  <option>Tinggi</option><option>Sedang</option><option>Rendah</option>
-                </select>
-              </div>
-              <div class="form-field full">
-                <label for="perihalLapor">Perihal</label>
-                <input id="perihalLapor" type="text" placeholder="Contoh: Permintaan tambahan modul praktik lab">
-              </div>
-              <div class="form-field full">
-                <label for="deskripsiLapor">Deskripsi</label>
-                <textarea id="deskripsiLapor" rows="4" placeholder="Jelaskan kendala atau kebutuhan terkait program diklat..."></textarea>
-              </div>
-              <div class="form-field full">
-                <label for="lampiranLapor">Lampiran (dokumen pendukung)</label>
-                <input id="lampiranLapor" type="file" accept=".pdf,.jpg,.png">
-                <span class="form-hint">Format PDF/JPG/PNG, maksimal 25 MB sesuai ketentuan rapat.</span>
-              </div>
-              <div class="form-field full">
-                <button class="btn btn-primary" type="submit">Kirim Laporan ke Komandan</button>
-              </div>
-            </form>
-          </div>
-        @else
-          <div class="section-head">
-            <h2>Verifikasi Laporan dari Piket</h2>
-            <p>Laporan atau pengajuan yang dikirim Piket dan menunggu verifikasi Komandan sebelum diteruskan ke WADAN.</p>
+            <h2>Verifikasi &amp; Teruskan Laporan</h2>
+            <p>Laporan atau pengajuan yang menunggu diteruskan ke WADAN.</p>
           </div>
           <div class="panel">
             <div class="tbl-wrap">
@@ -224,7 +180,6 @@
               </table>
             </div>
           </div>
-        @endif
       </section>
 
     </div>

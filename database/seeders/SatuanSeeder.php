@@ -10,9 +10,10 @@ use Illuminate\Support\Facades\Hash;
 class SatuanSeeder extends Seeder
 {
     /**
-     * Daftar satuan sesuai hasil rapat dengan Pak Komandan.
-     * Setiap satuan otomatis dibuatkan 2 akun contoh (Komandan & Piket)
-     * sesuai role yang disepakati: setiap satuan punya 2 user.
+     * Daftar satuan sesuai hasil rapat.
+     * Setiap satuan hanya punya SATU akun (tidak ada pembagian Komandan/Piket
+     * lagi) — satu orang memegang penuh satuannya, mulai dari input laporan
+     * sampai verifikasi/teruskan laporan.
      */
     public function run(): void
     {
@@ -38,26 +39,15 @@ class SatuanSeeder extends Seeder
         foreach ($satuans as $data) {
             $satuan = Satuan::updateOrCreate(['kode' => $data['kode']], $data);
 
-            // Akun contoh: Komandan satuan (untuk approval) & Piket (untuk input laporan)
+            // Satu akun per satuan — memegang seluruh alur (input & verifikasi laporan).
             User::updateOrCreate(
-                ['username' => strtolower($data['kode']).'.komandan'],
+                ['username' => strtolower($data['kode'])],
                 [
-                    'name' => 'Komandan '.$data['nama'],
-                    'email' => strtolower($data['kode']).'.komandan@pussiberad.mil.id',
+                    'name' => $data['nama'],
+                    'email' => strtolower($data['kode']).'@pussiberad.mil.id',
                     'password' => Hash::make('password'),
                     'satuan_id' => $satuan->id,
-                    'jabatan' => 'Komandan',
-                ]
-            );
-
-            User::updateOrCreate(
-                ['username' => strtolower($data['kode']).'.piket'],
-                [
-                    'name' => 'Piket '.$data['nama'],
-                    'email' => strtolower($data['kode']).'.piket@pussiberad.mil.id',
-                    'password' => Hash::make('password'),
-                    'satuan_id' => $satuan->id,
-                    'jabatan' => 'Piket',
+                    'jabatan' => null,
                 ]
             );
         }

@@ -4,15 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WADAN — SIBERAD</title>
-<link rel="icon" type="image/jpeg" href="{{ asset('images/logo-pussiberad.jpg') }}">
-@include('siberad.dashboards.partials.dash-styles')
+<link rel="icon" type="image/jpeg" href="<?php echo e(asset('images/logo-pussiberad.jpg')); ?>">
+<?php echo $__env->make('siberad.dashboards.partials.dash-styles', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </head>
 <body>
 <div class="shell">
 
   <aside class="sidebar" id="sidebar">
     <div class="side-brand">
-      <img src="{{ asset('images/logo-pussiberad.jpg') }}" alt="Lambang Pussiberad">
+      <img src="<?php echo e(asset('images/logo-pussiberad.jpg')); ?>" alt="Lambang Pussiberad">
       <div class="logo">SIBER<span>AD</span></div>
     </div>
     <nav class="side-nav">
@@ -23,8 +23,8 @@
       <a href="#" class="side-link" data-tab-link="diteruskan"><span class="dot"></span>Diteruskan ke DANPUS</a>
     </nav>
     <div class="side-foot">
-      <form class="logout" method="POST" action="{{ route('logout') }}">
-        @csrf
+      <form class="logout" method="POST" action="<?php echo e(route('logout')); ?>">
+        <?php echo csrf_field(); ?>
         <button type="submit">Keluar</button>
       </form>
     </div>
@@ -35,7 +35,7 @@
       <div style="display:flex;align-items:center;gap:12px;">
         <button class="menu-btn" id="menuBtn">☰</button>
         <div>
-          <div class="topbar-title">Selamat datang, {{ $user->name }}</div>
+          <div class="topbar-title">Selamat datang, <?php echo e($user->name); ?></div>
         </div>
       </div>
       <div class="topbar-actions">
@@ -48,7 +48,7 @@
 
     <div class="content">
 
-      {{-- ===== RINGKASAN ===== --}}
+      
       <section class="tab-panel active" data-tab-panel="ringkasan">
         <div class="section-head">
           <h2>Ringkasan Koordinasi</h2>
@@ -57,22 +57,22 @@
         <div class="stat-grid">
           <div class="stat-card">
             <div class="lbl">Menunggu Verifikasi</div>
-            <div class="val" style="color:var(--amber);">{{ $stats['menunggu_verifikasi'] }}</div>
+            <div class="val" style="color:var(--amber);"><?php echo e($stats['menunggu_verifikasi']); ?></div>
             <div class="sub">Perlu ditinjau WADAN</div>
           </div>
           <div class="stat-card">
             <div class="lbl">Diteruskan ke DANPUS</div>
-            <div class="val" style="color:var(--green-bright);">{{ $stats['diteruskan'] }}</div>
+            <div class="val" style="color:var(--green-bright);"><?php echo e($stats['diteruskan']); ?></div>
             <div class="sub">Bulan ini</div>
           </div>
           <div class="stat-card">
             <div class="lbl">Satuan Aktif Melapor</div>
-            <div class="val">{{ $stats['satuan_aktif'] }}/8</div>
+            <div class="val"><?php echo e($stats['satuan_aktif']); ?>/8</div>
             <div class="sub">Dari Satlak & Direktorat</div>
           </div>
           <div class="stat-card">
             <div class="lbl">Permintaan Koordinasi</div>
-            <div class="val">{{ $stats['permintaan_koordinasi'] }}</div>
+            <div class="val"><?php echo e($stats['permintaan_koordinasi']); ?></div>
             <div class="sub">Menunggu tindak lanjut</div>
           </div>
         </div>
@@ -85,21 +85,21 @@
             <table class="dtbl">
               <thead><tr><th>Asal</th><th>Perihal</th><th>Tanggal</th><th>Status</th></tr></thead>
               <tbody>
-                @foreach($aktivitasTerbaru as $a)
+                <?php $__currentLoopData = $aktivitasTerbaru; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $a): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <tr>
-                  <td>{{ $a['satuan'] }}</td>
-                  <td>{{ $a['perihal'] }}</td>
-                  <td>{{ $a['tanggal'] }}</td>
-                  <td><span class="badge {{ $a['status_class'] }}">{{ $a['status'] }}</span></td>
+                  <td><?php echo e($a['satuan']); ?></td>
+                  <td><?php echo e($a['perihal']); ?></td>
+                  <td><?php echo e($a['tanggal']); ?></td>
+                  <td><span class="badge <?php echo e($a['status_class']); ?>"><?php echo e($a['status']); ?></span></td>
                 </tr>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
               </tbody>
             </table>
           </div>
         </div>
       </section>
 
-      {{-- ===== LAPORAN MASUK ===== --}}
+      
       <section class="tab-panel" data-tab-panel="laporan">
         <div class="section-head">
           <h2>Laporan Masuk</h2>
@@ -112,13 +112,13 @@
               <th>Aksi</th>
               </tr></thead>
               <tbody>
-                @foreach($laporanMasuk as $l)
+                <?php $__currentLoopData = $laporanMasuk; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $l): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <tr>
-                  <td>{{ $l['satuan'] }}</td>
-                  <td>{{ $l['perihal'] }}</td>
-                  <td>{{ $l['tanggal'] }}</td>
-                  <td><span class="status-dot {{ $l['prioritas_class'] }}">{{ $l['prioritas'] }}</span></td>
-                  <td><span class="badge {{ $l['status_class'] }}">{{ $l['status'] }}</span></td>
+                  <td><?php echo e($l['satuan']); ?></td>
+                  <td><?php echo e($l['perihal']); ?></td>
+                  <td><?php echo e($l['tanggal']); ?></td>
+                  <td><span class="status-dot <?php echo e($l['prioritas_class']); ?>"><?php echo e($l['prioritas']); ?></span></td>
+                  <td><span class="badge <?php echo e($l['status_class']); ?>"><?php echo e($l['status']); ?></span></td>
                   <td>
                     <div class="btn-row">
                       <button class="btn btn-primary btn-sm" type="button">Teruskan ke DANPUS</button>
@@ -126,14 +126,14 @@
                     </div>
                   </td>
                 </tr>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
               </tbody>
             </table>
           </div>
         </div>
       </section>
 
-      {{-- ===== KOORDINASI SATLAK ===== --}}
+      
       <section class="tab-panel" data-tab-panel="koordinasi">
         <div class="section-head">
           <h2>Koordinasi dengan Satlak</h2>
@@ -144,22 +144,22 @@
             <table class="dtbl">
               <thead><tr><th>Satuan Tujuan</th><th>Perihal Koordinasi</th><th>Diminta Oleh</th><th>Tanggal</th><th>Status</th></tr></thead>
               <tbody>
-                @foreach($koordinasi as $k)
+                <?php $__currentLoopData = $koordinasi; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $k): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <tr>
-                  <td>{{ $k['satuan'] }}</td>
-                  <td>{{ $k['perihal'] }}</td>
-                  <td>{{ $k['diminta_oleh'] }}</td>
-                  <td>{{ $k['tanggal'] }}</td>
-                  <td><span class="badge {{ $k['status_class'] }}">{{ $k['status'] }}</span></td>
+                  <td><?php echo e($k['satuan']); ?></td>
+                  <td><?php echo e($k['perihal']); ?></td>
+                  <td><?php echo e($k['diminta_oleh']); ?></td>
+                  <td><?php echo e($k['tanggal']); ?></td>
+                  <td><span class="badge <?php echo e($k['status_class']); ?>"><?php echo e($k['status']); ?></span></td>
                 </tr>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
               </tbody>
             </table>
           </div>
         </div>
       </section>
 
-      {{-- ===== DITERUSKAN KE DANPUS ===== --}}
+      
       <section class="tab-panel" data-tab-panel="diteruskan">
         <div class="section-head">
           <h2>Riwayat Diteruskan ke DANPUS</h2>
@@ -170,14 +170,14 @@
             <table class="dtbl">
               <thead><tr><th>Asal Satuan</th><th>Perihal</th><th>Tanggal Diteruskan</th><th>Status di DANPUS</th></tr></thead>
               <tbody>
-                @foreach($riwayatDiteruskan as $r)
+                <?php $__currentLoopData = $riwayatDiteruskan; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $r): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <tr>
-                  <td>{{ $r['satuan'] }}</td>
-                  <td>{{ $r['perihal'] }}</td>
-                  <td>{{ $r['tanggal'] }}</td>
-                  <td><span class="badge {{ $r['status_class'] }}">{{ $r['status'] }}</span></td>
+                  <td><?php echo e($r['satuan']); ?></td>
+                  <td><?php echo e($r['perihal']); ?></td>
+                  <td><?php echo e($r['tanggal']); ?></td>
+                  <td><span class="badge <?php echo e($r['status_class']); ?>"><?php echo e($r['status']); ?></span></td>
                 </tr>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
               </tbody>
             </table>
           </div>
@@ -187,6 +187,6 @@
     </div>
   </main>
 </div>
-@include('siberad.dashboards.partials.dash-script')
+<?php echo $__env->make('siberad.dashboards.partials.dash-script', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </body>
-</html>
+</html><?php /**PATH D:\Unjani\Kerja Praktek\kelompok5\KP_UNJANI_SI_2026\resources\views/siberad/dashboards/wadan.blade.php ENDPATH**/ ?>

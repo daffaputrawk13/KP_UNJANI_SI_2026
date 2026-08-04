@@ -608,7 +608,7 @@
   .badge svg{width:14px;height:14px;color:var(--gold-bright);flex-shrink:0;}
 
   /* ================= FOOTER ================= */
-  footer{padding:60px 0 40px;border-top:1px solid var(--border-soft);}
+  footer{padding:60px 0 40px;border-top:1px solid var(--border-soft);background:var(--panel);}
   .footer-grid{display:grid;grid-template-columns:1.2fr .85fr .85fr 1fr;gap:36px;margin-bottom:40px;}
   @media (max-width:820px){ .footer-grid{grid-template-columns:1fr;gap:30px;} }
   .footer-brand-row{display:flex;align-items:center;gap:14px;margin-bottom:14px;}

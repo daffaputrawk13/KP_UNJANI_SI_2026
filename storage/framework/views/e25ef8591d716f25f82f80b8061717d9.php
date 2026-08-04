@@ -8,6 +8,75 @@
 <?php echo $__env->make('siberad.dashboards.partials.dash-styles', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </head>
 <body>
+
+
+
+<div class="profile-modal-overlay" id="profileModalOverlay">
+  <div class="profile-modal-card" id="profileModalCard" role="dialog" aria-modal="true" aria-label="Detail profil">
+    <button type="button" class="profile-modal-close" id="profileModalCloseBtn" aria-label="Tutup">
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+    </button>
+
+    
+    <div class="profile-dropdown-view" id="profilePhotoView" style="display:none;">
+      <div class="profile-dropdown-head-lg">
+        <div class="profile-dropdown-avatar-lg">
+          <span class="profile-initial" id="profileInitialLarge"><?php echo e(strtoupper(mb_substr($user->name ?? 'U', 0, 1))); ?></span>
+          <img class="profile-photo" id="profilePhotoLarge" alt="Foto profil <?php echo e($user->name); ?>">
+        </div>
+        <div class="profile-dropdown-name"><?php echo e($user->name); ?></div>
+        <div class="profile-dropdown-role"><?php echo e($user->jabatan ?? 'Pengguna'); ?></div>
+      </div>
+
+      <button type="button" class="profile-dropdown-item" id="gantiFotoBtn" role="menuitem">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2l1-2h7l1 2h2A1.5 1.5 0 0 1 20 8.5v9A1.5 1.5 0 0 1 18.5 19h-13A1.5 1.5 0 0 1 4 17.5Z"></path><circle cx="12" cy="13" r="3.4"></circle></svg>
+        <span id="gantiFotoLabel">Ganti Foto Profil</span>
+      </button>
+      <button type="button" class="profile-dropdown-item" id="hapusFotoBtn" role="menuitem" style="display:none;">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"></path><path d="M9 7V4.5A1.5 1.5 0 0 1 10.5 3h3A1.5 1.5 0 0 1 15 4.5V7"></path><path d="M18 7l-.8 12.1a1.8 1.8 0 0 1-1.8 1.7H8.6a1.8 1.8 0 0 1-1.8-1.7L6 7"></path></svg>
+        Hapus Foto Profil
+      </button>
+      <input type="file" id="fotoProfilInput" accept="image/png,image/jpeg,image/webp" hidden>
+    </div>
+
+    
+    <div class="profile-dropdown-view" id="profileSettingsView" style="display:none;">
+      <div class="profile-modal-title">Pengaturan Akun</div>
+
+      <div class="profile-form-notice">
+        Perubahan kata sandi tidak langsung berlaku. Permintaan akan dikirim ke <b>Admin</b> untuk diverifikasi terlebih dahulu.
+      </div>
+
+      <form class="profile-form" id="formGantiPassword" novalidate>
+        <div class="profile-form-field">
+          <label for="passBaru">Kata Sandi Baru</label>
+          <input type="password" id="passBaru" minlength="8" required placeholder="Minimal 8 karakter">
+        </div>
+        <div class="profile-form-field">
+          <label for="passKonfirmasi">Konfirmasi Kata Sandi Baru</label>
+          <input type="password" id="passKonfirmasi" minlength="8" required placeholder="Ulangi kata sandi baru">
+        </div>
+        <div class="profile-form-field">
+          <label for="passCatatan">Catatan untuk Admin (opsional)</label>
+          <textarea id="passCatatan" rows="2" placeholder="Contoh: lupa kata sandi lama"></textarea>
+        </div>
+        <span class="profile-form-error" id="passError"></span>
+        <button type="submit" class="btn btn-primary btn-sm" style="width:100%;justify-content:center;">Kirim Permintaan ke Admin</button>
+      </form>
+    </div>
+
+    
+    <div class="profile-dropdown-view" id="profileHelpView" style="display:none;">
+      <div class="profile-modal-title">Bantuan &amp; Panduan</div>
+      <p class="profile-help-text">
+        Prototype — pusat bantuan belum tersambung. Kalau butuh bantuan seputar SIBERAD,
+        silakan hubungi Admin Pussiberad melalui jalur koordinasi internal.
+      </p>
+    </div>
+
+  </div>
+</div>
+
 <div class="shell">
 
   <aside class="sidebar" id="sidebar">
@@ -18,12 +87,9 @@
     <nav class="side-nav">
       <div class="side-nav-label">Menu</div>
       <a href="#" class="side-link active" data-tab-link="ringkasan"><span class="dot"></span>Ringkasan</a>
-      <?php if(($user->jabatan ?? '') === 'Piket'): ?>
-      <a href="#" class="side-link" data-tab-link="lapor"><span class="dot"></span>Buat Laporan</a>
-      <?php else: ?>
       <a href="#" class="side-link" data-tab-link="lapor"><span class="dot"></span>Verifikasi Laporan</a>
-      <?php endif; ?>
       <a href="#" class="side-link" data-tab-link="danpus"><span class="dot"></span>Lapor ke DANPUS</a>
+      <a href="#" class="side-link" data-tab-link="sdir"><span class="dot"></span>Koordinasi SDIR</a>
     </nav>
     <div class="side-foot">
       <form class="logout logout-form" method="POST" action="<?php echo e(route('logout')); ?>">
@@ -37,9 +103,6 @@
     <div class="topbar">
       <div style="display:flex;align-items:center;gap:12px;">
         <button class="menu-btn" id="menuBtn">☰</button>
-        <div>
-          <div class="topbar-title">Selamat datang, <?php echo e($user->name); ?></div>
-        </div>
       </div>
       <div class="topbar-actions">
         <button type="button" class="btn-icon-toggle" id="themeToggleBtn" aria-pressed="false" aria-label="Ganti tema">
@@ -55,70 +118,39 @@
 
           <div class="profile-dropdown" id="profileDropdown" role="menu" aria-label="Menu profil">
 
-            
-            <div class="profile-dropdown-view" id="profileMainView">
-              <div class="profile-dropdown-head">
-                <div class="profile-dropdown-avatar">
-                  <span class="profile-initial" id="profileInitialDropdown"><?php echo e(strtoupper(mb_substr($user->name ?? 'U', 0, 1))); ?></span>
-                  <img class="profile-photo" id="profilePhotoDropdown" alt="Foto profil <?php echo e($user->name); ?>">
-                </div>
-                <div>
-                  <div class="profile-dropdown-name"><?php echo e($user->name); ?></div>
-                  <div class="profile-dropdown-role"><?php echo e($user->jabatan ?? 'Pengguna'); ?></div>
-                </div>
+            <div class="profile-dropdown-head">
+              <div class="profile-dropdown-avatar">
+                <span class="profile-initial" id="profileInitialDropdown"><?php echo e(strtoupper(mb_substr($user->name ?? 'U', 0, 1))); ?></span>
+                <img class="profile-photo" id="profilePhotoDropdown" alt="Foto profil <?php echo e($user->name); ?>">
               </div>
-
-              <button type="button" class="profile-dropdown-item" id="openProfilSayaBtn" role="menuitem">
-                <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"></circle><path d="M5 20c1.2-4 4.2-6 7-6s5.8 2 7 6"></path></svg>
-                Profil Saya
-              </button>
-              <a href="#" class="profile-dropdown-item" role="menuitem" onclick="alert('Prototype — pengaturan akun belum tersambung.'); return false;">
-                <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.5-2-3.4-2.3.9a7.6 7.6 0 0 0-2.6-1.5L14 2.5h-4l-.5 2.5a7.6 7.6 0 0 0-2.6 1.5l-2.3-.9-2 3.4 2 1.5a7.6 7.6 0 0 0 0 3l-2 1.5 2 3.4 2.3-.9a7.6 7.6 0 0 0 2.6 1.5l.5 2.5h4l.5-2.5a7.6 7.6 0 0 0 2.6-1.5l2.3.9 2-3.4Z"></path></svg>
-                Pengaturan Akun
-              </a>
-              <a href="#" class="profile-dropdown-item" role="menuitem" onclick="alert('Prototype — pusat bantuan belum tersambung.'); return false;">
-                <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"></circle><path d="M9.2 9.2a2.8 2.8 0 1 1 3.9 2.6c-.8.4-1.1 1-1.1 1.9"></path><path d="M12 17.2h.01"></path></svg>
-                Bantuan &amp; Panduan
-              </a>
-
-              <div class="profile-dropdown-divider"></div>
-
-              <form class="logout-form" method="POST" action="<?php echo e(route('logout')); ?>">
-                <?php echo csrf_field(); ?>
-                <button type="submit" class="profile-dropdown-item danger" role="menuitem">
-                  <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>
-                  Keluar
-                </button>
-              </form>
-            </div>
-
-            
-            <div class="profile-dropdown-view" id="profilePhotoView" style="display:none;">
-              <button type="button" class="profile-dropdown-back" id="backToMainBtn">
-                <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg>
-                Profil Saya
-              </button>
-
-              <div class="profile-dropdown-head-lg">
-                <div class="profile-dropdown-avatar-lg">
-                  <span class="profile-initial" id="profileInitialLarge"><?php echo e(strtoupper(mb_substr($user->name ?? 'U', 0, 1))); ?></span>
-                  <img class="profile-photo" id="profilePhotoLarge" alt="Foto profil <?php echo e($user->name); ?>">
-                </div>
+              <div>
                 <div class="profile-dropdown-name"><?php echo e($user->name); ?></div>
                 <div class="profile-dropdown-role"><?php echo e($user->jabatan ?? 'Pengguna'); ?></div>
               </div>
-
-              <button type="button" class="profile-dropdown-item" id="gantiFotoBtn" role="menuitem">
-                <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2l1-2h7l1 2h2A1.5 1.5 0 0 1 20 8.5v9A1.5 1.5 0 0 1 18.5 19h-13A1.5 1.5 0 0 1 4 17.5Z"></path><circle cx="12" cy="13" r="3.4"></circle></svg>
-                <span id="gantiFotoLabel">Ganti Foto Profil</span>
-              </button>
-              <button type="button" class="profile-dropdown-item" id="hapusFotoBtn" role="menuitem" style="display:none;">
-                <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"></path><path d="M9 7V4.5A1.5 1.5 0 0 1 10.5 3h3A1.5 1.5 0 0 1 15 4.5V7"></path><path d="M18 7l-.8 12.1a1.8 1.8 0 0 1-1.8 1.7H8.6a1.8 1.8 0 0 1-1.8-1.7L6 7"></path></svg>
-                Hapus Foto Profil
-              </button>
-              <input type="file" id="fotoProfilInput" accept="image/png,image/jpeg,image/webp" hidden>
             </div>
 
+            <button type="button" class="profile-dropdown-item" id="openProfilSayaBtn" role="menuitem">
+              <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"></circle><path d="M5 20c1.2-4 4.2-6 7-6s5.8 2 7 6"></path></svg>
+              Profil Saya
+            </button>
+            <button type="button" class="profile-dropdown-item" id="openPengaturanBtn" role="menuitem">
+              <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.5-2-3.4-2.3.9a7.6 7.6 0 0 0-2.6-1.5L14 2.5h-4l-.5 2.5a7.6 7.6 0 0 0-2.6 1.5l-2.3-.9-2 3.4 2 1.5a7.6 7.6 0 0 0 0 3l-2 1.5 2 3.4 2.3-.9a7.6 7.6 0 0 0 2.6 1.5l.5 2.5h4l.5-2.5a7.6 7.6 0 0 0 2.6-1.5l2.3.9 2-3.4Z"></path></svg>
+              Pengaturan Akun
+            </button>
+            <button type="button" class="profile-dropdown-item" id="openBantuanBtn" role="menuitem">
+              <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"></circle><path d="M9.2 9.2a2.8 2.8 0 1 1 3.9 2.6c-.8.4-1.1 1-1.1 1.9"></path><path d="M12 17.2h.01"></path></svg>
+              Bantuan &amp; Panduan
+            </button>
+
+            <div class="profile-dropdown-divider"></div>
+
+            <form class="logout-form" method="POST" action="<?php echo e(route('logout')); ?>">
+              <?php echo csrf_field(); ?>
+              <button type="submit" class="profile-dropdown-item danger" role="menuitem">
+                <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>
+                Keluar
+              </button>
+            </form>
           </div>
         </div>
       </div>
@@ -177,49 +209,9 @@
 
       
       <section class="tab-panel" data-tab-panel="lapor">
-        <?php if(($user->jabatan ?? '') === 'Piket'): ?>
           <div class="section-head">
-            <h2>Buat Laporan Insiden</h2>
-            <p>Form untuk Piket melaporkan insiden ke Komandan Satlakal (Penangkalan).</p>
-          </div>
-          <div class="panel">
-            <form class="form-grid" onsubmit="event.preventDefault(); alert('Prototype — form ini belum tersambung ke database.');">
-              <div class="form-field">
-                <label for="asetLapor">Aset / Website Terdampak</label>
-                <select id="asetLapor">
-                  <?php $__currentLoopData = $asetMonitoring; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $a): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                    <option><?php echo e($a['nama']); ?></option>
-                  <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                </select>
-              </div>
-              <div class="form-field">
-                <label for="prioritasLapor">Prioritas</label>
-                <select id="prioritasLapor">
-                  <option>Tinggi</option><option>Sedang</option><option>Rendah</option>
-                </select>
-              </div>
-              <div class="form-field full">
-                <label for="perihalLapor">Perihal</label>
-                <input id="perihalLapor" type="text" placeholder="Contoh: Website diserang DDoS">
-              </div>
-              <div class="form-field full">
-                <label for="deskripsiLapor">Deskripsi Kejadian</label>
-                <textarea id="deskripsiLapor" rows="4" placeholder="Jelaskan kronologi dan dampak insiden..."></textarea>
-              </div>
-              <div class="form-field full">
-                <label for="lampiranLapor">Lampiran (bukti / dokumentasi)</label>
-                <input id="lampiranLapor" type="file" accept=".pdf">
-                <span class="form-hint">Format PDF, maksimal 20 MB, dikirim langsung ke DANPUS.</span>
-              </div>
-              <div class="form-field full">
-                <button class="btn btn-primary" type="submit">Kirim Laporan ke Komandan</button>
-              </div>
-            </form>
-          </div>
-        <?php else: ?>
-          <div class="section-head">
-            <h2>Verifikasi Laporan dari Piket</h2>
-            <p>Laporan insiden yang dikirim Piket dan menunggu verifikasi Komandan sebelum diteruskan langsung ke DANPUS.</p>
+            <h2>Verifikasi &amp; Teruskan Laporan</h2>
+            <p>Laporan insiden yang menunggu diteruskan langsung ke DANPUS.</p>
           </div>
           <div class="panel">
             <div class="tbl-wrap">
@@ -245,18 +237,22 @@
               </table>
             </div>
           </div>
-        <?php endif; ?>
-        <div class="panel" style="margin-top:20px;">
-          <div class="panel-head">
-            <div><h3>Koordinasi dengan SDIR</h3><p>Ajukan permintaan koordinasi (bukan laporan insiden) ke SDIR bila diperlukan.</p></div>
-          </div>
-          <div class="form-grid" style="padding:0 22px 22px;">
+
+      </section>
+
+      
+      <section class="tab-panel" data-tab-panel="sdir">
+        <div class="section-head">
+          <h2>Koordinasi dengan SDIR</h2>
+          <p>Ajukan permintaan koordinasi (bukan laporan insiden) ke SDIR bila diperlukan.</p>
+        </div>
+        <div class="panel">
+          <div class="form-grid" style="padding:22px;">
             <div class="form-field full">
               <button class="btn btn-sm" type="button" onclick="alert('Prototype — form koordinasi ke SDIR belum tersambung ke database.')">Ajukan Koordinasi ke SDIR</button>
             </div>
           </div>
         </div>
-
       </section>
 
       
@@ -308,27 +304,15 @@
         var menuBtn = document.getElementById('profileMenuBtn');
         var dropdown = document.getElementById('profileDropdown');
         var wrapper = document.getElementById('profileMenu');
-        var mainView = document.getElementById('profileMainView');
-        var photoView = document.getElementById('profilePhotoView');
         var openProfilBtn = document.getElementById('openProfilSayaBtn');
-        var backBtn = document.getElementById('backToMainBtn');
+        var openPengaturanBtn = document.getElementById('openPengaturanBtn');
+        var openBantuanBtn = document.getElementById('openBantuanBtn');
         if (!menuBtn || !dropdown || !wrapper) return;
-
-        function showMainView() {
-          if (mainView) mainView.style.display = 'block';
-          if (photoView) photoView.style.display = 'none';
-        }
-
-        function showPhotoView() {
-          if (mainView) mainView.style.display = 'none';
-          if (photoView) photoView.style.display = 'block';
-        }
 
         function closeMenu() {
           dropdown.classList.remove('open');
           menuBtn.classList.remove('open');
           menuBtn.setAttribute('aria-expanded', 'false');
-          showMainView();
         }
 
         function openMenu() {
@@ -346,17 +330,27 @@
           }
         });
 
+        // Item di dropdown kecil membuka popup besar di tengah layar
+        // (fungsi openProfileModal didefinisikan di script popup di bawah)
         if (openProfilBtn) {
           openProfilBtn.addEventListener('click', function (e) {
             e.stopPropagation();
-            showPhotoView();
+            closeMenu();
+            if (window.openProfileModal) window.openProfileModal('profilePhotoView');
           });
         }
-
-        if (backBtn) {
-          backBtn.addEventListener('click', function (e) {
+        if (openPengaturanBtn) {
+          openPengaturanBtn.addEventListener('click', function (e) {
             e.stopPropagation();
-            showMainView();
+            closeMenu();
+            if (window.openProfileModal) window.openProfileModal('profileSettingsView');
+          });
+        }
+        if (openBantuanBtn) {
+          openBantuanBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            closeMenu();
+            if (window.openProfileModal) window.openProfileModal('profileHelpView');
           });
         }
 
@@ -366,6 +360,54 @@
 
         document.addEventListener('keydown', function (e) {
           if (e.key === 'Escape') closeMenu();
+        });
+      })();
+      </script>
+
+      <script>
+      (function () {
+        var overlay = document.getElementById('profileModalOverlay');
+        var card = document.getElementById('profileModalCard');
+        var closeBtn = document.getElementById('profileModalCloseBtn');
+        var views = document.querySelectorAll('#profileModalOverlay .profile-dropdown-view');
+        if (!overlay || !card) return;
+
+        function showView(id) {
+          views.forEach(function (v) {
+            v.style.display = (v.id === id) ? 'block' : 'none';
+          });
+        }
+
+        window.openProfileModal = function (viewId) {
+          showView(viewId);
+          overlay.classList.add('open');
+          document.body.style.overflow = 'hidden';
+        };
+
+        function closeModal() {
+          overlay.classList.remove('open');
+          document.body.style.overflow = '';
+        }
+
+        if (closeBtn) {
+          closeBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            closeModal();
+          });
+        }
+
+        // Klik di backdrop (di luar kartu popup) menutup popup
+        overlay.addEventListener('click', function (e) {
+          if (e.target === overlay) closeModal();
+        });
+
+        // Klik di dalam kartu popup tidak boleh menutupnya
+        card.addEventListener('click', function (e) {
+          e.stopPropagation();
+        });
+
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape' && overlay.classList.contains('open')) closeModal();
         });
       })();
       </script>
