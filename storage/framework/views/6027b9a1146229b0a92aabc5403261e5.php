@@ -3,14 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Satlakal (Penangkalan) — SIBERAD</title>
+<title>WADAN — SIBERAD</title>
 <link rel="icon" type="image/jpeg" href="<?php echo e(asset('images/logo-pussiberad.jpg')); ?>">
 <?php echo $__env->make('siberad.dashboards.partials.dash-styles', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </head>
 <body>
-
-
-
 <div class="profile-modal-overlay" id="profileModalOverlay">
   <div class="profile-modal-card" id="profileModalCard" role="dialog" aria-modal="true" aria-label="Detail profil">
     <button type="button" class="profile-modal-close" id="profileModalCloseBtn" aria-label="Tutup">
@@ -77,25 +74,6 @@
   </div>
 </div>
 
-<div class="profile-modal-overlay" id="notifModalOverlay">
-  <div class="profile-modal-card" id="notifModalCard" role="dialog" aria-modal="true" aria-label="Notifikasi">
-    <button type="button" class="profile-modal-close" id="notifModalCloseBtn" aria-label="Tutup">
-      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
-    </button>
-
-    <div class="profile-dropdown-view" style="display:block;">
-      <div class="profile-modal-title">Notifikasi</div>
-      <div style="text-align:center;padding:26px 6px 6px;">
-        <svg viewBox="0 0 24 24" width="42" height="42" fill="none" stroke="var(--text-dim)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 16px;display:block;">
-          <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path>
-          <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-        </svg>
-        <p style="margin:0;font-size:13.5px;line-height:1.6;color:var(--text-muted);">Belum ada notifikasi saat ini.<br>Fitur pusat notifikasi masih prototype dan belum tersambung ke database.</p>
-      </div>
-    </div>
-  </div>
-</div>
-
 <div class="shell">
 
   <aside class="sidebar" id="sidebar">
@@ -106,9 +84,9 @@
     <nav class="side-nav">
       <div class="side-nav-label">Menu</div>
       <a href="#" class="side-link active" data-tab-link="ringkasan"><span class="dot"></span>Ringkasan</a>
-      <a href="#" class="side-link" data-tab-link="lapor"><span class="dot"></span>Verifikasi Laporan</a>
-      <a href="#" class="side-link" data-tab-link="danpus"><span class="dot"></span>Lapor ke DANPUS</a>
-      <a href="#" class="side-link" data-tab-link="sdir"><span class="dot"></span>Koordinasi SDIR</a>
+      <a href="#" class="side-link" data-tab-link="laporan"><span class="dot"></span>Laporan Masuk</a>
+      <a href="#" class="side-link" data-tab-link="koordinasi"><span class="dot"></span>Koordinasi Satlak</a>
+      <a href="#" class="side-link" data-tab-link="diteruskan"><span class="dot"></span>Diteruskan ke DANPUS</a>
     </nav>
     <div class="side-foot">
       <form class="logout logout-form" method="POST" action="<?php echo e(route('logout')); ?>">
@@ -127,14 +105,6 @@
         <button type="button" class="btn-icon-toggle" id="themeToggleBtn" aria-pressed="false" aria-label="Ganti tema">
           <svg class="icon-moon" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"></path></svg>
           <svg class="icon-sun" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"></circle><path d="M12 2.5v2.4M12 19.1v2.4M4.4 4.4l1.7 1.7M17.9 17.9l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.4 19.6l1.7-1.7M17.9 6.1l1.7-1.7"></path></svg>
-        </button>
-
-        <button type="button" class="btn-icon-toggle" id="notifBtn" aria-label="Notifikasi" aria-haspopup="dialog" aria-expanded="false" style="position:relative;">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--gold-bright) !important;color:var(--gold-bright) !important;">
-            <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" style="fill:var(--gold-dim) !important;stroke:var(--gold-bright) !important;"></path>
-            <path d="M13.73 21a2 2 0 0 1-3.46 0" style="fill:none !important;stroke:var(--gold-bright) !important;"></path>
-          </svg>
-          <span style="position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--red);box-shadow:0 0 0 2px var(--panel,#0c2417);"></span>
         </button>
 
         <div class="profile-menu" id="profileMenu">
@@ -183,49 +153,52 @@
       </div>
     </div>
 
+    
     <div class="content">
 
       
       <section class="tab-panel active" data-tab-panel="ringkasan">
         <div class="section-head">
-          <h2>Ringkasan Pemantauan</h2>
-          <p>Status aset/website yang dipantau Satlakal (Penangkalan) hari ini.</p>
+          <h2>Ringkasan Koordinasi</h2>
+          <p>Status laporan yang masuk dari SDIR maupun langsung dari Satlak.</p>
         </div>
         <div class="stat-grid">
           <div class="stat-card">
-            <div class="lbl">Total Aset Dipantau</div>
-            <div class="val"><?php echo e($stats['total_aset']); ?></div>
-            <div class="sub">Website & layanan digital</div>
+            <div class="lbl">Menunggu Verifikasi</div>
+            <div class="val" style="color:var(--amber);"><?php echo e($stats['menunggu_verifikasi']); ?></div>
+            <div class="sub">Perlu ditinjau WADAN</div>
           </div>
           <div class="stat-card">
-            <div class="lbl">Status Normal</div>
-            <div class="val" style="color:var(--green);"><?php echo e($stats['normal']); ?></div>
-            <div class="sub">Berjalan baik</div>
+            <div class="lbl">Diteruskan ke DANPUS</div>
+            <div class="val" style="color:var(--green-bright);"><?php echo e($stats['diteruskan']); ?></div>
+            <div class="sub">Bulan ini</div>
           </div>
           <div class="stat-card">
-            <div class="lbl">Sedang Diserang</div>
-            <div class="val" style="color:var(--red);"><?php echo e($stats['diserang']); ?></div>
-            <div class="sub">Butuh penanganan segera</div>
+            <div class="lbl">Satuan Aktif Melapor</div>
+            <div class="val"><?php echo e($stats['satuan_aktif']); ?>/8</div>
+            <div class="sub">Dari Satlak & Direktorat</div>
           </div>
           <div class="stat-card">
-            <div class="lbl">Dalam Pemulihan</div>
-            <div class="val" style="color:var(--amber);"><?php echo e($stats['pemulihan']); ?></div>
-            <div class="sub">Sedang ditangani</div>
+            <div class="lbl">Permintaan Koordinasi</div>
+            <div class="val"><?php echo e($stats['permintaan_koordinasi']); ?></div>
+            <div class="sub">Menunggu tindak lanjut</div>
           </div>
         </div>
 
         <div class="panel">
-          <div class="panel-head"><div><h3>Insiden Terbaru</h3><p>Serangan atau gangguan yang baru terdeteksi.</p></div></div>
+          <div class="panel-head">
+            <div><h3>Aktivitas Terbaru</h3><p>Ringkasan laporan & koordinasi terbaru dari satuan pelaksana.</p></div>
+          </div>
           <div class="tbl-wrap">
             <table class="dtbl">
-              <thead><tr><th>Aset</th><th>Jenis Gangguan</th><th>Terdeteksi</th><th>Status</th></tr></thead>
+              <thead><tr><th>Asal</th><th>Perihal</th><th>Tanggal</th><th>Status</th></tr></thead>
               <tbody>
-                <?php $__currentLoopData = $insidenTerbaru; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <?php $__currentLoopData = $aktivitasTerbaru; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $a): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <tr>
-                  <td><?php echo e($i['aset']); ?></td>
-                  <td><?php echo e($i['jenis']); ?></td>
-                  <td><?php echo e($i['waktu']); ?></td>
-                  <td><span class="status-dot <?php echo e($i['status_class']); ?>"><?php echo e($i['status']); ?></span></td>
+                  <td><?php echo e($a['satuan']); ?></td>
+                  <td><?php echo e($a['perihal']); ?></td>
+                  <td><?php echo e($a['tanggal']); ?></td>
+                  <td><span class="badge <?php echo e($a['status_class']); ?>"><?php echo e($a['status']); ?></span></td>
                 </tr>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
               </tbody>
@@ -235,96 +208,91 @@
       </section>
 
       
-      <section class="tab-panel" data-tab-panel="lapor">
-          <div class="section-head">
-            <h2>Verifikasi &amp; Teruskan Laporan</h2>
-            <p>Laporan insiden yang menunggu diteruskan langsung ke DANPUS.</p>
-          </div>
-          <div class="panel">
-            <div class="tbl-wrap">
-              <table class="dtbl">
-                <thead><tr><th>Aset</th><th>Perihal</th><th>Dilaporkan Oleh</th><th>Tanggal</th><th>Prioritas</th><th>Aksi</th></tr></thead>
-                <tbody>
-                  <?php $__currentLoopData = $laporanPiket; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $l): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                  <tr>
-                    <td><?php echo e($l['aset']); ?></td>
-                    <td><?php echo e($l['perihal']); ?></td>
-                    <td><?php echo e($l['pelapor']); ?></td>
-                    <td><?php echo e($l['tanggal']); ?></td>
-                    <td><span class="status-dot <?php echo e($l['prioritas_class']); ?>"><?php echo e($l['prioritas']); ?></span></td>
-                    <td>
-                      <div class="btn-row">
-                        <button class="btn btn-primary btn-sm" type="button">Verifikasi & Teruskan ke DANPUS</button>
-                        <button class="btn btn-ghost-red btn-sm" type="button">Tolak</button>
-                      </div>
-                    </td>
-                  </tr>
-                  <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-      </section>
-
-      
-      <section class="tab-panel" data-tab-panel="sdir">
+      <section class="tab-panel" data-tab-panel="laporan">
         <div class="section-head">
-          <h2>Koordinasi dengan SDIR</h2>
-          <p>Ajukan permintaan koordinasi (bukan laporan insiden) ke SDIR bila diperlukan.</p>
+          <h2>Laporan Masuk</h2>
+          <p>Laporan dari SDIR dan seluruh Satlak yang perlu diverifikasi sebelum diteruskan ke DANPUS.</p>
         </div>
         <div class="panel">
-          <div class="form-grid" style="padding:22px;">
-            <div class="form-field full">
-              <button class="btn btn-sm" type="button" onclick="alert('Prototype — form koordinasi ke SDIR belum tersambung ke database.')">Ajukan Koordinasi ke SDIR</button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      
-      <section class="tab-panel" data-tab-panel="danpus">
-        <div class="section-head">
-          <h2>Lapor ke DANPUS</h2>
-          <p>Laporan insiden yang dikirim langsung ke DANPUS, lengkap dengan lampiran bukti dalam format PDF.</p>
-        </div>
-        <div class="panel">
-          <form class="form-grid" id="formDanpus" novalidate>
-            <div class="form-field">
-              <label for="asetDanpus">Aset / Website Terdampak</label>
-              <select id="asetDanpus" required>
-                <?php $__currentLoopData = $asetMonitoring; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $a): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                  <option><?php echo e($a['nama']); ?></option>
+          <div class="tbl-wrap">
+            <table class="dtbl">
+              <thead><tr><th>Asal Satuan</th><th>Perihal</th><th>Tanggal</th><th>Prioritas</th><th>Status</th>
+              <th>Aksi</th>
+              </tr></thead>
+              <tbody>
+                <?php $__currentLoopData = $laporanMasuk; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $l): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <tr>
+                  <td><?php echo e($l['satuan']); ?></td>
+                  <td><?php echo e($l['perihal']); ?></td>
+                  <td><?php echo e($l['tanggal']); ?></td>
+                  <td><span class="status-dot <?php echo e($l['prioritas_class']); ?>"><?php echo e($l['prioritas']); ?></span></td>
+                  <td><span class="badge <?php echo e($l['status_class']); ?>"><?php echo e($l['status']); ?></span></td>
+                  <td>
+                    <div class="btn-row">
+                      <button class="btn btn-primary btn-sm" type="button">Teruskan ke DANPUS</button>
+                      <button class="btn btn-sm" type="button">Kembalikan</button>
+                    </div>
+                  </td>
+                </tr>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-              </select>
-            </div>
-            <div class="form-field">
-              <label for="prioritasDanpus">Prioritas</label>
-              <select id="prioritasDanpus" required>
-                <option>Tinggi</option><option>Sedang</option><option>Rendah</option>
-              </select>
-            </div>
-            <div class="form-field full">
-              <label for="perihalDanpus">Perihal</label>
-              <input id="perihalDanpus" type="text" placeholder="Contoh: Website diserang DDoS" required>
-            </div>
-            <div class="form-field full">
-              <label for="deskripsiDanpus">Deskripsi Kejadian</label>
-              <textarea id="deskripsiDanpus" rows="4" placeholder="Jelaskan kronologi dan dampak insiden..." required></textarea>
-            </div>
-            <div class="form-field full">
-              <label for="lampiranDanpus">Lampiran (bukti / dokumentasi)</label>
-              <input id="lampiranDanpus" type="file" accept="application/pdf,.pdf">
-              <span class="form-hint">Format PDF, maksimal 20 MB, dikirim langsung ke DANPUS.</span>
-              <span class="form-hint" id="lampiranDanpusInfo" style="display:none;"></span>
-              <span class="form-hint" id="lampiranDanpusError" style="display:none;color:var(--red);"></span>
-            </div>
-            <div class="form-field full">
-              <button class="btn btn-primary" type="submit">Kirim Laporan ke DANPUS</button>
-            </div>
-          </form>
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
+
+      
+      <section class="tab-panel" data-tab-panel="koordinasi">
+        <div class="section-head">
+          <h2>Koordinasi dengan Satlak</h2>
+          <p>Permintaan koordinasi antar satuan — misalnya permintaan pengiriman personel dari SDIR ke Satlak.</p>
+        </div>
+        <div class="panel">
+          <div class="tbl-wrap">
+            <table class="dtbl">
+              <thead><tr><th>Satuan Tujuan</th><th>Perihal Koordinasi</th><th>Diminta Oleh</th><th>Tanggal</th><th>Status</th></tr></thead>
+              <tbody>
+                <?php $__currentLoopData = $koordinasi; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $k): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <tr>
+                  <td><?php echo e($k['satuan']); ?></td>
+                  <td><?php echo e($k['perihal']); ?></td>
+                  <td><?php echo e($k['diminta_oleh']); ?></td>
+                  <td><?php echo e($k['tanggal']); ?></td>
+                  <td><span class="badge <?php echo e($k['status_class']); ?>"><?php echo e($k['status']); ?></span></td>
+                </tr>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      
+      <section class="tab-panel" data-tab-panel="diteruskan">
+        <div class="section-head">
+          <h2>Riwayat Diteruskan ke DANPUS</h2>
+          <p>Laporan yang sudah diverifikasi WADAN dan sudah dikirim ke DANPUS untuk persetujuan akhir.</p>
+        </div>
+        <div class="panel">
+          <div class="tbl-wrap">
+            <table class="dtbl">
+              <thead><tr><th>Asal Satuan</th><th>Perihal</th><th>Tanggal Diteruskan</th><th>Status di DANPUS</th></tr></thead>
+              <tbody>
+                <?php $__currentLoopData = $riwayatDiteruskan; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $r): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <tr>
+                  <td><?php echo e($r['satuan']); ?></td>
+                  <td><?php echo e($r['perihal']); ?></td>
+                  <td><?php echo e($r['tanggal']); ?></td>
+                  <td><span class="badge <?php echo e($r['status_class']); ?>"><?php echo e($r['status']); ?></span></td>
+                </tr>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </div>
 
       <script>
       (function () {
@@ -544,120 +512,6 @@
       })();
       </script>
 
-      <script>
-      (function () {
-        var MAX_SIZE_MB = 20;
-        var MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
-
-        var form = document.getElementById('formDanpus');
-        var fileInput = document.getElementById('lampiranDanpus');
-        var infoEl = document.getElementById('lampiranDanpusInfo');
-        var errorEl = document.getElementById('lampiranDanpusError');
-
-        if (!form || !fileInput) return;
-
-        function resetFileMessages() {
-          infoEl.style.display = 'none';
-          infoEl.textContent = '';
-          errorEl.style.display = 'none';
-          errorEl.textContent = '';
-        }
-
-        function formatSize(bytes) {
-          return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
-        }
-
-        function validateFile() {
-          resetFileMessages();
-
-          var file = fileInput.files && fileInput.files[0];
-          if (!file) return null;
-
-          var isPdfType = file.type === 'application/pdf';
-          var isPdfExt = /\.pdf$/i.test(file.name);
-
-          if (!isPdfType && !isPdfExt) {
-            errorEl.textContent = 'File "' + file.name + '" ditolak: hanya format PDF yang diperbolehkan.';
-            errorEl.style.display = 'block';
-            fileInput.value = '';
-            return null;
-          }
-
-          if (file.size > MAX_SIZE_BYTES) {
-            errorEl.textContent = 'File "' + file.name + '" (' + formatSize(file.size) + ') melebihi batas maksimal ' + MAX_SIZE_MB + ' MB.';
-            errorEl.style.display = 'block';
-            fileInput.value = '';
-            return null;
-          }
-
-          infoEl.textContent = 'Lampiran dipilih: ' + file.name + ' (' + formatSize(file.size) + ')';
-          infoEl.style.display = 'block';
-          return file;
-        }
-
-        fileInput.addEventListener('change', validateFile);
-
-        form.addEventListener('submit', function (e) {
-          e.preventDefault();
-
-          if (!form.checkValidity()) {
-            form.reportValidity();
-            return;
-          }
-
-          var file = validateFile();
-          if (fileInput.files.length > 0 && !file) {
-            // File dipilih tapi tidak lolos validasi
-            return;
-          }
-
-          alert('Prototype — form ini belum tersambung ke database. ' + (file ? 'Lampiran "' + file.name + '" siap dikirim.' : 'Tidak ada lampiran.'));
-        });
-      })();
-      </script>
-
-    </div>
-      <script>
-      (function () {
-        var notifBtn = document.getElementById('notifBtn');
-        var overlay = document.getElementById('notifModalOverlay');
-        var card = document.getElementById('notifModalCard');
-        var closeBtn = document.getElementById('notifModalCloseBtn');
-        if (!notifBtn || !overlay || !card) return;
-
-        function openNotif() {
-          overlay.classList.add('open');
-          notifBtn.setAttribute('aria-expanded', 'true');
-          document.body.style.overflow = 'hidden';
-        }
-        function closeNotif() {
-          overlay.classList.remove('open');
-          notifBtn.setAttribute('aria-expanded', 'false');
-          document.body.style.overflow = '';
-        }
-
-        notifBtn.addEventListener('click', function (e) {
-          e.stopPropagation();
-          openNotif();
-        });
-        if (closeBtn) {
-          closeBtn.addEventListener('click', function (e) {
-            e.stopPropagation();
-            closeNotif();
-          });
-        }
-        overlay.addEventListener('click', function (e) {
-          if (e.target === overlay) closeNotif();
-        });
-        card.addEventListener('click', function (e) {
-          e.stopPropagation();
-        });
-        document.addEventListener('keydown', function (e) {
-          if (e.key === 'Escape' && overlay.classList.contains('open')) closeNotif();
-        });
-      })();
-      </script>
-
   </main>
 
   
@@ -716,4 +570,4 @@
 
 <?php echo $__env->make('siberad.dashboards.partials.dash-script', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </body>
-</html><?php /**PATH D:\SEMESTER 6\KP PUSSIBERAD\KP_UNJANI_SI_2026\resources\views/siberad/dashboards/satlakal.blade.php ENDPATH**/ ?>
+</html><?php /**PATH D:\SEMESTER 6\KP PUSSIBERAD\KP_UNJANI_SI_2026\resources\views/siberad/dashboards/wadan.blade.php ENDPATH**/ ?>
