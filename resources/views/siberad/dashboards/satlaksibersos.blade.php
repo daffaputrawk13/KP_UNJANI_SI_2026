@@ -193,8 +193,8 @@
               </div>
               <div class="form-field full">
                 <label for="lampiranLaporSos">Lampiran (tangkapan layar)</label>
-                <input id="lampiranLaporSos" type="file" accept=".pdf,.jpg,.png">
-                <span class="form-hint">Format PDF/JPG/PNG, maksimal 25 MB sesuai ketentuan rapat.</span>
+                <input id="lampiranLaporSos" type="file" accept=".pdf">
+                <span class="form-hint">Format PDF, maksimal 20 MB, dikirim langsung ke DANPUS.</span>
               </div>
               <div class="form-field full">
                 <button class="btn btn-primary" type="submit">Kirim Laporan ke Komandan</button>
@@ -220,7 +220,7 @@
                     <td><span class="status-dot {{ $l['prioritas_class'] }}">{{ $l['prioritas'] }}</span></td>
                     <td>
                       <div class="btn-row">
-                        <button class="btn btn-primary btn-sm" type="button">Verifikasi & Teruskan</button>
+                        <button class="btn btn-primary btn-sm" type="button">Verifikasi & Teruskan ke DANPUS</button>
                         <button class="btn btn-ghost-red btn-sm" type="button">Tolak</button>
                       </div>
                     </td>
@@ -231,6 +231,17 @@
             </div>
           </div>
         @endif
+        <div class="panel" style="margin-top:20px;">
+          <div class="panel-head">
+            <div><h3>Koordinasi dengan SDIR</h3><p>Ajukan permintaan koordinasi (bukan laporan insiden) ke SDIR bila diperlukan.</p></div>
+          </div>
+          <div class="form-grid" style="padding:0 22px 22px;">
+            <div class="form-field full">
+              <button class="btn btn-sm" type="button" onclick="alert('Prototype — form koordinasi ke SDIR belum tersambung ke database.')">Ajukan Koordinasi ke SDIR</button>
+            </div>
+          </div>
+        </div>
+
       </section>
 
     </div>

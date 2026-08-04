@@ -643,6 +643,8 @@
     if(saved === 'light'){ document.documentElement.setAttribute('data-theme','light'); }
   })();
 </script>
+
+@vite(['resources/js/app.js'])
 </head>
 <body class="is-loading">
 

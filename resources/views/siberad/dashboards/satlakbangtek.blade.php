@@ -186,8 +186,8 @@
               </div>
               <div class="form-field full">
                 <label for="lampiranLapor">Lampiran (dokumentasi / data uji)</label>
-                <input id="lampiranLapor" type="file" accept=".pdf,.jpg,.png,.zip">
-                <span class="form-hint">Format PDF/JPG/PNG/ZIP, maksimal 25 MB sesuai ketentuan rapat.</span>
+                <input id="lampiranLapor" type="file" accept=".pdf">
+                <span class="form-hint">Format PDF, maksimal 20 MB, dikirim langsung ke DANPUS.</span>
               </div>
               <div class="form-field full">
                 <button class="btn btn-primary" type="submit">Kirim ke Komandan</button>
@@ -197,7 +197,7 @@
         @else
           <div class="section-head">
             <h2>Verifikasi Laporan dari Piket</h2>
-            <p>Laporan atau pengajuan yang dikirim Piket dan menunggu verifikasi Komandan sebelum diteruskan ke WADAN.</p>
+            <p>Laporan atau pengajuan yang dikirim Piket dan menunggu verifikasi Komandan sebelum diteruskan langsung ke DANPUS.</p>
           </div>
           <div class="panel">
             <div class="tbl-wrap">
@@ -213,7 +213,7 @@
                     <td><span class="status-dot {{ $l['prioritas_class'] }}">{{ $l['prioritas'] }}</span></td>
                     <td>
                       <div class="btn-row">
-                        <button class="btn btn-primary btn-sm" type="button">Verifikasi & Teruskan</button>
+                        <button class="btn btn-primary btn-sm" type="button">Verifikasi & Teruskan ke DANPUS</button>
                         <button class="btn btn-ghost-red btn-sm" type="button">Tolak</button>
                       </div>
                     </td>
@@ -224,6 +224,17 @@
             </div>
           </div>
         @endif
+        <div class="panel" style="margin-top:20px;">
+          <div class="panel-head">
+            <div><h3>Koordinasi dengan SDIR</h3><p>Ajukan permintaan koordinasi (bukan laporan insiden) ke SDIR bila diperlukan.</p></div>
+          </div>
+          <div class="form-grid" style="padding:0 22px 22px;">
+            <div class="form-field full">
+              <button class="btn btn-sm" type="button" onclick="alert('Prototype — form koordinasi ke SDIR belum tersambung ke database.')">Ajukan Koordinasi ke SDIR</button>
+            </div>
+          </div>
+        </div>
+
       </section>
 
     </div>
