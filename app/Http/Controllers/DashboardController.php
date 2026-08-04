@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Satuan;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -10,10 +11,12 @@ class DashboardController extends Controller
 {
     /**
      * Mengarahkan user ke halaman dashboard sesuai satuan (role) tempat ia login.
-     * Seluruh 11 role sudah punya halaman dashboard khusus (DANPUS, WADAN,
+     * Seluruh 12 role sudah punya halaman dashboard khusus (ADMIN, DANPUS, WADAN,
      * Satlakal (Penangkalan), Satlak Sibersos, Satlak Penindakan, Satlok Duktek (Dukungan Teknologi),
-     * Binfung, Binkum, Diklat, Binmat, SDIR). Dashboard generik tetap
-     * dipertahankan sebagai fallback jika ada satuan baru di kemudian hari.
+     * Binfung, Binkum, Diklat, Binmat, SDIR). ADMIN bukan satuan operasional —
+     * perannya khusus mengelola akun pengguna, data satuan, dan permintaan
+     * reset password. Dashboard generik tetap dipertahankan sebagai fallback
+     * jika ada satuan baru di kemudian hari.
      */
     public function __invoke(Request $request): View
     {
@@ -21,6 +24,7 @@ class DashboardController extends Controller
         $satuan = $user->satuan;
 
         return match ($satuan?->kode) {
+            'ADMIN' => $this->admin($user, $satuan),
             'DANPUS' => $this->danpus($user, $satuan),
             'WADAN' => $this->wadan($user, $satuan),
             'SATLAKAL' => $this->satlakAlmon($user, $satuan),
@@ -37,11 +41,50 @@ class DashboardController extends Controller
     }
 
     /**
+     * ADMIN — pengelola sistem: akun pengguna, data satuan, dan permintaan
+     * reset password yang dikirim dari halaman "Pengaturan Akun" tiap satuan.
+     */
+    private function admin($user, $satuan): View
+    {
+        $semuaPengguna = User::with('satuan')->orderBy('name')->get();
+        $semuaSatuan = Satuan::withCount('users')->orderBy('urutan')->get();
+
+        $permintaanResetPassword = [
+            ['satuan' => 'Satlak Sibersos', 'catatan' => 'Lupa kata sandi lama', 'tanggal' => '02 Agu 2026', 'status' => 'Menunggu', 'status_class' => 'amber'],
+            ['satuan' => 'Binmat (Pembinaan Materiil)', 'catatan' => 'Akun terkunci setelah beberapa kali salah input', 'tanggal' => '01 Agu 2026', 'status' => 'Menunggu', 'status_class' => 'amber'],
+            ['satuan' => 'Diklat (Pendidikan & Latihan)', 'catatan' => 'Pergantian operator baru', 'tanggal' => '29 Jul 2026', 'status' => 'Selesai', 'status_class' => 'green'],
+        ];
+
+        $aktivitasTerbaru = [
+            ['kegiatan' => 'Permintaan reset password baru dari Satlak Sibersos', 'waktu' => '3 jam lalu', 'status' => 'Menunggu', 'status_class' => 'amber'],
+            ['kegiatan' => 'Akun WADAN (Wakil Komandan) login dari perangkat baru', 'waktu' => 'Kemarin', 'status' => 'Info', 'status_class' => 'ok'],
+            ['kegiatan' => 'Data satuan Binfung (Pembinaan Fungsi) diperbarui', 'waktu' => '2 hari lalu', 'status' => 'Selesai', 'status_class' => 'green'],
+        ];
+
+        return view('siberad.dashboards.admin', [
+            'user' => $user,
+            'satuan' => $satuan,
+            'semuaPengguna' => $semuaPengguna,
+            'semuaSatuan' => $semuaSatuan,
+            'permintaanResetPassword' => $permintaanResetPassword,
+            'aktivitasTerbaru' => $aktivitasTerbaru,
+            'stats' => [
+                'total_pengguna' => $semuaPengguna->count(),
+                'total_satuan' => $semuaSatuan->count(),
+                'reset_password_pending' => collect($permintaanResetPassword)->where('status_class', 'amber')->count(),
+                'satuan_tanpa_pengguna' => $semuaSatuan->where('users_count', 0)->count(),
+            ],
+        ]);
+    }
+
+    /**
      * DANPUS — penerima laporan tertinggi, persetujuan akhir, pantauan seluruh satuan.
      */
     private function danpus($user, $satuan): View
     {
-        $semuaSatuan = Satuan::orderBy('urutan')->get();
+        // ADMIN bukan satuan operasional, jadi tidak ikut ditampilkan di
+        // pantauan status satuan milik DANPUS.
+        $semuaSatuan = Satuan::where('kode', '!=', 'ADMIN')->orderBy('urutan')->get();
 
         $statusSatuan = [
             'SATLAKAL' => ['label' => 'Ada Insiden', 'class' => 'bad', 'update' => '10 menit lalu'],

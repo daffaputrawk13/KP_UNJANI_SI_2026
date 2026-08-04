@@ -1054,10 +1054,10 @@ unset($__errorArgs, $__bag); ?>
 
   // ---------- nav aktif mengikuti section (scrollspy) ----------
   const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
-  const navSectionMap = new Map();
+  const navSections = [];
   navLinks.forEach(link => {
     const target = document.querySelector(link.getAttribute('href'));
-    if (target) navSectionMap.set(target, link);
+    if (target) navSections.push({ link, target });
   });
 
   function setActiveNavLink(activeLink) {
@@ -1065,13 +1065,42 @@ unset($__errorArgs, $__bag); ?>
     if (activeLink) activeLink.classList.add('active');
   }
 
-  const navSpyObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) setActiveNavLink(navSectionMap.get(entry.target));
-    });
-  }, { rootMargin: '-40% 0px -55% 0px', threshold: 0 });
+  // Dihitung ulang dari posisi asli tiap section setiap ada scroll, bukan
+  // menunggu event "masuk/keluar zona" seperti IntersectionObserver — supaya
+  // tidak ada section yang "terlewat" saat scroll cepat, baik ke bawah
+  // maupun ke atas.
+  let scrollSpyTicking = false;
+  function updateScrollSpy(){
+    scrollSpyTicking = false;
 
-  navSectionMap.forEach((link, section) => navSpyObserver.observe(section));
+    // Kalau halaman sudah discroll mentok ke paling bawah, langsung pakai
+    // menu terakhir (Kontak) — footer kadang lebih pendek dari garis acuan
+    // di bawah sehingga tidak akan pernah "kena" garis acuan itu.
+    const sudahMentok = (window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 2);
+    if (sudahMentok) {
+      setActiveNavLink(navSections[navSections.length - 1].link);
+      return;
+    }
+
+    const garisAcuan = window.innerHeight * 0.35;
+    let aktif = navSections[0];
+    for (const item of navSections) {
+      const rect = item.target.getBoundingClientRect();
+      if (rect.top <= garisAcuan) aktif = item;
+    }
+    setActiveNavLink(aktif.link);
+  }
+
+  function requestScrollSpyUpdate(){
+    if (!scrollSpyTicking) {
+      scrollSpyTicking = true;
+      requestAnimationFrame(updateScrollSpy);
+    }
+  }
+
+  window.addEventListener('scroll', requestScrollSpyUpdate, {passive:true});
+  window.addEventListener('resize', requestScrollSpyUpdate);
+  updateScrollSpy();
 
   // set aktif langsung saat diklik (biar kerasa instan sebelum animasi scroll selesai)
   navLinks.forEach(link => {

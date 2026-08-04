@@ -18,6 +18,9 @@ class SatuanSeeder extends Seeder
     public function run(): void
     {
         $satuans = [
+            // --- ADMIN (Pengelola sistem, bukan satuan operasional) ---
+            ['kode' => 'ADMIN', 'nama' => 'Administrator Sistem', 'kategori' => Satuan::KATEGORI_ADMIN, 'deskripsi' => 'Kelola akun pengguna, satuan, dan permintaan reset password.', 'urutan' => 0],
+
             // --- SATLAK (Satuan Pelaksana) ---
             ['kode' => 'SATLAKAL',       'nama' => 'Satlakal (Penangkalan)',                  'kategori' => Satuan::KATEGORI_SATLAK,      'deskripsi' => 'Pemantauan & pemulihan (mis. website yang diserang).',   'urutan' => 10],
             ['kode' => 'SATLAKSIBERSOS', 'nama' => 'Satlak Sibersos',               'kategori' => Satuan::KATEGORI_SATLAK,      'deskripsi' => 'Pengelolaan media sosial di daerah.',                    'urutan' => 20],

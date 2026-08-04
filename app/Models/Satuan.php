@@ -24,6 +24,7 @@ class Satuan extends Model
     public const KATEGORI_SATLAK = 'satlak';
     public const KATEGORI_DIREKTORAT = 'direktorat';
     public const KATEGORI_PIMPINAN = 'pimpinan';
+    public const KATEGORI_ADMIN = 'admin';
 
     public function users(): HasMany
     {

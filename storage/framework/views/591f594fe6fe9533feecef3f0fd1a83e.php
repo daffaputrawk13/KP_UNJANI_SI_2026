@@ -3,14 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Satlakal (Penangkalan) — SIBERAD</title>
+<title>Admin — SIBERAD</title>
 <link rel="icon" type="image/jpeg" href="<?php echo e(asset('images/logo-pussiberad.jpg')); ?>">
 <?php echo $__env->make('siberad.dashboards.partials.dash-styles', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </head>
 <body>
-
-
-
 <div class="profile-modal-overlay" id="profileModalOverlay">
   <div class="profile-modal-card" id="profileModalCard" role="dialog" aria-modal="true" aria-label="Detail profil">
     <button type="button" class="profile-modal-close" id="profileModalCloseBtn" aria-label="Tutup">
@@ -87,9 +84,9 @@
     <nav class="side-nav">
       <div class="side-nav-label">Menu</div>
       <a href="#" class="side-link active" data-tab-link="ringkasan"><span class="dot"></span>Ringkasan</a>
-      <a href="#" class="side-link" data-tab-link="lapor"><span class="dot"></span>Verifikasi Laporan</a>
-      <a href="#" class="side-link" data-tab-link="danpus"><span class="dot"></span>Lapor ke DANPUS</a>
-      <a href="#" class="side-link" data-tab-link="sdir"><span class="dot"></span>Koordinasi SDIR</a>
+      <a href="#" class="side-link" data-tab-link="pengguna"><span class="dot"></span>Kelola Pengguna</a>
+      <a href="#" class="side-link" data-tab-link="satuan"><span class="dot"></span>Kelola Satuan</a>
+      <a href="#" class="side-link" data-tab-link="reset-password"><span class="dot"></span>Permintaan Reset Password</a>
     </nav>
     <div class="side-foot">
       <form class="logout logout-form" method="POST" action="<?php echo e(route('logout')); ?>">
@@ -132,7 +129,6 @@
             </div>
           </div>
         </div>
-
         <div class="profile-menu" id="profileMenu">
           <button type="button" class="profile-menu-btn" id="profileMenuBtn" aria-haspopup="menu" aria-expanded="false" aria-label="Menu profil">
             <span class="profile-initial" id="profileInitial"><?php echo e(strtoupper(mb_substr($user->name ?? 'U', 0, 1))); ?></span>
@@ -179,49 +175,49 @@
       </div>
     </div>
 
+    
     <div class="content">
 
       
       <section class="tab-panel active" data-tab-panel="ringkasan">
         <div class="section-head">
-          <h2>Ringkasan Pemantauan</h2>
-          <p>Status aset/website yang dipantau Satlakal (Penangkalan) hari ini.</p>
+          <h2>Ringkasan Sistem</h2>
+          <p>Kondisi akun pengguna dan satuan yang terdaftar di SIBERAD.</p>
         </div>
         <div class="stat-grid">
           <div class="stat-card">
-            <div class="lbl">Total Aset Dipantau</div>
-            <div class="val"><?php echo e($stats['total_aset']); ?></div>
-            <div class="sub">Website & layanan digital</div>
+            <div class="lbl">Total Pengguna</div>
+            <div class="val"><?php echo e($stats['total_pengguna']); ?></div>
+            <div class="sub">Akun terdaftar di sistem</div>
           </div>
           <div class="stat-card">
-            <div class="lbl">Status Normal</div>
-            <div class="val" style="color:var(--green);"><?php echo e($stats['normal']); ?></div>
-            <div class="sub">Berjalan baik</div>
+            <div class="lbl">Total Satuan</div>
+            <div class="val"><?php echo e($stats['total_satuan']); ?></div>
+            <div class="sub">Termasuk Admin</div>
           </div>
           <div class="stat-card">
-            <div class="lbl">Sedang Diserang</div>
-            <div class="val" style="color:var(--red);"><?php echo e($stats['diserang']); ?></div>
-            <div class="sub">Butuh penanganan segera</div>
+            <div class="lbl">Permintaan Reset Password</div>
+            <div class="val" style="color:var(--amber);"><?php echo e($stats['reset_password_pending']); ?></div>
+            <div class="sub">Menunggu diverifikasi</div>
           </div>
           <div class="stat-card">
-            <div class="lbl">Dalam Pemulihan</div>
-            <div class="val" style="color:var(--amber);"><?php echo e($stats['pemulihan']); ?></div>
-            <div class="sub">Sedang ditangani</div>
+            <div class="lbl">Satuan Tanpa Pengguna</div>
+            <div class="val" style="color:<?php echo e($stats['satuan_tanpa_pengguna'] > 0 ? 'var(--red)' : 'var(--green)'); ?>;"><?php echo e($stats['satuan_tanpa_pengguna']); ?></div>
+            <div class="sub">Perlu dibuatkan akun</div>
           </div>
         </div>
 
         <div class="panel">
-          <div class="panel-head"><div><h3>Insiden Terbaru</h3><p>Serangan atau gangguan yang baru terdeteksi.</p></div></div>
+          <div class="panel-head"><div><h3>Aktivitas Terbaru</h3><p>Aktivitas seputar akun dan data satuan.</p></div></div>
           <div class="tbl-wrap">
             <table class="dtbl">
-              <thead><tr><th>Aset</th><th>Jenis Gangguan</th><th>Terdeteksi</th><th>Status</th></tr></thead>
+              <thead><tr><th>Kegiatan</th><th>Waktu</th><th>Status</th></tr></thead>
               <tbody>
-                <?php $__currentLoopData = $insidenTerbaru; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <?php $__currentLoopData = $aktivitasTerbaru; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $a): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <tr>
-                  <td><?php echo e($i['aset']); ?></td>
-                  <td><?php echo e($i['jenis']); ?></td>
-                  <td><?php echo e($i['waktu']); ?></td>
-                  <td><span class="status-dot <?php echo e($i['status_class']); ?>"><?php echo e($i['status']); ?></span></td>
+                  <td><?php echo e($a['kegiatan']); ?></td>
+                  <td><?php echo e($a['waktu']); ?></td>
+                  <td><span class="status-dot <?php echo e($a['status_class']); ?>"><?php echo e($a['status']); ?></span></td>
                 </tr>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
               </tbody>
@@ -231,96 +227,122 @@
       </section>
 
       
-      <section class="tab-panel" data-tab-panel="lapor">
-          <div class="section-head">
-            <h2>Verifikasi &amp; Teruskan Laporan</h2>
-            <p>Laporan insiden yang menunggu diteruskan langsung ke DANPUS.</p>
-          </div>
-          <div class="panel">
-            <div class="tbl-wrap">
-              <table class="dtbl">
-                <thead><tr><th>Aset</th><th>Perihal</th><th>Dilaporkan Oleh</th><th>Tanggal</th><th>Prioritas</th><th>Aksi</th></tr></thead>
-                <tbody>
-                  <?php $__currentLoopData = $laporanPiket; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $l): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                  <tr>
-                    <td><?php echo e($l['aset']); ?></td>
-                    <td><?php echo e($l['perihal']); ?></td>
-                    <td><?php echo e($l['pelapor']); ?></td>
-                    <td><?php echo e($l['tanggal']); ?></td>
-                    <td><span class="status-dot <?php echo e($l['prioritas_class']); ?>"><?php echo e($l['prioritas']); ?></span></td>
-                    <td>
-                      <div class="btn-row">
-                        <button class="btn btn-primary btn-sm" type="button">Verifikasi & Teruskan ke DANPUS</button>
-                        <button class="btn btn-ghost-red btn-sm" type="button">Tolak</button>
-                      </div>
-                    </td>
-                  </tr>
-                  <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-      </section>
-
-      
-      <section class="tab-panel" data-tab-panel="sdir">
+      <section class="tab-panel" data-tab-panel="pengguna">
         <div class="section-head">
-          <h2>Koordinasi dengan SDIR</h2>
-          <p>Ajukan permintaan koordinasi (bukan laporan insiden) ke SDIR bila diperlukan.</p>
+          <h2>Kelola Pengguna</h2>
+          <p>Seluruh akun yang terdaftar, satu akun per satuan.</p>
         </div>
         <div class="panel">
-          <div class="form-grid" style="padding:22px;">
-            <div class="form-field full">
-              <button class="btn btn-sm" type="button" onclick="alert('Prototype — form koordinasi ke SDIR belum tersambung ke database.')">Ajukan Koordinasi ke SDIR</button>
-            </div>
+          <div class="panel-head">
+            <div><h3>Daftar Pengguna</h3><p><?php echo e($semuaPengguna->count()); ?> akun terdaftar.</p></div>
+            <button type="button" class="btn btn-primary btn-sm" onclick="alert('Prototype — form tambah pengguna belum tersambung ke database.')">+ Tambah Pengguna</button>
           </div>
-        </div>
-      </section>
-
-      
-      <section class="tab-panel" data-tab-panel="danpus">
-        <div class="section-head">
-          <h2>Lapor ke DANPUS</h2>
-          <p>Laporan insiden yang dikirim langsung ke DANPUS, lengkap dengan lampiran bukti dalam format PDF.</p>
-        </div>
-        <div class="panel">
-          <form class="form-grid" id="formDanpus" novalidate>
-            <div class="form-field">
-              <label for="asetDanpus">Aset / Website Terdampak</label>
-              <select id="asetDanpus" required>
-                <?php $__currentLoopData = $asetMonitoring; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $a): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                  <option><?php echo e($a['nama']); ?></option>
+          <div class="tbl-wrap" data-row-limit="8">
+            <table class="dtbl">
+              <thead><tr><th>Nama</th><th>Username</th><th>Email</th><th>Satuan</th><th>Aksi</th></tr></thead>
+              <tbody>
+                <?php $__currentLoopData = $semuaPengguna; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $p): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <tr>
+                  <td><?php echo e($p->name); ?></td>
+                  <td><span class="badge"><?php echo e($p->username); ?></span></td>
+                  <td style="color:var(--text-muted);"><?php echo e($p->email); ?></td>
+                  <td><?php echo e($p->satuan->nama ?? '-'); ?></td>
+                  <td>
+                    <div class="btn-row">
+                      <button class="btn btn-sm" type="button" onclick="alert('Prototype — reset password untuk &quot;<?php echo e($p->name); ?>&quot; belum tersambung ke database.')">Reset Password</button>
+                    </div>
+                  </td>
+                </tr>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-              </select>
-            </div>
-            <div class="form-field">
-              <label for="prioritasDanpus">Prioritas</label>
-              <select id="prioritasDanpus" required>
-                <option>Tinggi</option><option>Sedang</option><option>Rendah</option>
-              </select>
-            </div>
-            <div class="form-field full">
-              <label for="perihalDanpus">Perihal</label>
-              <input id="perihalDanpus" type="text" placeholder="Contoh: Website diserang DDoS" required>
-            </div>
-            <div class="form-field full">
-              <label for="deskripsiDanpus">Deskripsi Kejadian</label>
-              <textarea id="deskripsiDanpus" rows="4" placeholder="Jelaskan kronologi dan dampak insiden..." required></textarea>
-            </div>
-            <div class="form-field full">
-              <label for="lampiranDanpus">Lampiran (bukti / dokumentasi)</label>
-              <input id="lampiranDanpus" type="file" accept="application/pdf,.pdf">
-              <span class="form-hint">Format PDF, maksimal 20 MB, dikirim langsung ke DANPUS.</span>
-              <span class="form-hint" id="lampiranDanpusInfo" style="display:none;"></span>
-              <span class="form-hint" id="lampiranDanpusError" style="display:none;color:var(--red);"></span>
-            </div>
-            <div class="form-field full">
-              <button class="btn btn-primary" type="submit">Kirim Laporan ke DANPUS</button>
-            </div>
-          </form>
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
+
+      
+      <section class="tab-panel" data-tab-panel="satuan">
+        <div class="section-head">
+          <h2>Kelola Satuan</h2>
+          <p>Daftar satuan yang tersedia sebagai pilihan role akun pengguna.</p>
+        </div>
+        <div class="panel">
+          <div class="panel-head">
+            <div><h3>Daftar Satuan</h3><p><?php echo e($semuaSatuan->count()); ?> satuan terdaftar.</p></div>
+            <button type="button" class="btn btn-primary btn-sm" onclick="alert('Prototype — form tambah satuan belum tersambung ke database.')">+ Tambah Satuan</button>
+          </div>
+          <div class="tbl-wrap" data-row-limit="8">
+            <table class="dtbl">
+              <thead><tr><th>Kode</th><th>Nama Satuan</th><th>Kategori</th><th>Jumlah Pengguna</th><th>Aksi</th></tr></thead>
+              <tbody>
+                <?php $__currentLoopData = $semuaSatuan; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $s): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <tr>
+                  <td><span class="badge"><?php echo e($s->kode); ?></span></td>
+                  <td><?php echo e($s->nama); ?></td>
+                  <td style="text-transform:capitalize;"><?php echo e($s->kategori); ?></td>
+                  <td><?php echo e($s->users_count); ?></td>
+                  <td>
+                    <div class="btn-row">
+                      <button class="btn btn-sm" type="button" onclick="alert('Prototype — edit satuan &quot;<?php echo e($s->nama); ?>&quot; belum tersambung ke database.')">Edit</button>
+                    </div>
+                  </td>
+                </tr>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      
+      <section class="tab-panel" data-tab-panel="reset-password">
+        <div class="section-head">
+          <h2>Permintaan Reset Password</h2>
+          <p>Permintaan ganti kata sandi yang dikirim pengguna lewat menu "Pengaturan Akun".</p>
+        </div>
+        <div class="panel">
+          <div class="tbl-wrap">
+            <table class="dtbl">
+              <thead><tr><th>Satuan</th><th>Catatan</th><th>Tanggal</th><th>Status</th><th>Aksi</th></tr></thead>
+              <tbody>
+                <?php $__currentLoopData = $permintaanResetPassword; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i => $r): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <tr id="rowReset<?php echo e($i); ?>">
+                  <td><?php echo e($r['satuan']); ?></td>
+                  <td style="color:var(--text-muted);"><?php echo e($r['catatan']); ?></td>
+                  <td><?php echo e($r['tanggal']); ?></td>
+                  <td id="statusReset<?php echo e($i); ?>"><span class="badge <?php echo e($r['status_class']); ?>"><?php echo e($r['status']); ?></span></td>
+                  <td>
+                    <?php if($r['status_class'] === 'amber'): ?>
+                    <div class="btn-row">
+                      <button class="btn btn-primary btn-sm" type="button" onclick="setujuiResetPassword(<?php echo e($i); ?>)">Setujui</button>
+                      <button class="btn btn-ghost-red btn-sm" type="button" onclick="tolakResetPassword(<?php echo e($i); ?>)">Tolak</button>
+                    </div>
+                    <?php else: ?>
+                      <span style="font-size:11.5px;color:var(--text-dim);">Sudah diproses</span>
+                    <?php endif; ?>
+                  </td>
+                </tr>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+      <script>
+        function setujuiResetPassword(i) {
+          document.getElementById('statusReset' + i).innerHTML = '<span class="badge green">Selesai</span>';
+          var row = document.getElementById('rowReset' + i);
+          if (row) row.children[4].innerHTML = '<span style="font-size:11.5px;color:var(--text-dim);">Sudah diproses</span>';
+        }
+        function tolakResetPassword(i) {
+          document.getElementById('statusReset' + i).innerHTML = '<span class="badge red">Ditolak</span>';
+          var row = document.getElementById('rowReset' + i);
+          if (row) row.children[4].innerHTML = '<span style="font-size:11.5px;color:var(--text-dim);">Sudah diproses</span>';
+        }
+      </script>
 
       <script>
       (function () {
@@ -552,79 +574,6 @@
 
       <script>
       (function () {
-        var MAX_SIZE_MB = 20;
-        var MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
-
-        var form = document.getElementById('formDanpus');
-        var fileInput = document.getElementById('lampiranDanpus');
-        var infoEl = document.getElementById('lampiranDanpusInfo');
-        var errorEl = document.getElementById('lampiranDanpusError');
-
-        if (!form || !fileInput) return;
-
-        function resetFileMessages() {
-          infoEl.style.display = 'none';
-          infoEl.textContent = '';
-          errorEl.style.display = 'none';
-          errorEl.textContent = '';
-        }
-
-        function formatSize(bytes) {
-          return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
-        }
-
-        function validateFile() {
-          resetFileMessages();
-
-          var file = fileInput.files && fileInput.files[0];
-          if (!file) return null;
-
-          var isPdfType = file.type === 'application/pdf';
-          var isPdfExt = /\.pdf$/i.test(file.name);
-
-          if (!isPdfType && !isPdfExt) {
-            errorEl.textContent = 'File "' + file.name + '" ditolak: hanya format PDF yang diperbolehkan.';
-            errorEl.style.display = 'block';
-            fileInput.value = '';
-            return null;
-          }
-
-          if (file.size > MAX_SIZE_BYTES) {
-            errorEl.textContent = 'File "' + file.name + '" (' + formatSize(file.size) + ') melebihi batas maksimal ' + MAX_SIZE_MB + ' MB.';
-            errorEl.style.display = 'block';
-            fileInput.value = '';
-            return null;
-          }
-
-          infoEl.textContent = 'Lampiran dipilih: ' + file.name + ' (' + formatSize(file.size) + ')';
-          infoEl.style.display = 'block';
-          return file;
-        }
-
-        fileInput.addEventListener('change', validateFile);
-
-        form.addEventListener('submit', function (e) {
-          e.preventDefault();
-
-          if (!form.checkValidity()) {
-            form.reportValidity();
-            return;
-          }
-
-          var file = validateFile();
-          if (fileInput.files.length > 0 && !file) {
-            // File dipilih tapi tidak lolos validasi
-            return;
-          }
-
-          alert('Prototype — form ini belum tersambung ke database. ' + (file ? 'Lampiran "' + file.name + '" siap dikirim.' : 'Tidak ada lampiran.'));
-        });
-      })();
-      </script>
-
-    </div>
-      <script>
-      (function () {
         var notifBtn = document.getElementById('notifBtn');
         var dropdown = document.getElementById('notifDropdown');
         var wrapper = document.getElementById('notifMenu');
@@ -729,4 +678,4 @@
 
 <?php echo $__env->make('siberad.dashboards.partials.dash-script', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </body>
-</html><?php /**PATH D:\SEMESTER 6\KP PUSSIBERAD\KP_UNJANI_SI_2026\resources\views/siberad/dashboards/satlakal.blade.php ENDPATH**/ ?>
+</html><?php /**PATH D:\Unjani\Kerja Praktek\kelompok5\KP_UNJANI_SI_2026\resources\views/siberad/dashboards/admin.blade.php ENDPATH**/ ?>
