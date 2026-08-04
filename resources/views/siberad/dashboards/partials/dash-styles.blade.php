@@ -206,7 +206,7 @@
   .profile-menu{position:relative;}
   .profile-menu-btn{
     width:42px;height:42px;border-radius:8px;flex-shrink:0;box-sizing:border-box;
-    display:flex;align-items:center;justify-content:center;
+    display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;
     border:1px solid var(--border);background:var(--gold-dim);cursor:pointer;
     color:var(--gold-bright);font-family:var(--mono);font-weight:700;font-size:13px;
     transition:border-color .2s ease,color .2s ease,transform .2s ease;
@@ -223,7 +223,10 @@
   }
   .profile-dropdown.open{opacity:1;visibility:visible;transform:translateY(0);pointer-events:auto;}
   .profile-dropdown-head{display:flex;align-items:center;gap:10px;padding:8px 8px 12px;border-bottom:1px solid var(--border-soft);margin-bottom:6px;}
-  .profile-dropdown-avatar{width:38px;height:38px;border-radius:50%;background:var(--gold-dim);color:var(--gold-bright);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:700;font-size:13px;flex-shrink:0;border:1px solid var(--border);}
+  .profile-dropdown-avatar{width:38px;height:38px;border-radius:50%;background:var(--gold-dim);color:var(--gold-bright);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:700;font-size:13px;flex-shrink:0;border:1px solid var(--border);position:relative;overflow:hidden;}
+  .profile-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;}
+  .profile-photo.visible{display:block;}
+  .profile-initial.hidden{display:none;}
   .profile-dropdown-name{font-size:13.5px;font-weight:600;color:var(--text);line-height:1.3;}
   .profile-dropdown-role{font-size:11px;color:var(--text-muted);margin-top:2px;font-family:var(--mono);letter-spacing:.02em;}
   .profile-dropdown-item{
@@ -235,6 +238,7 @@
   .profile-dropdown-item svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;flex-shrink:0;}
   .profile-dropdown-item.danger{color:var(--red);}
   .profile-dropdown-item.danger:hover{background:var(--red-dim);color:var(--red);}
+  .profile-dropdown-item[disabled]{opacity:.5;cursor:not-allowed;pointer-events:none;}
   .profile-dropdown-divider{height:1px;background:var(--border-soft);margin:6px 2px;}
   .profile-dropdown form{margin:0;}
 

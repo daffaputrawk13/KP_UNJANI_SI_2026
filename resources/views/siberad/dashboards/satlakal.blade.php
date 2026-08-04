@@ -51,17 +51,31 @@
 
         <div class="profile-menu" id="profileMenu">
           <button type="button" class="profile-menu-btn" id="profileMenuBtn" aria-haspopup="menu" aria-expanded="false" aria-label="Menu profil">
-            {{ strtoupper(mb_substr($user->name ?? 'U', 0, 1)) }}
+            <span class="profile-initial" id="profileInitial">{{ strtoupper(mb_substr($user->name ?? 'U', 0, 1)) }}</span>
+            <img class="profile-photo" id="profilePhotoBtn" alt="Foto profil {{ $user->name }}">
           </button>
 
           <div class="profile-dropdown" id="profileDropdown" role="menu" aria-label="Menu profil">
             <div class="profile-dropdown-head">
-              <div class="profile-dropdown-avatar">{{ strtoupper(mb_substr($user->name ?? 'U', 0, 1)) }}</div>
+              <div class="profile-dropdown-avatar">
+                <span class="profile-initial" id="profileInitialDropdown">{{ strtoupper(mb_substr($user->name ?? 'U', 0, 1)) }}</span>
+                <img class="profile-photo" id="profilePhotoDropdown" alt="Foto profil {{ $user->name }}">
+              </div>
               <div>
                 <div class="profile-dropdown-name">{{ $user->name }}</div>
                 <div class="profile-dropdown-role">{{ $user->jabatan ?? 'Pengguna' }}</div>
               </div>
             </div>
+
+            <button type="button" class="profile-dropdown-item" id="gantiFotoBtn" role="menuitem">
+              <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2l1-2h7l1 2h2A1.5 1.5 0 0 1 20 8.5v9A1.5 1.5 0 0 1 18.5 19h-13A1.5 1.5 0 0 1 4 17.5Z"></path><circle cx="12" cy="13" r="3.4"></circle></svg>
+              <span id="gantiFotoLabel">Ganti Foto Profil</span>
+            </button>
+            <button type="button" class="profile-dropdown-item" id="hapusFotoBtn" role="menuitem" style="display:none;">
+              <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"></path><path d="M9 7V4.5A1.5 1.5 0 0 1 10.5 3h3A1.5 1.5 0 0 1 15 4.5V7"></path><path d="M18 7l-.8 12.1a1.8 1.8 0 0 1-1.8 1.7H8.6a1.8 1.8 0 0 1-1.8-1.7L6 7"></path></svg>
+              Hapus Foto Profil
+            </button>
+            <input type="file" id="fotoProfilInput" accept="image/png,image/jpeg,image/webp" hidden>
 
             <a href="#" class="profile-dropdown-item" role="menuitem" onclick="alert('Prototype — halaman profil belum tersambung.'); return false;">
               <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"></circle><path d="M5 20c1.2-4 4.2-6 7-6s5.8 2 7 6"></path></svg>
@@ -363,6 +377,103 @@
 
         document.addEventListener('keydown', function (e) {
           if (e.key === 'Escape') closeMenu();
+        });
+      })();
+      </script>
+
+      <script>
+      (function () {
+        var MAX_PHOTO_MB = 5;
+        var MAX_PHOTO_BYTES = MAX_PHOTO_MB * 1024 * 1024;
+        var ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+        var STORAGE_KEY = 'siberad-profile-photo-{{ $user->id ?? "default" }}';
+
+        var fileInput = document.getElementById('fotoProfilInput');
+        var gantiBtn = document.getElementById('gantiFotoBtn');
+        var gantiLabel = document.getElementById('gantiFotoLabel');
+        var hapusBtn = document.getElementById('hapusFotoBtn');
+
+        var photoBtn = document.getElementById('profilePhotoBtn');
+        var photoDropdown = document.getElementById('profilePhotoDropdown');
+        var initialBtn = document.getElementById('profileInitial');
+        var initialDropdown = document.getElementById('profileInitialDropdown');
+
+        if (!fileInput || !gantiBtn || !hapusBtn) return;
+
+        function showPhoto(dataUrl) {
+          photoBtn.src = dataUrl;
+          photoDropdown.src = dataUrl;
+          photoBtn.classList.add('visible');
+          photoDropdown.classList.add('visible');
+          initialBtn.classList.add('hidden');
+          initialDropdown.classList.add('hidden');
+          hapusBtn.style.display = 'flex';
+        }
+
+        function clearPhoto() {
+          photoBtn.classList.remove('visible');
+          photoDropdown.classList.remove('visible');
+          photoBtn.removeAttribute('src');
+          photoDropdown.removeAttribute('src');
+          initialBtn.classList.remove('hidden');
+          initialDropdown.classList.remove('hidden');
+          hapusBtn.style.display = 'none';
+        }
+
+        // Muat foto tersimpan (jika ada) saat halaman dibuka
+        try {
+          var saved = localStorage.getItem(STORAGE_KEY);
+          if (saved) showPhoto(saved);
+        } catch (e) {}
+
+        gantiBtn.addEventListener('click', function () {
+          fileInput.click();
+        });
+
+        hapusBtn.addEventListener('click', function () {
+          clearPhoto();
+          try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+        });
+
+        fileInput.addEventListener('change', function () {
+          var file = fileInput.files && fileInput.files[0];
+          if (!file) return;
+
+          if (ALLOWED_TYPES.indexOf(file.type) === -1) {
+            alert('File "' + file.name + '" ditolak: hanya format JPG, PNG, atau WEBP yang diperbolehkan.');
+            fileInput.value = '';
+            return;
+          }
+
+          if (file.size > MAX_PHOTO_BYTES) {
+            alert('File "' + file.name + '" (' + (file.size / (1024 * 1024)).toFixed(2) + ' MB) melebihi batas maksimal ' + MAX_PHOTO_MB + ' MB.');
+            fileInput.value = '';
+            return;
+          }
+
+          gantiLabel.textContent = 'Memproses...';
+          gantiBtn.setAttribute('disabled', 'disabled');
+
+          var reader = new FileReader();
+          reader.onload = function (e) {
+            var dataUrl = e.target.result;
+            showPhoto(dataUrl);
+            try {
+              localStorage.setItem(STORAGE_KEY, dataUrl);
+            } catch (err) {
+              alert('Foto berhasil ditampilkan, tetapi gagal disimpan secara lokal (kemungkinan ukuran terlalu besar untuk penyimpanan browser).');
+            }
+            gantiLabel.textContent = 'Ganti Foto Profil';
+            gantiBtn.removeAttribute('disabled');
+            fileInput.value = '';
+          };
+          reader.onerror = function () {
+            alert('Gagal membaca file gambar. Silakan coba file lain.');
+            gantiLabel.textContent = 'Ganti Foto Profil';
+            gantiBtn.removeAttribute('disabled');
+            fileInput.value = '';
+          };
+          reader.readAsDataURL(file);
         });
       })();
       </script>
