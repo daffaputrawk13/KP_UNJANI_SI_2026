@@ -242,6 +242,20 @@
   .profile-dropdown-divider{height:1px;background:var(--border-soft);margin:6px 2px;}
   .profile-dropdown form{margin:0;}
 
+  .profile-dropdown-back{
+    display:flex;align-items:center;gap:8px;width:100%;padding:9px 10px;margin-bottom:4px;border-radius:8px;
+    background:transparent;border:none;color:var(--text-muted);font-family:var(--body);font-size:12.5px;font-weight:600;
+    cursor:pointer;text-align:left;
+  }
+  .profile-dropdown-back:hover{background:var(--hover-tint);color:var(--text);}
+  .profile-dropdown-back svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;flex-shrink:0;}
+  .profile-dropdown-head-lg{display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:8px 8px 16px;border-bottom:1px solid var(--border-soft);margin-bottom:8px;}
+  .profile-dropdown-avatar-lg{
+    width:72px;height:72px;border-radius:50%;background:var(--gold-dim);color:var(--gold-bright);
+    display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:700;font-size:24px;
+    border:1px solid var(--border);position:relative;overflow:hidden;margin-bottom:8px;
+  }
+
   .content{padding:30px 32px 64px;max-width:1180px;position:relative;z-index:1;}
   .tab-panel{display:none;}
   .tab-panel.active{display:block;animation:fadeIn .25s ease;}
