@@ -48,6 +48,45 @@
           <svg class="icon-moon" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"></path></svg>
           <svg class="icon-sun" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"></circle><path d="M12 2.5v2.4M12 19.1v2.4M4.4 4.4l1.7 1.7M17.9 17.9l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.4 19.6l1.7-1.7M17.9 6.1l1.7-1.7"></path></svg>
         </button>
+
+        <div class="profile-menu" id="profileMenu">
+          <button type="button" class="profile-menu-btn" id="profileMenuBtn" aria-haspopup="menu" aria-expanded="false" aria-label="Menu profil">
+            {{ strtoupper(mb_substr($user->name ?? 'U', 0, 1)) }}
+          </button>
+
+          <div class="profile-dropdown" id="profileDropdown" role="menu" aria-label="Menu profil">
+            <div class="profile-dropdown-head">
+              <div class="profile-dropdown-avatar">{{ strtoupper(mb_substr($user->name ?? 'U', 0, 1)) }}</div>
+              <div>
+                <div class="profile-dropdown-name">{{ $user->name }}</div>
+                <div class="profile-dropdown-role">{{ $user->jabatan ?? 'Pengguna' }}</div>
+              </div>
+            </div>
+
+            <a href="#" class="profile-dropdown-item" role="menuitem" onclick="alert('Prototype — halaman profil belum tersambung.'); return false;">
+              <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"></circle><path d="M5 20c1.2-4 4.2-6 7-6s5.8 2 7 6"></path></svg>
+              Profil Saya
+            </a>
+            <a href="#" class="profile-dropdown-item" role="menuitem" onclick="alert('Prototype — pengaturan akun belum tersambung.'); return false;">
+              <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.5-2-3.4-2.3.9a7.6 7.6 0 0 0-2.6-1.5L14 2.5h-4l-.5 2.5a7.6 7.6 0 0 0-2.6 1.5l-2.3-.9-2 3.4 2 1.5a7.6 7.6 0 0 0 0 3l-2 1.5 2 3.4 2.3-.9a7.6 7.6 0 0 0 2.6 1.5l.5 2.5h4l.5-2.5a7.6 7.6 0 0 0 2.6-1.5l2.3.9 2-3.4Z"></path></svg>
+              Pengaturan Akun
+            </a>
+            <a href="#" class="profile-dropdown-item" role="menuitem" onclick="alert('Prototype — pusat bantuan belum tersambung.'); return false;">
+              <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"></circle><path d="M9.2 9.2a2.8 2.8 0 1 1 3.9 2.6c-.8.4-1.1 1-1.1 1.9"></path><path d="M12 17.2h.01"></path></svg>
+              Bantuan &amp; Panduan
+            </a>
+
+            <div class="profile-dropdown-divider"></div>
+
+            <form method="POST" action="{{ route('logout') }}">
+              @csrf
+              <button type="submit" class="profile-dropdown-item danger" role="menuitem">
+                <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>
+                Keluar
+              </button>
+            </form>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -289,6 +328,44 @@
           </form>
         </div>
       </section>
+
+      <script>
+      (function () {
+        var menuBtn = document.getElementById('profileMenuBtn');
+        var dropdown = document.getElementById('profileDropdown');
+        var wrapper = document.getElementById('profileMenu');
+        if (!menuBtn || !dropdown || !wrapper) return;
+
+        function closeMenu() {
+          dropdown.classList.remove('open');
+          menuBtn.classList.remove('open');
+          menuBtn.setAttribute('aria-expanded', 'false');
+        }
+
+        function openMenu() {
+          dropdown.classList.add('open');
+          menuBtn.classList.add('open');
+          menuBtn.setAttribute('aria-expanded', 'true');
+        }
+
+        menuBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          if (dropdown.classList.contains('open')) {
+            closeMenu();
+          } else {
+            openMenu();
+          }
+        });
+
+        document.addEventListener('click', function (e) {
+          if (!wrapper.contains(e.target)) closeMenu();
+        });
+
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape') closeMenu();
+        });
+      })();
+      </script>
 
       <script>
       (function () {
