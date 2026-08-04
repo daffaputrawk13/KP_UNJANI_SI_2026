@@ -93,6 +93,7 @@
       <a href="#" class="side-link" data-tab-link="lapor"><span class="dot"></span>Verifikasi Laporan</a>
       <?php endif; ?>
       <a href="#" class="side-link" data-tab-link="danpus"><span class="dot"></span>Lapor ke DANPUS</a>
+      <a href="#" class="side-link" data-tab-link="sdir"><span class="dot"></span>Koordinasi SDIR</a>
     </nav>
     <div class="side-foot">
       <form class="logout logout-form" method="POST" action="<?php echo e(route('logout')); ?>">
@@ -106,9 +107,6 @@
     <div class="topbar">
       <div style="display:flex;align-items:center;gap:12px;">
         <button class="menu-btn" id="menuBtn">☰</button>
-        <div>
-          <div class="topbar-title">Selamat datang, <?php echo e($user->name); ?></div>
-        </div>
       </div>
       <div class="topbar-actions">
         <button type="button" class="btn-icon-toggle" id="themeToggleBtn" aria-pressed="false" aria-label="Ganti tema">
@@ -284,17 +282,22 @@
             </div>
           </div>
         <?php endif; ?>
-        <div class="panel" style="margin-top:20px;">
-          <div class="panel-head">
-            <div><h3>Koordinasi dengan SDIR</h3><p>Ajukan permintaan koordinasi (bukan laporan insiden) ke SDIR bila diperlukan.</p></div>
-          </div>
-          <div class="form-grid" style="padding:0 22px 22px;">
+
+      </section>
+
+      
+      <section class="tab-panel" data-tab-panel="sdir">
+        <div class="section-head">
+          <h2>Koordinasi dengan SDIR</h2>
+          <p>Ajukan permintaan koordinasi (bukan laporan insiden) ke SDIR bila diperlukan.</p>
+        </div>
+        <div class="panel">
+          <div class="form-grid" style="padding:22px;">
             <div class="form-field full">
               <button class="btn btn-sm" type="button" onclick="alert('Prototype — form koordinasi ke SDIR belum tersambung ke database.')">Ajukan Koordinasi ke SDIR</button>
             </div>
           </div>
         </div>
-
       </section>
 
       
