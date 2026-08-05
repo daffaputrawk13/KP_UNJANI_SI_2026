@@ -13,7 +13,7 @@ class DashboardController extends Controller
      * Mengarahkan user ke halaman dashboard sesuai satuan (role) tempat ia login.
      * Seluruh 12 role sudah punya halaman dashboard khusus (ADMIN, DANPUS, WADAN,
      * Satlakal (Penangkalan), Satlak Sibersos, Satlak Penindakan, Satlok Duktek (Dukungan Teknologi),
-     * Binfung, Binum, Diklat, Binmat, SDIR). ADMIN bukan satuan operasional —
+     * Binfung, Binkum, Diklat, Binmat, SDIR). ADMIN bukan satuan operasional —
      * perannya khusus mengelola akun pengguna, data satuan, dan permintaan
      * reset password. Dashboard generik tetap dipertahankan sebagai fallback
      * jika ada satuan baru di kemudian hari.
@@ -30,9 +30,9 @@ class DashboardController extends Controller
             'SATLAKAL' => $this->satlakAlmon($user, $satuan),
             'SATLAKSIBERSOS' => $this->satlakSibersos($user, $satuan),
             'SATLAKRINDAK' => $this->satlakRindak($user, $satuan),
-            'SATLAKDUKTEK' => $this->satlakDuktek($user, $satuan),
+            'SATLAKBANGTEK' => $this->satlakBangtek($user, $satuan),
             'BINFUNG' => $this->binfung($user, $satuan),
-            'BINUM' => $this->binum($user, $satuan),
+            'BINKUM' => $this->binkum($user, $satuan),
             'DIKLAT' => $this->diklat($user, $satuan),
             'BINMAT' => $this->binmat($user, $satuan),
             'SDIR' => $this->sdir($user, $satuan),
@@ -92,7 +92,7 @@ class DashboardController extends Controller
             'SATLAKRINDAK' => ['label' => 'Normal', 'class' => 'ok', 'update' => '1 jam lalu'],
             'SATLAKBANGTEK' => ['label' => 'Normal', 'class' => 'ok', 'update' => '2 jam lalu'],
             'BINFUNG' => ['label' => 'Normal', 'class' => 'ok', 'update' => 'Hari ini'],
-            'BINUM' => ['label' => 'Normal', 'class' => 'ok', 'update' => 'Hari ini'],
+            'BINKUM' => ['label' => 'Normal', 'class' => 'ok', 'update' => 'Hari ini'],
             'DIKLAT' => ['label' => 'Normal', 'class' => 'ok', 'update' => 'Hari ini'],
             'BINMAT' => ['label' => 'Normal', 'class' => 'ok', 'update' => 'Kemarin'],
             'SDIR' => ['label' => 'Normal', 'class' => 'ok', 'update' => 'Hari ini'],
@@ -351,9 +351,9 @@ class DashboardController extends Controller
     }
 
     /**
-     * Binum — pembinaan umum: pengawasan satuan, lomba internal, personel baru.
+     * Binkum — pembinaan umum: pengawasan satuan, lomba internal, personel baru.
      */
-    private function binum($user, $satuan): View
+    private function binkum($user, $satuan): View
     {
         $pengawasanSatuan = [
             ['satuan' => 'Satlak Penindakan', 'aspek' => 'Kepatuhan SOP penanganan insiden', 'hasil' => 'Baik', 'hasil_class' => 'ok', 'tanggal' => '01 Agu 2026'],
@@ -362,7 +362,7 @@ class DashboardController extends Controller
             ['satuan' => 'Satlok Duktek (Dukungan Teknologi)', 'aspek' => 'Keamanan dokumen riset', 'hasil' => 'Pelanggaran Ringan', 'hasil_class' => 'bad', 'tanggal' => '25 Jul 2026'],
         ];
 
-        return view('siberad.dashboards.binum', [
+        return view('siberad.dashboards.binkum', [
             'user' => $user,
             'satuan' => $satuan,
             'pengawasanSatuan' => $pengawasanSatuan,
@@ -381,7 +381,7 @@ class DashboardController extends Controller
                 ['nama' => 'Lomba Kedisiplinan Pelaporan', 'peserta' => '11 Satuan', 'periode' => 'Apr – Jun 2026', 'status' => 'Selesai', 'status_class' => 'green'],
             ],
             'laporanPiket' => [
-                ['satuan' => 'Satlok Duktek (Dukungan Teknologi)', 'perihal' => 'Temuan pelanggaran ringan keamanan dokumen riset', 'pelapor' => 'Piket Binum', 'tanggal' => '25 Jul 2026', 'prioritas' => 'Sedang', 'prioritas_class' => 'warn'],
+                ['satuan' => 'Satlok Duktek (Dukungan Teknologi)', 'perihal' => 'Temuan pelanggaran ringan keamanan dokumen riset', 'pelapor' => 'Piket Binkum', 'tanggal' => '25 Jul 2026', 'prioritas' => 'Sedang', 'prioritas_class' => 'warn'],
             ],
         ]);
     }
