@@ -19,37 +19,42 @@ class SatuanSeeder extends Seeder
     {
         $satuans = [
             // --- ADMIN (Pengelola sistem, bukan satuan operasional) ---
-            ['kode' => 'ADMIN', 'nama' => 'Administrator Sistem', 'kategori' => Satuan::KATEGORI_ADMIN, 'deskripsi' => 'Kelola akun pengguna, satuan, dan permintaan reset password.', 'urutan' => 0],
+            ['kode' => 'ADMIN', 'username' => 'admin', 'nama' => 'Administrator Sistem', 'kategori' => Satuan::KATEGORI_ADMIN, 'deskripsi' => 'Kelola akun pengguna, satuan, dan permintaan reset password.', 'urutan' => 0],
 
             // --- SATLAK (Satuan Pelaksana) ---
-            ['kode' => 'SATLAKAL',       'nama' => 'Satlakal (Penangkalan)',                  'kategori' => Satuan::KATEGORI_SATLAK,      'deskripsi' => 'Pemantauan & pemulihan (mis. website yang diserang).',   'urutan' => 10],
-            ['kode' => 'SATLAKSIBERSOS', 'nama' => 'Satlak Sibersos',               'kategori' => Satuan::KATEGORI_SATLAK,      'deskripsi' => 'Pengelolaan media sosial di daerah.',                    'urutan' => 20],
-            ['kode' => 'SATLAKRINDAK',   'nama' => 'Satlak Penindakan',             'kategori' => Satuan::KATEGORI_SATLAK,      'deskripsi' => 'Penanganan aksi cyber: malware, ransomware, serangan.', 'urutan' => 30],
-            ['kode' => 'SATLAKDUKTEK',  'nama' => 'Satlok Duktek (Dukungan Teknologi)', 'kategori' => Satuan::KATEGORI_SATLAK,      'deskripsi' => 'Riset & pengembangan teknologi terkini (AI, drone, dll).', 'urutan' => 40],
+            ['kode' => 'SATLAKAL',       'username' => 'satlakkal',   'nama' => 'Satlakal (Penangkalan)',                  'kategori' => Satuan::KATEGORI_SATLAK,      'deskripsi' => 'Pemantauan & pemulihan (mis. website yang diserang).',   'urutan' => 10],
+            ['kode' => 'SATLAKSIBERSOS', 'username' => 'satlaksibersos', 'nama' => 'Satlak Sibersos',               'kategori' => Satuan::KATEGORI_SATLAK,      'deskripsi' => 'Pengelolaan media sosial di daerah.',                    'urutan' => 20],
+            ['kode' => 'SATLAKRINDAK',   'username' => 'satlakdak',   'nama' => 'Satlak Penindakan',             'kategori' => Satuan::KATEGORI_SATLAK,      'deskripsi' => 'Penanganan aksi cyber: malware, ransomware, serangan.', 'urutan' => 30],
+            ['kode' => 'SATLAKDUKTEK',  'username' => 'satlakduktek', 'nama' => 'Satlok Duktek (Dukungan Teknologi)', 'kategori' => Satuan::KATEGORI_SATLAK,      'deskripsi' => 'Riset & pengembangan teknologi terkini (AI, drone, dll).', 'urutan' => 40],
 
             // --- DIR (Direktorat) ---
-            ['kode' => 'BINFUNG', 'nama' => 'Binfung (Pembinaan Fungsi)',    'kategori' => Satuan::KATEGORI_DIREKTORAT, 'deskripsi' => 'Penempatan personel yang masuk.',                  'urutan' => 50],
-            ['kode' => 'BINUM',  'nama' => 'Binum (Pembinaan Umum)',      'kategori' => Satuan::KATEGORI_DIREKTORAT, 'deskripsi' => 'Pengawasan satuan, lomba internal, personel baru.', 'urutan' => 60],
-            ['kode' => 'DIKLAT',  'nama' => 'Diklat (Pendidikan & Latihan)', 'kategori' => Satuan::KATEGORI_DIREKTORAT, 'deskripsi' => 'Pendidikan dan latihan satuan.',                   'urutan' => 70],
-            ['kode' => 'BINMAT',  'nama' => 'Binmat (Pembinaan Materiil)',  'kategori' => Satuan::KATEGORI_DIREKTORAT, 'deskripsi' => 'Pengurusan material/perlengkapan satuan.',         'urutan' => 80],
+            ['kode' => 'BINFUNG', 'username' => 'binfung', 'nama' => 'Binfung (Pembinaan Fungsi)',    'kategori' => Satuan::KATEGORI_DIREKTORAT, 'deskripsi' => 'Penempatan personel yang masuk.',                  'urutan' => 50],
+            ['kode' => 'BINUM',  'username' => 'binum',  'nama' => 'Binum (Pembinaan Umum)',      'kategori' => Satuan::KATEGORI_DIREKTORAT, 'deskripsi' => 'Pengawasan satuan, lomba internal, personel baru.', 'urutan' => 60],
+            ['kode' => 'DIKLAT',  'username' => 'diklat', 'nama' => 'Diklat (Pendidikan & Latihan)', 'kategori' => Satuan::KATEGORI_DIREKTORAT, 'deskripsi' => 'Pendidikan dan latihan satuan.',                   'urutan' => 70],
+            ['kode' => 'BINMAT',  'username' => 'binmat', 'nama' => 'Binmat (Pembinaan Materiil)',  'kategori' => Satuan::KATEGORI_DIREKTORAT, 'deskripsi' => 'Pengurusan material/perlengkapan satuan.',         'urutan' => 80],
 
             // --- Koordinasi / Pimpinan ---
-            ['kode' => 'SDIR',   'nama' => 'SDIR (Sekretaris Direktorat)',  'kategori' => Satuan::KATEGORI_PIMPINAN, 'deskripsi' => 'Koordinasi antar Satlak, pelaporan ke DANPUS.', 'urutan' => 90],
-            ['kode' => 'WADAN',  'nama' => 'WADAN (Wakil Komandan)',       'kategori' => Satuan::KATEGORI_PIMPINAN, 'deskripsi' => 'Penerima laporan dari SDIR/Satlak.',            'urutan' => 100],
-            ['kode' => 'DANPUS', 'nama' => 'DANPUS', 'kategori' => Satuan::KATEGORI_PIMPINAN, 'deskripsi' => 'Penerima laporan tertinggi dari seluruh satuan.', 'urutan' => 110],
+            ['kode' => 'SDIR',   'username' => 'sdir',   'nama' => 'SDIR (Sekretaris Direktorat)',  'kategori' => Satuan::KATEGORI_PIMPINAN, 'deskripsi' => 'Koordinasi antar Satlak, pelaporan ke DANPUS.', 'urutan' => 90],
+            ['kode' => 'WADAN',  'username' => 'wadan',  'nama' => 'WADAN (Wakil Komandan)',       'kategori' => Satuan::KATEGORI_PIMPINAN, 'deskripsi' => 'Penerima laporan dari SDIR/Satlak.',            'urutan' => 100],
+            ['kode' => 'DANPUS', 'username' => 'danpus', 'nama' => 'DANPUS', 'kategori' => Satuan::KATEGORI_PIMPINAN, 'deskripsi' => 'Penerima laporan tertinggi dari seluruh satuan.', 'urutan' => 110],
         ];
 
         foreach ($satuans as $data) {
-            $satuan = Satuan::updateOrCreate(['kode' => $data['kode']], $data);
+            $satuan = Satuan::updateOrCreate(
+                ['kode' => $data['kode']],
+                collect($data)->except('username')->all()
+            );
 
             // Satu akun per satuan — memegang seluruh alur (input & verifikasi laporan).
+            // Dicocokkan lewat satuan_id (bukan username) supaya perubahan username
+            // tidak membuat akun baru/duplikat, melainkan meng-update akun yang sudah ada.
             User::updateOrCreate(
-                ['username' => strtolower($data['kode'])],
+                ['satuan_id' => $satuan->id],
                 [
                     'name' => $data['nama'],
-                    'email' => strtolower($data['kode']).'@pussiberad.mil.id',
-                    'password' => Hash::make('password'),
-                    'satuan_id' => $satuan->id,
+                    'username' => $data['username'],
+                    'email' => $data['username'].'@pussiberad.mil.id',
+                    'password' => Hash::make('111'),
                     'jabatan' => null,
                 ]
             );
