@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Binkum — SIBERAD</title>
+<title>Binum — SIBERAD</title>
 <link rel="icon" type="image/jpeg" href="{{ asset('images/logo-pussiberad.jpg') }}">
 @include('siberad.dashboards.partials.dash-styles')
 </head>
@@ -209,7 +209,7 @@
       <section class="tab-panel active" data-tab-panel="dashboard">
         <div class="section-head">
           <h2>Ringkasan Pembinaan Umum</h2>
-          <p>Status pengawasan dan kegiatan pembinaan yang ditangani Binkum saat ini.</p>
+          <p>Status pengawasan dan kegiatan pembinaan yang ditangani Binum saat ini.</p>
         </div>
         <div class="stat-grid">
           <div class="stat-card">
@@ -292,7 +292,7 @@
       <section class="tab-panel" data-tab-panel="lomba">
         <div class="section-head">
           <h2>Lomba Internal</h2>
-          <p>Daftar lomba internal antar satuan yang dikelola Binkum.</p>
+          <p>Daftar lomba internal antar satuan yang dikelola Binum.</p>
         </div>
         <div class="panel">
           <div class="tbl-wrap">
