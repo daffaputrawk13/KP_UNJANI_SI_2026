@@ -84,8 +84,6 @@
     <nav class="side-nav">
       <div class="side-nav-label">Menu</div>
       <a href="#" class="side-link active" data-tab-link="dashboard"><span class="dot"></span>Dashboard</a>
-      <a href="#" class="side-link" data-tab-link="monitoring"><span class="dot"></span>Monitoring Medsos</a>
-      <a href="#" class="side-link" data-tab-link="isu"><span class="dot"></span>Isu Terdeteksi</a>
 
       <div class="side-dropdown" id="laporanDropdown">
         <button type="button" class="side-link side-dropdown-toggle" id="laporanToggle" aria-expanded="false" aria-controls="laporanSubmenu">
