@@ -25,11 +25,11 @@ class SatuanSeeder extends Seeder
             ['kode' => 'SATLAKAL',       'username' => 'satlakkal',   'nama' => 'Satlakal (Penangkalan)',                  'kategori' => Satuan::KATEGORI_SATLAK,      'deskripsi' => 'Pemantauan & pemulihan (mis. website yang diserang).',   'urutan' => 10],
             ['kode' => 'SATLAKSIBERSOS', 'username' => 'satlaksibersos', 'nama' => 'Satlak Sibersos',               'kategori' => Satuan::KATEGORI_SATLAK,      'deskripsi' => 'Pengelolaan media sosial di daerah.',                    'urutan' => 20],
             ['kode' => 'SATLAKRINDAK',   'username' => 'satlakdak',   'nama' => 'Satlak Penindakan',             'kategori' => Satuan::KATEGORI_SATLAK,      'deskripsi' => 'Penanganan aksi cyber: malware, ransomware, serangan.', 'urutan' => 30],
-            ['kode' => 'SATLAKDUKTEK',  'username' => 'satlakduktek', 'nama' => 'Satlok Duktek (Dukungan Teknologi)', 'kategori' => Satuan::KATEGORI_SATLAK,      'deskripsi' => 'Riset & pengembangan teknologi terkini (AI, drone, dll).', 'urutan' => 40],
+            ['kode' => 'SATLAKBANGTEK',  'username' => 'satlakduktek', 'nama' => 'Satlok Duktek (Dukungan Teknologi)', 'kategori' => Satuan::KATEGORI_SATLAK,      'deskripsi' => 'Riset & pengembangan teknologi terkini (AI, drone, dll).', 'urutan' => 40],
 
             // --- DIR (Direktorat) ---
             ['kode' => 'BINFUNG', 'username' => 'binfung', 'nama' => 'Binfung (Pembinaan Fungsi)',    'kategori' => Satuan::KATEGORI_DIREKTORAT, 'deskripsi' => 'Penempatan personel yang masuk.',                  'urutan' => 50],
-            ['kode' => 'BINUM',  'username' => 'binum',  'nama' => 'Binum (Pembinaan Umum)',      'kategori' => Satuan::KATEGORI_DIREKTORAT, 'deskripsi' => 'Pengawasan satuan, lomba internal, personel baru.', 'urutan' => 60],
+            ['kode' => 'BINKUM',  'username' => 'binum',  'nama' => 'Binkum (Pembinaan Umum)',      'kategori' => Satuan::KATEGORI_DIREKTORAT, 'deskripsi' => 'Pengawasan satuan, lomba internal, personel baru.', 'urutan' => 60],
             ['kode' => 'DIKLAT',  'username' => 'diklat', 'nama' => 'Diklat (Pendidikan & Latihan)', 'kategori' => Satuan::KATEGORI_DIREKTORAT, 'deskripsi' => 'Pendidikan dan latihan satuan.',                   'urutan' => 70],
             ['kode' => 'BINMAT',  'username' => 'binmat', 'nama' => 'Binmat (Pembinaan Materiil)',  'kategori' => Satuan::KATEGORI_DIREKTORAT, 'deskripsi' => 'Pengurusan material/perlengkapan satuan.',         'urutan' => 80],
 
