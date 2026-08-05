@@ -209,7 +209,7 @@
       <section class="tab-panel active" data-tab-panel="dashboard">
         <div class="section-head">
           <h2>Ringkasan Riset & Pengembangan</h2>
-          <p>Status proyek teknologi yang dikerjakan Satlok Duktek (Dukungan Teknologi) saat ini.</p>
+          <p>Status proyek teknologi yang dikerjakan Satlak Duktek (Dukungan Teknologi) saat ini.</p>
         </div>
         <div class="stat-grid">
           <div class="stat-card">
@@ -352,7 +352,7 @@
       <section class="tab-panel" data-tab-panel="status-laporan">
         <div class="section-head">
           <h2>Status Laporan</h2>
-          <p>Pantau progres laporan yang sudah diajukan oleh Satlok Duktek (Dukungan Teknologi).</p>
+          <p>Pantau progres laporan yang sudah diajukan oleh Satlak Duktek (Dukungan Teknologi).</p>
         </div>
         <div class="panel">
           <div class="tbl-wrap">
@@ -387,7 +387,7 @@
       <section class="tab-panel" data-tab-panel="riwayat-laporan">
         <div class="section-head">
           <h2>Riwayat Laporan</h2>
-          <p>Log lengkap kegiatan uji dan pengembangan yang pernah ditangani Satlok Duktek (Dukungan Teknologi).</p>
+          <p>Log lengkap kegiatan uji dan pengembangan yang pernah ditangani Satlak Duktek (Dukungan Teknologi).</p>
         </div>
         <div class="panel">
           <div class="tbl-wrap">
