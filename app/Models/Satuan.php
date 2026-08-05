@@ -30,4 +30,20 @@ class Satuan extends Model
     {
         return $this->hasMany(User::class);
     }
+
+    /**
+     * Laporan yang dikirim oleh satuan ini (mis. laporan dari Satlok Duktek).
+     */
+    public function laporanTerkirim(): HasMany
+    {
+        return $this->hasMany(Laporan::class, 'satuan_id');
+    }
+
+    /**
+     * Laporan yang ditujukan ke satuan ini (mis. laporan masuk ke DANPUS).
+     */
+    public function laporanDiterima(): HasMany
+    {
+        return $this->hasMany(Laporan::class, 'tujuan_satuan_id');
+    }
 }

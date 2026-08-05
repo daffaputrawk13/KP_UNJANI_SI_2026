@@ -377,39 +377,51 @@
       <section class="tab-panel" data-tab-panel="tambah-laporan">
         <div class="section-head">
           <h2>Tambah Laporan</h2>
-          <p>Catat kendala, kebutuhan, atau perkembangan baru dari proyek riset dan pengembangan.</p>
+          <p>Catat kendala, kebutuhan, atau perkembangan baru dari proyek riset dan pengembangan. Laporan dikirim langsung ke DANPUS.</p>
         </div>
         <div class="panel">
-          <form class="form-grid" id="formTambahLaporan" style="padding:22px;" novalidate>
+          <?php if(session('status')): ?>
+          <div class="profile-form-notice" style="margin:22px 22px 0;border-color:var(--green);color:var(--green);"><?php echo e(session('status')); ?></div>
+          <?php endif; ?>
+          <?php if($errors->any()): ?>
+          <div class="profile-form-notice" style="margin:22px 22px 0;border-color:var(--red);color:var(--red);">
+            <?php echo e($errors->first()); ?>
+
+          </div>
+          <?php endif; ?>
+          <form class="form-grid" id="formTambahLaporan" method="POST" action="<?php echo e(route('laporan.store')); ?>" enctype="multipart/form-data" style="padding:22px;">
+            <?php echo csrf_field(); ?>
             <div class="form-field">
               <label for="proyekTambahLaporan">Proyek Terkait</label>
-              <select id="proyekTambahLaporan" required>
+              <select id="proyekTambahLaporan" name="proyek" required>
                 <?php $__currentLoopData = $proyekRiset; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $p): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                  <option><?php echo e($p['nama']); ?></option>
+                  <option value="<?php echo e($p['nama']); ?>"><?php echo e($p['nama']); ?></option>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
               </select>
             </div>
             <div class="form-field">
               <label for="prioritasTambahLaporan">Prioritas</label>
-              <select id="prioritasTambahLaporan" required>
-                <option>Tinggi</option><option>Sedang</option><option>Rendah</option>
+              <select id="prioritasTambahLaporan" name="prioritas" required>
+                <option value="Tinggi">Tinggi</option>
+                <option value="Sedang">Sedang</option>
+                <option value="Rendah">Rendah</option>
               </select>
             </div>
             <div class="form-field full">
               <label for="perihalTambahLaporan">Perihal</label>
-              <input id="perihalTambahLaporan" type="text" placeholder="Contoh: Pengajuan anggaran komponen gimbal kamera baru" required>
+              <input id="perihalTambahLaporan" name="perihal" type="text" placeholder="Contoh: Pengajuan anggaran komponen gimbal kamera baru" required>
             </div>
             <div class="form-field full">
               <label for="deskripsiTambahLaporan">Deskripsi Kejadian</label>
-              <textarea id="deskripsiTambahLaporan" rows="4" placeholder="Jelaskan kronologi dan dampaknya terhadap proyek..." required></textarea>
+              <textarea id="deskripsiTambahLaporan" name="deskripsi" rows="4" placeholder="Jelaskan kronologi dan dampaknya terhadap proyek..." required></textarea>
             </div>
             <div class="form-field full">
               <label for="lampiranTambahLaporan">Lampiran (bukti / dokumentasi)</label>
-              <input id="lampiranTambahLaporan" type="file" accept="application/pdf,.pdf">
+              <input id="lampiranTambahLaporan" name="lampiran" type="file" accept="application/pdf,.pdf">
               <span class="form-hint">Format PDF, maksimal 20 MB.</span>
             </div>
             <div class="form-field full">
-              <button class="btn btn-primary" type="button" onclick="alert('Prototype — form Tambah Laporan belum tersambung ke database.')">Simpan Laporan</button>
+              <button class="btn btn-primary" type="submit">Kirim Laporan ke DANPUS</button>
             </div>
           </form>
         </div>
@@ -419,31 +431,29 @@
       <section class="tab-panel" data-tab-panel="status-laporan">
         <div class="section-head">
           <h2>Status Laporan</h2>
-          <p>Pantau progres laporan yang sudah diajukan oleh Satlak Duktek (Dukungan Teknologi).</p>
+          <p>Pantau progres laporan yang sudah diajukan oleh Satlak Duktek (Dukungan Teknologi) ke DANPUS.</p>
         </div>
         <div class="panel">
           <div class="tbl-wrap">
             <table class="dtbl">
               <thead><tr><th>Proyek</th><th>Perihal</th><th>Tanggal</th><th>Status</th></tr></thead>
               <tbody>
+                <?php $__empty_1 = true; $__currentLoopData = $laporanTerkirim; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $l): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                 <tr>
-                  <td>Drone Pemantau Perbatasan Gen-2</td>
-                  <td>Pengajuan anggaran komponen gimbal kamera baru</td>
-                  <td>02 Agu 2026</td>
-                  <td><span class="status-dot amber">Menunggu Verifikasi</span></td>
+                  <td><?php echo e($l->proyek ?? '—'); ?></td>
+                  <td><?php echo e($l->perihal); ?></td>
+                  <td><?php echo e($l->created_at->translatedFormat('d M Y')); ?></td>
+                  <td>
+                    <span class="status-dot <?php echo e(match($l->status) {
+                      'Disetujui DANPUS' => 'green',
+                      'Ditolak DANPUS' => 'bad',
+                      default => 'amber',
+                    }); ?>"><?php echo e($l->status); ?></span>
+                  </td>
                 </tr>
-                <tr>
-                  <td>Deteksi Anomali Jaringan berbasis AI</td>
-                  <td>Permintaan data insiden tambahan dari Satlak Penindakan</td>
-                  <td>30 Jul 2026</td>
-                  <td><span class="status-dot warn">Diteruskan ke DANPUS</span></td>
-                </tr>
-                <tr>
-                  <td>Chatbot Internal Layanan Personel</td>
-                  <td>Laporan hasil uji terima pengguna (UAT)</td>
-                  <td>25 Jul 2026</td>
-                  <td><span class="status-dot green">Disetujui DANPUS</span></td>
-                </tr>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                <tr><td colspan="4" style="text-align:center;color:var(--text-muted);">Belum ada laporan yang dikirim ke DANPUS.</td></tr>
+                <?php endif; ?>
               </tbody>
             </table>
           </div>
@@ -1031,5 +1041,16 @@
 </script>
 
 <?php echo $__env->make('siberad.dashboards.partials.dash-script', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+
+<?php if(session('status') || $errors->any()): ?>
+<script>
+// Setelah kirim/gagal kirim laporan, otomatis buka tab "Tambah Laporan"
+// supaya pesan sukses/errornya langsung kelihatan (bukan nyangkut di tab Dashboard).
+(function () {
+  var tab = document.querySelector('[data-tab-link="tambah-laporan"]');
+  if (tab) tab.click();
+})();
+</script>
+<?php endif; ?>
 </body>
 </html><?php /**PATH D:\SEMESTER 6\KP PUSSIBERAD\SISTEM_baru\resources\views/siberad/dashboards/satlakbangtek.blade.php ENDPATH**/ ?>

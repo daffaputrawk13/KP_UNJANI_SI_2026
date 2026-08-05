@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Laporan;
 use App\Models\Satuan;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -106,7 +107,38 @@ class DashboardController extends Controller
             'DANPUS' => ['label' => 'Normal', 'class' => 'ok', 'update' => 'Hari ini'],
         ];
 
+        // Laporan asli yang dikirim langsung ke DANPUS (mis. dari Satlok Duktek/
+        // Bangtek) — ditaruh di atas daftar dummy WADAN supaya kelihatan paling baru.
+        $laporanMasukReal = Laporan::with('satuan')
+            ->where('tujuan_satuan_id', $satuan->id)
+            ->latest()
+            ->get()
+            ->map(fn (Laporan $l) => [
+                'satuan' => $l->satuan->nama,
+                'perihal' => $l->perihal,
+                'diteruskan_oleh' => $l->satuan->nama, // dikirim langsung, bukan lewat WADAN
+                'tanggal' => $l->created_at->translatedFormat('d M Y'),
+                'prioritas' => $l->prioritas,
+                'prioritas_class' => match ($l->prioritas) {
+                    'Tinggi' => 'bad',
+                    'Sedang' => 'warn',
+                    default => 'ok',
+                },
+                'status' => $l->status,
+                'status_class' => match ($l->status) {
+                    'Disetujui DANPUS' => 'green',
+                    'Ditolak DANPUS' => 'bad',
+                    default => 'amber',
+                },
+            ])
+            ->toArray();
+
+        // Notifikasi laporan baru untuk DANPUS yang sedang login — ditampilkan
+        // di lonceng notifikasi pada topbar.
+        $notifikasi = $user->unreadNotifications;
+
         return view('siberad.dashboards.danpus', [
+            'notifikasi' => $notifikasi,
             'user' => $user,
             'satuan' => $satuan,
             'semuaSatuan' => $semuaSatuan,
@@ -122,11 +154,11 @@ class DashboardController extends Controller
                 ['satuan' => 'Satlak Sibersos', 'perihal' => 'Hoaks rekrutmen mengatasnamakan TNI AD', 'prioritas' => 'Sedang', 'prioritas_class' => 'warn', 'tanggal' => '01 Agu 2026', 'status' => 'Menunggu DANPUS', 'status_class' => 'amber'],
                 ['satuan' => 'Satlak Penindakan', 'perihal' => 'Indikasi ransomware pada server unit', 'prioritas' => 'Tinggi', 'prioritas_class' => 'bad', 'tanggal' => '31 Jul 2026', 'status' => 'Disetujui', 'status_class' => 'green'],
             ],
-            'laporanMasuk' => [
+            'laporanMasuk' => array_merge($laporanMasukReal, [
                 ['satuan' => 'Satlakal (Penangkalan)', 'perihal' => 'Serangan DDoS pada portal utama', 'diteruskan_oleh' => 'WADAN', 'tanggal' => '02 Agu 2026', 'prioritas' => 'Tinggi', 'prioritas_class' => 'bad', 'status' => 'Menunggu', 'status_class' => 'amber'],
                 ['satuan' => 'Satlak Sibersos', 'perihal' => 'Hoaks rekrutmen mengatasnamakan TNI AD', 'diteruskan_oleh' => 'WADAN', 'tanggal' => '01 Agu 2026', 'prioritas' => 'Sedang', 'prioritas_class' => 'warn', 'status' => 'Menunggu', 'status_class' => 'amber'],
                 ['satuan' => 'Binmat', 'perihal' => 'Pengadaan perangkat pemantauan baru', 'diteruskan_oleh' => 'WADAN', 'tanggal' => '29 Jul 2026', 'prioritas' => 'Rendah', 'prioritas_class' => 'ok', 'status' => 'Disetujui', 'status_class' => 'green'],
-            ],
+            ]),
         ]);
     }
 
@@ -310,10 +342,17 @@ class DashboardController extends Controller
             ['nama' => 'Penindakan (Rindak)', 'singkatan' => 'Rindak', 'progres' => 50, 'highlight' => false],
         ];
 
+        // Laporan yang sudah pernah dikirim satuan ini ke DANPUS — dipakai di
+        // tab "Status Laporan" dan "Riwayat Laporan", jadi bukan data dummy lagi.
+        $laporanTerkirim = Laporan::where('satuan_id', $satuan->id)
+            ->latest()
+            ->get();
+
         return view('siberad.dashboards.satlakbangtek', [
             'user' => $user,
             'satuan' => $satuan,
             'proyekRiset' => $proyekRiset,
+            'laporanTerkirim' => $laporanTerkirim,
             'kategoriDistribusi' => $kategoriDistribusi,
             'perbandinganSatlak' => $perbandinganSatlak,
             'stats' => [

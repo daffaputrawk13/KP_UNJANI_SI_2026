@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\NotifikasiController;
 use App\Models\Satuan;
 use Illuminate\Support\Facades\Route;
 
@@ -25,3 +27,13 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name
 Route::get('/dashboard', DashboardController::class)
     ->middleware('auth')
     ->name('dashboard');
+
+// Kirim laporan dari satuan pengirim (mis. Satlok Duktek/Bangtek) ke DANPUS,
+// sekaligus memicu notifikasi database ke seluruh akun DANPUS.
+Route::post('/laporan', [LaporanController::class, 'store'])
+    ->middleware('auth')
+    ->name('laporan.store');
+
+Route::post('/notifikasi/baca-semua', [NotifikasiController::class, 'bacaSemua'])
+    ->middleware('auth')
+    ->name('notifikasi.baca-semua');
