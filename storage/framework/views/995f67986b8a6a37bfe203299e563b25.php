@@ -3,56 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin — SIBERAD</title>
-<link rel="icon" type="image/jpeg" href="{{ asset('images/logo-pussiberad.jpg') }}">
-@include('siberad.dashboards.partials.dash-styles')
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-<style>
-  .chart-box{margin-bottom:26px;}
-  .chart-box-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
-  .chart-mini{background:var(--panel-alt);border:1px solid var(--border-soft);border-radius:10px;padding:14px;}
-  .chart-mini-head{margin-bottom:8px;}
-  .chart-mini-head h4{font-family:var(--display);font-size:13px;font-weight:700;letter-spacing:.01em;line-height:1.3;}
-  .chart-mini-head p{font-size:11px;color:var(--text-muted);margin-top:2px;}
-  .chart-mini .chart-wrap{position:relative;height:210px;}
-  @media(max-width:980px){.chart-box-grid{grid-template-columns:1fr;}.chart-mini .chart-wrap{height:230px;}}
-
-  /* ===== toolbar cari & filter tabel ===== */
-  .table-toolbar{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
-  .table-search-wrap{position:relative;flex:1;min-width:200px;}
-  .table-search-wrap svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:15px;height:15px;stroke:var(--text-dim);pointer-events:none;}
-  .table-search{
-    width:100%;box-sizing:border-box;background:var(--panel);border:1px solid var(--border);color:var(--text);
-    font-family:var(--body);font-size:13px;border-radius:8px;padding:9px 12px 9px 34px;
-  }
-  .table-search::placeholder{color:var(--text-dim);}
-  .table-search:focus{outline:none;border-color:var(--gold);}
-  .table-filter{
-    background:var(--panel);border:1px solid var(--border);color:var(--text);font-family:var(--mono);
-    font-size:11.5px;letter-spacing:.02em;border-radius:8px;padding:0 10px;cursor:pointer;flex-shrink:0;
-    min-width:170px;height:38px;
-  }
-  .table-filter:focus{outline:none;border-color:var(--gold);}
-  .table-empty-row td{text-align:center;color:var(--text-dim);font-size:12.5px;padding:26px 12px !important;}
-  @media(max-width:640px){.table-toolbar{flex-direction:column;}.table-filter{width:100%;}}
-</style>
+<title>DANPUS — SIBERAD</title>
+<link rel="icon" type="image/jpeg" href="<?php echo e(asset('images/logo-pussiberad.jpg')); ?>">
+<?php echo $__env->make('siberad.dashboards.partials.dash-styles', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </head>
 <body>
+<?php
+  $laporanBySatuan = collect($laporanMasuk ?? [])->groupBy('satuan');
+?>
 <div class="profile-modal-overlay" id="profileModalOverlay">
   <div class="profile-modal-card" id="profileModalCard" role="dialog" aria-modal="true" aria-label="Detail profil">
     <button type="button" class="profile-modal-close" id="profileModalCloseBtn" aria-label="Tutup">
       <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
     </button>
 
-    {{-- ===== VIEW PROFIL SAYA ===== --}}
+    
     <div class="profile-dropdown-view" id="profilePhotoView" style="display:none;">
       <div class="profile-dropdown-head-lg">
         <div class="profile-dropdown-avatar-lg">
-          <span class="profile-initial" id="profileInitialLarge">{{ strtoupper(mb_substr($user->name ?? 'U', 0, 1)) }}</span>
-          <img class="profile-photo" id="profilePhotoLarge" alt="Foto profil {{ $user->name }}">
+          <span class="profile-initial" id="profileInitialLarge"><?php echo e(strtoupper(mb_substr($user->name ?? 'U', 0, 1))); ?></span>
+          <img class="profile-photo" id="profilePhotoLarge" alt="Foto profil <?php echo e($user->name); ?>">
         </div>
-        <div class="profile-dropdown-name">{{ $user->name }}</div>
-        <div class="profile-dropdown-role">{{ $user->jabatan ?? 'Pengguna' }}</div>
+        <div class="profile-dropdown-name"><?php echo e($user->name); ?></div>
+        <div class="profile-dropdown-role"><?php echo e($user->jabatan ?? 'Pengguna'); ?></div>
       </div>
 
       <button type="button" class="profile-dropdown-item" id="gantiFotoBtn" role="menuitem">
@@ -66,7 +39,7 @@
       <input type="file" id="fotoProfilInput" accept="image/png,image/jpeg,image/webp" hidden>
     </div>
 
-    {{-- ===== VIEW PENGATURAN AKUN ===== --}}
+    
     <div class="profile-dropdown-view" id="profileSettingsView" style="display:none;">
       <div class="profile-modal-title">Pengaturan Akun</div>
 
@@ -92,7 +65,7 @@
       </form>
     </div>
 
-    {{-- ===== VIEW BANTUAN & PANDUAN ===== --}}
+    
     <div class="profile-dropdown-view" id="profileHelpView" style="display:none;">
       <div class="profile-modal-title">Bantuan &amp; Panduan</div>
       <p class="profile-help-text">
@@ -106,69 +79,28 @@
 
 <div class="shell">
 
+  
   <aside class="sidebar" id="sidebar">
     <div class="side-brand">
-      <img src="{{ asset('images/logo-pussiberad.jpg') }}" alt="Lambang Pussiberad">
+      <img src="<?php echo e(asset('images/logo-pussiberad.jpg')); ?>" alt="Lambang Pussiberad">
       <div class="logo">SIBER<span>AD</span></div>
     </div>
     <nav class="side-nav">
       <div class="side-nav-label">Menu</div>
-      <a href="#" class="side-link active" data-tab-link="dashboard"><span class="dot"></span>Dashboard</a>
-
-      <div class="side-dropdown" id="penggunaDropdown">
-        <button type="button" class="side-link side-dropdown-toggle" id="penggunaToggle" aria-expanded="false" aria-controls="penggunaSubmenu">
-          <span class="dot"></span>
-          <span class="side-link-label">Kelola Pengguna</span>
-          <svg class="side-dropdown-arrow" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg>
-        </button>
-        <div class="side-dropdown-menu" id="penggunaSubmenu">
-          <a href="#" class="side-link side-sublink" data-tab-link="pengguna">Daftar Pengguna</a>
-          <a href="#" class="side-link side-sublink" data-tab-link="reset-password">Permintaan Reset Password</a>
-        </div>
-      </div>
-
-      <div class="side-dropdown" id="sistemDropdown">
-        <button type="button" class="side-link side-dropdown-toggle" id="sistemToggle" aria-expanded="false" aria-controls="sistemSubmenu">
-          <span class="dot"></span>
-          <span class="side-link-label">Kelola Sistem</span>
-          <svg class="side-dropdown-arrow" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg>
-        </button>
-        <div class="side-dropdown-menu" id="sistemSubmenu">
-          <a href="#" class="side-link side-sublink" data-tab-link="pengaturan-umum">Pengaturan Umum</a>
-        </div>
-      </div>
+      <a href="#" class="side-link active" data-tab-link="ringkasan"><span class="dot"></span>Ringkasan</a>
+      <a href="#" class="side-link" data-tab-link="laporan"><span class="dot"></span>Laporan Masuk</a>
+      <a href="#" class="side-link" data-tab-link="status-satuan"><span class="dot"></span>Status Seluruh Satuan</a>
     </nav>
+
     <div class="side-foot">
-      <form class="logout logout-form" method="POST" action="{{ route('logout') }}">
-        @csrf
+      <form class="logout logout-form" method="POST" action="<?php echo e(route('logout')); ?>">
+        <?php echo csrf_field(); ?>
         <button type="submit">Keluar</button>
       </form>
     </div>
   </aside>
 
-  <script>
-  (function () {
-    var dropdowns = [
-      { wrap: 'penggunaDropdown', toggle: 'penggunaToggle' },
-      { wrap: 'sistemDropdown', toggle: 'sistemToggle' }
-    ];
-    dropdowns.forEach(function (cfg) {
-      var dropdown = document.getElementById(cfg.wrap);
-      var toggle = document.getElementById(cfg.toggle);
-      if (!dropdown || !toggle) return;
-
-      var subActive = dropdown.querySelector('.side-sublink.active');
-      if (subActive) dropdown.classList.add('open');
-
-      toggle.addEventListener('click', function (e) {
-        e.preventDefault();
-        var isOpen = dropdown.classList.toggle('open');
-        toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-      });
-    });
-  })();
-  </script>
-
+  
   <main class="main">
     <div class="topbar">
       <div style="display:flex;align-items:center;gap:12px;">
@@ -186,38 +118,60 @@
               <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" style="fill:var(--gold-dim) !important;stroke:var(--gold-bright) !important;"></path>
               <path d="M13.73 21a2 2 0 0 1-3.46 0" style="fill:none !important;stroke:var(--gold-bright) !important;"></path>
             </svg>
+            <?php if(($notifikasi ?? collect())->isNotEmpty()): ?>
             <span style="position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--red);box-shadow:0 0 0 2px var(--panel,#0c2417);"></span>
+            <?php endif; ?>
           </button>
 
           <div class="profile-dropdown" id="notifDropdown" role="menu" aria-label="Notifikasi">
-            <div class="profile-dropdown-head" style="border-bottom:1px solid var(--border-soft);">
+            <div class="profile-dropdown-head" style="border-bottom:1px solid var(--border-soft);display:flex;justify-content:space-between;align-items:center;gap:8px;">
               <div class="profile-dropdown-name" style="font-size:14px;">Notifikasi</div>
+              <?php if(($notifikasi ?? collect())->isNotEmpty()): ?>
+              <form method="POST" action="<?php echo e(route('notifikasi.baca-semua')); ?>">
+                <?php echo csrf_field(); ?>
+                <button type="submit" class="btn-link" style="font-size:11px;color:var(--gold-bright);background:none;border:none;cursor:pointer;">Tandai dibaca</button>
+              </form>
+              <?php endif; ?>
             </div>
+
+            <?php $__empty_1 = true; $__currentLoopData = ($notifikasi ?? collect()); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $n): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+            <div class="profile-dropdown-item" style="align-items:flex-start;white-space:normal;cursor:default;">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="var(--gold-bright)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px;">
+                <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+              </svg>
+              <div>
+                <div style="font-size:12.5px;line-height:1.5;color:var(--text);"><?php echo e($n->data['pesan'] ?? 'Laporan baru masuk.'); ?></div>
+                <div style="font-size:11px;color:var(--text-dim);margin-top:2px;"><?php echo e($n->created_at->diffForHumans()); ?></div>
+              </div>
+            </div>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
             <div style="text-align:center;padding:20px 6px 8px;">
               <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="var(--text-dim)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 14px;display:block;">
                 <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path>
                 <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
               </svg>
-              <p style="margin:0;font-size:12.5px;line-height:1.6;color:var(--text-muted);">Belum ada notifikasi saat ini.<br>Fitur pusat notifikasi masih prototype dan belum tersambung ke database.</p>
+              <p style="margin:0;font-size:12.5px;line-height:1.6;color:var(--text-muted);">Belum ada notifikasi saat ini.</p>
             </div>
+            <?php endif; ?>
           </div>
         </div>
         <div class="profile-menu" id="profileMenu">
           <button type="button" class="profile-menu-btn" id="profileMenuBtn" aria-haspopup="menu" aria-expanded="false" aria-label="Menu profil">
-            <span class="profile-initial" id="profileInitial">{{ strtoupper(mb_substr($user->name ?? 'U', 0, 1)) }}</span>
-            <img class="profile-photo" id="profilePhotoBtn" alt="Foto profil {{ $user->name }}">
+            <span class="profile-initial" id="profileInitial"><?php echo e(strtoupper(mb_substr($user->name ?? 'U', 0, 1))); ?></span>
+            <img class="profile-photo" id="profilePhotoBtn" alt="Foto profil <?php echo e($user->name); ?>">
           </button>
 
           <div class="profile-dropdown" id="profileDropdown" role="menu" aria-label="Menu profil">
 
             <div class="profile-dropdown-head">
               <div class="profile-dropdown-avatar">
-                <span class="profile-initial" id="profileInitialDropdown">{{ strtoupper(mb_substr($user->name ?? 'U', 0, 1)) }}</span>
-                <img class="profile-photo" id="profilePhotoDropdown" alt="Foto profil {{ $user->name }}">
+                <span class="profile-initial" id="profileInitialDropdown"><?php echo e(strtoupper(mb_substr($user->name ?? 'U', 0, 1))); ?></span>
+                <img class="profile-photo" id="profilePhotoDropdown" alt="Foto profil <?php echo e($user->name); ?>">
               </div>
               <div>
-                <div class="profile-dropdown-name">{{ $user->name }}</div>
-                <div class="profile-dropdown-role">{{ $user->jabatan ?? 'Pengguna' }}</div>
+                <div class="profile-dropdown-name"><?php echo e($user->name); ?></div>
+                <div class="profile-dropdown-role"><?php echo e($user->jabatan ?? 'Pengguna'); ?></div>
               </div>
             </div>
 
@@ -236,8 +190,8 @@
 
             <div class="profile-dropdown-divider"></div>
 
-            <form class="logout-form" method="POST" action="{{ route('logout') }}">
-              @csrf
+            <form class="logout-form" method="POST" action="<?php echo e(route('logout')); ?>">
+              <?php echo csrf_field(); ?>
               <button type="submit" class="profile-dropdown-item danger" role="menuitem">
                 <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>
                 Keluar
@@ -251,194 +205,120 @@
     
     <div class="content">
 
-      {{-- ===== DASHBOARD ===== --}}
-      <section class="tab-panel active" data-tab-panel="dashboard">
+      
+      <section class="tab-panel active" data-tab-panel="ringkasan">
         <div class="section-head">
-          <h2>Ringkasan Sistem</h2>
-          <p>Kondisi akun pengguna dan satuan yang terdaftar di SIBERAD.</p>
+          <h2>Ringkasan Organisasi</h2>
+          <p>Kondisi seluruh satuan Pussiberad secara garis besar, hari ini.</p>
         </div>
+
         <div class="stat-grid">
           <div class="stat-card">
-            <div class="lbl">Total Pengguna</div>
-            <div class="val">{{ $stats['total_pengguna'] }}</div>
-            <div class="sub">Akun terdaftar di sistem</div>
-          </div>
-          <div class="stat-card">
             <div class="lbl">Total Satuan</div>
-            <div class="val">{{ $stats['total_satuan'] }}</div>
-            <div class="sub">Termasuk Admin</div>
+            <div class="val"><?php echo e($stats['total_satuan']); ?></div>
+            <div class="sub">4 Satlak &middot; 4 Direktorat &middot; 2 Pimpinan</div>
           </div>
           <div class="stat-card">
-            <div class="lbl">Permintaan Reset Password</div>
-            <div class="val" style="color:var(--amber);">{{ $stats['reset_password_pending'] }}</div>
-            <div class="sub">Menunggu diverifikasi</div>
+            <div class="lbl">Insiden Aktif</div>
+            <div class="val" style="color:var(--red);"><?php echo e($stats['insiden_aktif']); ?></div>
+            <div class="sub">Ditangani Satlakal (Penangkalan)</div>
           </div>
           <div class="stat-card">
-            <div class="lbl">Satuan Tanpa Pengguna</div>
-            <div class="val" style="color:{{ $stats['satuan_tanpa_pengguna'] > 0 ? 'var(--red)' : 'var(--green)' }};">{{ $stats['satuan_tanpa_pengguna'] }}</div>
-            <div class="sub">Perlu dibuatkan akun</div>
+            <div class="lbl">Laporan Menunggu Persetujuan</div>
+            <div class="val" style="color:var(--amber);"><?php echo e($stats['laporan_pending']); ?></div>
+            <div class="sub">Diteruskan dari WADAN</div>
+          </div>
+          <div class="stat-card">
+            <div class="lbl">Satuan Status Siaga Hijau</div>
+            <div class="val" style="color:var(--green);"><?php echo e($stats['siaga_hijau']); ?>/<?php echo e($stats['total_satuan']); ?></div>
+            <div class="sub">Kondisi normal</div>
           </div>
         </div>
 
-        <div class="panel chart-box">
-          <div class="panel-head"><div><h3>Statistik Sistem</h3><p>Sebaran akun, satuan, dan permintaan reset password.</p></div></div>
-          <div class="chart-box-grid">
-
-            <div class="chart-mini">
-              <div class="chart-mini-head">
-                <h4>Pengguna per Kategori Satuan</h4><p>Sebaran akun berdasarkan kategori.</p>
-              </div>
-              <div class="chart-wrap"><canvas id="chartKategoriSatuan"></canvas></div>
-            </div>
-
-            <div class="chart-mini">
-              <div class="chart-mini-head">
-                <h4>Status Reset Password</h4><p>Proporsi permintaan yang masuk.</p>
-              </div>
-              <div class="chart-wrap"><canvas id="chartStatusReset"></canvas></div>
-            </div>
-
-            <div class="chart-mini">
-              <div class="chart-mini-head">
-                <h4>Kelengkapan Akun Satuan</h4><p>Satuan yang sudah vs belum punya akun.</p>
-              </div>
-              <div class="chart-wrap"><canvas id="chartKelengkapanSatuan"></canvas></div>
-            </div>
-
-          </div>
-        </div>
-
-        <div class="panel">
-          <div class="panel-head"><div><h3>Aktivitas Terbaru</h3><p>Aktivitas seputar akun dan data satuan.</p></div></div>
-          <div class="table-toolbar">
-            <div class="table-search-wrap">
-              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
-              <input type="text" class="table-search" data-table-search="tblAktivitas" placeholder="Cari kegiatan...">
-            </div>
-            <select class="table-filter" data-table-filter="tblAktivitas">
-              <option value="">Semua Status</option>
-              <option value="Menunggu">Menunggu</option>
-              <option value="Info">Info</option>
-              <option value="Selesai">Selesai</option>
-            </select>
-          </div>
-          <div class="tbl-wrap" data-row-limit="5">
-            <table class="dtbl" id="tblAktivitas">
-              <thead><tr><th>Kegiatan</th><th>Waktu</th><th>Status</th></tr></thead>
-              <tbody>
-                @foreach($aktivitasTerbaru as $a)
-                <tr data-filter-value="{{ $a['status'] }}">
-                  <td>{{ $a['kegiatan'] }}</td>
-                  <td>{{ $a['waktu'] }}</td>
-                  <td><span class="status-dot {{ $a['status_class'] }}">{{ $a['status'] }}</span></td>
-                </tr>
-                @endforeach
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      {{-- ===== KELOLA PENGGUNA ===== --}}
-      <section class="tab-panel" data-tab-panel="pengguna">
-        <div class="section-head">
-          <h2>Kelola Pengguna</h2>
-          <p>Seluruh akun yang terdaftar, satu akun per satuan.</p>
-        </div>
         <div class="panel">
           <div class="panel-head">
-            <button type="button" class="btn btn-primary btn-sm" style="margin-left:auto;" onclick="alert('Prototype — form tambah pengguna belum tersambung ke database.')">+ Tambah Pengguna</button>
-          </div>
-          <div class="table-toolbar">
-            <div class="table-search-wrap">
-              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
-              <input type="text" class="table-search" data-table-search="tblPengguna" placeholder="Cari nama, username, atau email...">
+            <div>
+              <h3>Laporan Prioritas Tinggi</h3>
+              <p>Ringkasan laporan yang butuh perhatian DANPUS segera.</p>
             </div>
-            <select class="table-filter" data-table-filter="tblPengguna">
-              <option value="">Semua Satuan</option>
-              @foreach($semuaSatuan as $s)
-              <option value="{{ $s->nama }}">{{ $s->nama }}</option>
-              @endforeach
-            </select>
           </div>
-          <div class="tbl-wrap" data-row-limit="5">
-            <table class="dtbl" id="tblPengguna">
-              <thead><tr><th>Nama</th><th>Username</th><th>Email</th><th>Satuan</th><th>Aksi</th></tr></thead>
+          <div class="tbl-wrap">
+            <table class="dtbl">
+              <thead><tr><th>Asal Satuan</th><th>Perihal</th><th>Prioritas</th><th>Tanggal</th><th>Status</th></tr></thead>
               <tbody>
-                @foreach($semuaPengguna as $p)
-                <tr data-filter-value="{{ $p->satuan->nama ?? '' }}">
-                  <td>{{ $p->name }}</td>
-                  <td><span class="badge">{{ $p->username }}</span></td>
-                  <td style="color:var(--text-muted);">{{ $p->email }}</td>
-                  <td>{{ $p->satuan->nama ?? '-' }}</td>
-                  <td>
-                    <div class="btn-row">
-                      <button class="btn btn-sm" type="button" onclick="alert('Prototype — reset password untuk &quot;{{ $p->name }}&quot; belum tersambung ke database.')">Reset Password</button>
-                    </div>
-                  </td>
+                <?php $__currentLoopData = $laporanPrioritas; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $l): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <tr>
+                  <td><?php echo e($l['satuan']); ?></td>
+                  <td><?php echo e($l['perihal']); ?></td>
+                  <td><span class="status-dot <?php echo e($l['prioritas_class']); ?>"><?php echo e($l['prioritas']); ?></span></td>
+                  <td><?php echo e($l['tanggal']); ?></td>
+                  <td><span class="badge <?php echo e($l['status_class']); ?>"><?php echo e($l['status']); ?></span></td>
                 </tr>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
               </tbody>
             </table>
           </div>
         </div>
       </section>
 
-      {{-- ===== PENGATURAN UMUM ===== --}}
-      <section class="tab-panel" data-tab-panel="pengaturan-umum">
+      
+      <section class="tab-panel" data-tab-panel="laporan">
         <div class="section-head">
-          <h2>Pengaturan Umum</h2>
-          <p>Konfigurasi umum aplikasi SIBERAD.</p>
+          <h2>Laporan Masuk dari WADAN</h2>
+          <p>Laporan yang sudah diverifikasi WADAN dan menunggu persetujuan akhir DANPUS.</p>
         </div>
         <div class="panel">
-          <div class="panel-head"><div><h3>Identitas Aplikasi</h3><p>Nama, logo, dan informasi dasar sistem.</p></div></div>
-          <div style="padding:24px;text-align:center;">
-            <p style="margin:0;font-size:12.5px;line-height:1.6;color:var(--text-muted);">Prototype — pengaturan umum belum tersambung ke database.<br>Nantinya menu ini dipakai untuk mengatur nama instansi, logo, dan preferensi sistem lainnya.</p>
+          <div class="tbl-wrap">
+            <table class="dtbl">
+              <thead><tr><th>Asal Satuan</th><th>Perihal</th><th>Diteruskan Oleh</th><th>Tanggal</th><th>Prioritas</th><th>Status</th>
+              <th>Aksi</th>
+              </tr></thead>
+              <tbody>
+                <?php $__currentLoopData = $laporanMasuk; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i => $l): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <tr id="rowLaporan<?php echo e($i); ?>">
+                  <td><?php echo e($l['satuan']); ?></td>
+                  <td><?php echo e($l['perihal']); ?></td>
+                  <td><?php echo e($l['diteruskan_oleh']); ?></td>
+                  <td><?php echo e($l['tanggal']); ?></td>
+                  <td><span class="status-dot <?php echo e($l['prioritas_class']); ?>"><?php echo e($l['prioritas']); ?></span></td>
+                  <td id="statusLaporan<?php echo e($i); ?>"><span class="badge <?php echo e($l['status_class']); ?>"><?php echo e($l['status']); ?></span></td>
+                  <td id="aksiLaporan<?php echo e($i); ?>">
+                    <div class="btn-row">
+                      <button class="btn btn-primary btn-sm" type="button" onclick="bukaKonfirmasiLaporan(<?php echo e($i); ?>, 'setuju', '<?php echo e(addslashes($l['satuan'])); ?>', '<?php echo e(addslashes($l['perihal'])); ?>')">Setujui</button>
+                      <button class="btn btn-ghost-red btn-sm" type="button" onclick="bukaKonfirmasiLaporan(<?php echo e($i); ?>, 'tolak', '<?php echo e(addslashes($l['satuan'])); ?>', '<?php echo e(addslashes($l['perihal'])); ?>')">Tolak</button>
+                    </div>
+                  </td>
+                </tr>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+              </tbody>
+            </table>
           </div>
         </div>
       </section>
 
-      {{-- ===== PERMINTAAN RESET PASSWORD ===== --}}
-      <section class="tab-panel" data-tab-panel="reset-password">
+      
+      <section class="tab-panel" data-tab-panel="status-satuan">
         <div class="section-head">
-          <h2>Permintaan Reset Password</h2>
-          <p>Permintaan ganti kata sandi yang dikirim pengguna lewat menu "Pengaturan Akun".</p>
+          <h2>Status Seluruh Satuan</h2>
+          <p>Pemantauan kondisi setiap Satlak dan Direktorat di bawah Pussiberad.</p>
         </div>
         <div class="panel">
-          <div class="table-toolbar">
-            <div class="table-search-wrap">
-              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
-              <input type="text" class="table-search" data-table-search="tblResetPassword" placeholder="Cari satuan atau catatan...">
-            </div>
-            <select class="table-filter" data-table-filter="tblResetPassword">
-              <option value="">Semua Status</option>
-              <option value="Menunggu">Menunggu</option>
-              <option value="Selesai">Selesai</option>
-              <option value="Ditolak">Ditolak</option>
-            </select>
-          </div>
           <div class="tbl-wrap" data-row-limit="5">
-            <table class="dtbl" id="tblResetPassword">
-              <thead><tr><th>Satuan</th><th>Catatan</th><th>Tanggal</th><th>Status</th><th>Aksi</th></tr></thead>
+            <table class="dtbl">
+              <thead><tr><th>Kode</th><th>Nama Satuan</th><th>Kategori</th><th>Status</th><th>Update Terakhir</th><th>Detail</th></tr></thead>
               <tbody>
-                @foreach($permintaanResetPassword as $i => $r)
-                <tr id="rowReset{{ $i }}" data-filter-value="{{ $r['status'] }}">
-                  <td>{{ $r['satuan'] }}</td>
-                  <td style="color:var(--text-muted);">{{ $r['catatan'] }}</td>
-                  <td>{{ $r['tanggal'] }}</td>
-                  <td id="statusReset{{ $i }}"><span class="badge {{ $r['status_class'] }}">{{ $r['status'] }}</span></td>
+                <?php $__currentLoopData = $semuaSatuan; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $s): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <tr>
+                  <td><span class="badge"><?php echo e($s->kode); ?></span></td>
+                  <td><?php echo e($s->nama); ?></td>
+                  <td style="text-transform:capitalize;"><?php echo e($s->kategori); ?></td>
+                  <td><span class="status-dot <?php echo e($statusSatuan[$s->kode]['class'] ?? 'ok'); ?>"><?php echo e($statusSatuan[$s->kode]['label'] ?? 'Normal'); ?></span></td>
+                  <td><?php echo e($statusSatuan[$s->kode]['update'] ?? '-'); ?></td>
                   <td>
-                    @if($r['status_class'] === 'amber')
-                    <div class="btn-row">
-                      <button class="btn btn-primary btn-sm" type="button" onclick="setujuiResetPassword({{ $i }})">Setujui</button>
-                      <button class="btn btn-ghost-red btn-sm" type="button" onclick="tolakResetPassword({{ $i }})">Tolak</button>
-                    </div>
-                    @else
-                      <span style="font-size:11.5px;color:var(--text-dim);">Sudah diproses</span>
-                    @endif
+                    <button type="button" class="btn btn-ghost btn-sm" onclick="bukaDetailSatuan('<?php echo e($s->nama); ?>', '<?php echo e($s->kode); ?>', '<?php echo e($s->kategori); ?>', '<?php echo e($statusSatuan[$s->kode]['label'] ?? 'Normal'); ?>', '<?php echo e($statusSatuan[$s->kode]['class'] ?? 'ok'); ?>')">Lihat Detail</button>
                   </td>
                 </tr>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
               </tbody>
             </table>
           </div>
@@ -446,27 +326,6 @@
       </section>
 
     </div>
-
-      <script>
-        function setujuiResetPassword(i) {
-          document.getElementById('statusReset' + i).innerHTML = '<span class="badge green">Selesai</span>';
-          var row = document.getElementById('rowReset' + i);
-          if (row) {
-            row.children[4].innerHTML = '<span style="font-size:11.5px;color:var(--text-dim);">Sudah diproses</span>';
-            row.setAttribute('data-filter-value', 'Selesai');
-            if (window.terapkanTabelFilter) window.terapkanTabelFilter('tblResetPassword');
-          }
-        }
-        function tolakResetPassword(i) {
-          document.getElementById('statusReset' + i).innerHTML = '<span class="badge red">Ditolak</span>';
-          var row = document.getElementById('rowReset' + i);
-          if (row) {
-            row.children[4].innerHTML = '<span style="font-size:11.5px;color:var(--text-dim);">Sudah diproses</span>';
-            row.setAttribute('data-filter-value', 'Ditolak');
-            if (window.terapkanTabelFilter) window.terapkanTabelFilter('tblResetPassword');
-          }
-        }
-      </script>
 
       <script>
       (function () {
@@ -596,7 +455,7 @@
         var MAX_PHOTO_MB = 5;
         var MAX_PHOTO_BYTES = MAX_PHOTO_MB * 1024 * 1024;
         var ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-        var STORAGE_KEY = 'siberad-profile-photo-{{ $user->id ?? "default" }}';
+        var STORAGE_KEY = 'siberad-profile-photo-<?php echo e($user->id ?? "default"); ?>';
 
         var fileInput = document.getElementById('fotoProfilInput');
         var gantiBtn = document.getElementById('gantiFotoBtn');
@@ -746,7 +605,151 @@
 
   </main>
 
-  {{-- ===== KONFIRMASI KELUAR ===== --}}
+  
+  <div class="modal-overlay" id="modalKonfirmasiLaporan">
+    <div class="modal-box" style="max-width:480px;">
+      <div class="modal-head">
+        <div>
+          <h3 id="konfirmasiJudul">Konfirmasi</h3>
+          <p id="konfirmasiSub" style="margin:2px 0 0;font-size:12.5px;color:var(--text-muted);">-</p>
+        </div>
+        <button type="button" class="modal-close" onclick="tutupKonfirmasiLaporan()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-field full" style="margin-bottom:16px;">
+          <label for="konfirmasiCatatan">Catatan (opsional)</label>
+          <textarea id="konfirmasiCatatan" rows="3" placeholder="Tulis catatan terkait keputusan ini..."></textarea>
+        </div>
+        <div class="btn-row" style="justify-content:flex-end;">
+          <button type="button" class="btn" onclick="tutupKonfirmasiLaporan()">Batal</button>
+          <button type="button" class="btn btn-primary" id="konfirmasiBtnAksi" onclick="konfirmasiLaporanSubmit()">Konfirmasi</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let laporanAktif = null;
+
+    function bukaKonfirmasiLaporan(index, aksi, satuan, perihal){
+      laporanAktif = { index, aksi };
+      const judul = aksi === 'setuju' ? 'Setujui Laporan' : 'Tolak Laporan';
+      document.getElementById('konfirmasiJudul').textContent = judul;
+      document.getElementById('konfirmasiSub').textContent = satuan + ' \u2014 ' + perihal;
+      document.getElementById('konfirmasiCatatan').value = '';
+
+      const btnAksi = document.getElementById('konfirmasiBtnAksi');
+      btnAksi.textContent = aksi === 'setuju' ? 'Ya, Setujui' : 'Ya, Tolak';
+      btnAksi.className = aksi === 'setuju' ? 'btn btn-primary' : 'btn btn-ghost-red';
+
+      document.getElementById('modalKonfirmasiLaporan').classList.add('open');
+    }
+
+    function tutupKonfirmasiLaporan(){
+      document.getElementById('modalKonfirmasiLaporan').classList.remove('open');
+      laporanAktif = null;
+    }
+
+    function konfirmasiLaporanSubmit(){
+      if(!laporanAktif) return;
+      const { index, aksi } = laporanAktif;
+
+      const statusCell = document.getElementById('statusLaporan' + index);
+      const aksiCell = document.getElementById('aksiLaporan' + index);
+
+      if(aksi === 'setuju'){
+        statusCell.innerHTML = '<span class="badge green">Disetujui</span>';
+      } else {
+        statusCell.innerHTML = '<span class="badge red">Ditolak</span>';
+      }
+
+      if(aksiCell){
+        aksiCell.innerHTML = '<span style="font-size:11.5px;color:var(--text-dim);">Sudah diproses</span>';
+      }
+
+      // Catatan (jika ada) saat ini baru tersimpan sementara di sisi tampilan.
+      // Kalau nanti mau disimpan permanen ke database, tinggal kirim nilai
+      // document.getElementById('konfirmasiCatatan').value beserta index-nya ke route backend di sini.
+
+      tutupKonfirmasiLaporan();
+    }
+
+    document.getElementById('modalKonfirmasiLaporan').addEventListener('click', function(e){
+      if(e.target === this) tutupKonfirmasiLaporan();
+    });
+  </script>
+
+  
+  <div class="modal-overlay" id="modalDetailSatuan">
+    <div class="modal-box">
+      <div class="modal-head">
+        <div>
+          <h3 id="modalSatuanNama">-</h3>
+          <p id="modalSatuanSub" style="margin:2px 0 0;font-size:12.5px;color:var(--text-muted);">-</p>
+        </div>
+        <button type="button" class="modal-close" onclick="tutupDetailSatuan()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="tbl-wrap">
+          <table class="dtbl">
+            <thead><tr><th>Perihal</th><th>Diteruskan Oleh</th><th>Tanggal</th><th>Prioritas</th><th>Status</th></tr></thead>
+            <tbody id="modalSatuanTbody">
+              <tr><td colspan="5" style="text-align:center;color:var(--text-muted);">Tidak ada data laporan.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:center;justify-content:center;padding:20px;}
+    .modal-overlay.open{display:flex;}
+    .modal-box{background:var(--panel,#0f1a14);border:1px solid var(--border-strong,#2a3a30);border-radius:12px;max-width:720px;width:100%;max-height:80vh;display:flex;flex-direction:column;}
+    .modal-head{display:flex;align-items:flex-start;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--border-soft,#22302a);}
+    .modal-head h3{margin:0;font-size:16px;}
+    .modal-close{background:none;border:none;color:var(--text-muted,#9fb0a8);font-size:22px;line-height:1;cursor:pointer;}
+    .modal-close:hover{color:var(--gold-bright,#f2c14e);}
+    .modal-body{padding:16px 20px 20px;overflow-y:auto;}
+  </style>
+
+  <script>
+    const laporanBySatuan = <?php echo json_encode($laporanBySatuan, 15, 512) ?>;
+
+    function bukaDetailSatuan(nama, kode, kategori, statusLabel, statusClass){
+      document.getElementById('modalSatuanNama').textContent = nama;
+      document.getElementById('modalSatuanSub').textContent = kode + ' \u00b7 ' + kategori + ' \u00b7 Status: ' + statusLabel;
+
+      const tbody = document.getElementById('modalSatuanTbody');
+      const data = laporanBySatuan[nama] || [];
+
+      if(data.length === 0){
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);">Tidak ada data laporan.</td></tr>';
+      } else {
+        tbody.innerHTML = data.map(l => `
+          <tr>
+            <td>${l.perihal ?? '-'}</td>
+            <td>${l.diteruskan_oleh ?? '-'}</td>
+            <td>${l.tanggal ?? '-'}</td>
+            <td><span class="status-dot ${l.prioritas_class ?? ''}">${l.prioritas ?? '-'}</span></td>
+            <td><span class="badge ${l.status_class ?? ''}">${l.status ?? '-'}</span></td>
+          </tr>
+        `).join('');
+      }
+
+      document.getElementById('modalDetailSatuan').classList.add('open');
+    }
+
+    function tutupDetailSatuan(){
+      document.getElementById('modalDetailSatuan').classList.remove('open');
+    }
+
+    document.getElementById('modalDetailSatuan').addEventListener('click', function(e){
+      if(e.target === this) tutupDetailSatuan();
+    });
+  </script>
+
+  
   <div class="confirm-overlay" id="logoutConfirmOverlay">
     <div class="confirm-box" role="alertdialog" aria-modal="true" aria-labelledby="logoutConfirmTitle">
       <div class="confirm-icon">
@@ -800,135 +803,6 @@
 })();
 </script>
 
-  <script>
-  (function () {
-    if (typeof Chart === 'undefined') return;
-
-    var root = getComputedStyle(document.documentElement);
-    var cGold = root.getPropertyValue('--gold-bright').trim() || '#f3cd5c';
-    var cGreen = root.getPropertyValue('--green-bright').trim() || '#3fc27d';
-    var cAmber = root.getPropertyValue('--amber').trim() || '#e0a83a';
-    var cRed = root.getPropertyValue('--red').trim() || '#c62828';
-    var cMuted = root.getPropertyValue('--text-muted').trim() || '#9fb3a5';
-    var cText = root.getPropertyValue('--text').trim() || '#f4f1e6';
-
-    Chart.defaults.color = cMuted;
-    Chart.defaults.font.family = "'JetBrains Mono', monospace";
-    Chart.defaults.font.size = 11;
-
-    var doughnutOptions = {
-      responsive: true,
-      maintainAspectRatio: false,
-      cutout: '62%',
-      plugins: { legend: { position: 'bottom', labels: { color: cText, boxWidth: 10, padding: 12 } } }
-    };
-
-    function renderDoughnut(canvasId, labels, values, colors) {
-      var el = document.getElementById(canvasId);
-      if (!el) return;
-      new Chart(el, {
-        type: 'doughnut',
-        data: { labels: labels, datasets: [{ data: values, backgroundColor: colors, borderColor: 'transparent' }] },
-        options: doughnutOptions
-      });
-    }
-
-    // ===== Grafik 1: Pengguna per Kategori Satuan =====
-    var distribusiKategori = @json($distribusiPenggunaKategori);
-    renderDoughnut(
-      'chartKategoriSatuan',
-      distribusiKategori.map(function (d) { return d.kategori; }),
-      distribusiKategori.map(function (d) { return d.jumlah; }),
-      [cGold, cGreen, cAmber, cMuted]
-    );
-
-    // ===== Grafik 2: Status Permintaan Reset Password =====
-    var statusReset = @json($statusResetPassword);
-    var warnaStatus = { 'Menunggu': cAmber, 'Selesai': cGreen, 'Ditolak': cRed };
-    renderDoughnut(
-      'chartStatusReset',
-      statusReset.map(function (s) { return s.status; }),
-      statusReset.map(function (s) { return s.jumlah; }),
-      statusReset.map(function (s) { return warnaStatus[s.status] || cMuted; })
-    );
-
-    // ===== Grafik 3: Kelengkapan Akun Satuan =====
-    var kelengkapan = @json($kelengkapanAkunSatuan);
-    renderDoughnut(
-      'chartKelengkapanSatuan',
-      ['Sudah Punya Akun', 'Belum Punya Akun'],
-      [kelengkapan.sudah, kelengkapan.belum],
-      [cGreen, cRed]
-    );
-  })();
-  </script>
-
-  <script>
-  (function () {
-    function collectRows(table) {
-      return Array.prototype.slice.call(table.querySelectorAll('tbody tr:not(.table-empty-row)'));
-    }
-
-    function buatBarisKosong(table) {
-      var colCount = table.querySelectorAll('thead th').length || 1;
-      var tr = document.createElement('tr');
-      tr.className = 'table-empty-row';
-      var td = document.createElement('td');
-      td.colSpan = colCount;
-      td.textContent = 'Tidak ada data yang cocok.';
-      tr.appendChild(td);
-      return tr;
-    }
-
-    // Terapkan pencarian teks + filter dropdown untuk satu tabel tertentu
-    // (dipanggil lewat id tabelnya). Diekspos ke window supaya bisa dipanggil
-    // ulang dari tempat lain (mis. setelah status baris berubah).
-    function terapkanTabelFilter(tableId) {
-      var table = document.getElementById(tableId);
-      if (!table) return;
-      var wrap = table.closest('.tbl-wrap');
-      var searchInput = document.querySelector('[data-table-search="' + tableId + '"]');
-      var filterSelect = document.querySelector('[data-table-filter="' + tableId + '"]');
-      var q = searchInput ? searchInput.value.trim().toLowerCase() : '';
-      var f = filterSelect ? filterSelect.value : '';
-      var rows = collectRows(table);
-      var visibleCount = 0;
-
-      rows.forEach(function (row) {
-        var cocokCari = !q || row.textContent.toLowerCase().indexOf(q) !== -1;
-        var cocokFilter = !f || row.getAttribute('data-filter-value') === f;
-        var tampil = cocokCari && cocokFilter;
-        row.style.display = tampil ? '' : 'none';
-        if (tampil) visibleCount++;
-      });
-
-      var tbody = table.querySelector('tbody');
-      var existingEmpty = tbody.querySelector('.table-empty-row');
-      if (visibleCount === 0) {
-        if (!existingEmpty) tbody.appendChild(buatBarisKosong(table));
-      } else if (existingEmpty) {
-        existingEmpty.remove();
-      }
-
-      // Hitung ulang batas 5 baris hanya berdasarkan baris yang sedang tampil.
-      if (window.terapkanRowLimitWrap) window.terapkanRowLimitWrap(wrap);
-    }
-
-    window.terapkanTabelFilter = terapkanTabelFilter;
-
-    document.querySelectorAll('[data-table-search]').forEach(function (input) {
-      input.addEventListener('input', function () {
-        terapkanTabelFilter(input.getAttribute('data-table-search'));
-      });
-    });
-    document.querySelectorAll('[data-table-filter]').forEach(function (select) {
-      select.addEventListener('change', function () {
-        terapkanTabelFilter(select.getAttribute('data-table-filter'));
-      });
-    });
-  })();
-  </script>
-
-@include('siberad.dashboards.partials.dash-script')
+<?php echo $__env->make('siberad.dashboards.partials.dash-script', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </body>
-</html>
+</html><?php /**PATH D:\Unjani\Kerja Praktek\kelompok5\KP_UNJANI_SI_2026\resources\views/siberad/dashboards/danpus.blade.php ENDPATH**/ ?>

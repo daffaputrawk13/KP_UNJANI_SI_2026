@@ -68,6 +68,33 @@ class DashboardController extends Controller
             ['kegiatan' => 'Data satuan Binfung (Pembinaan Fungsi) diperbarui', 'waktu' => '2 hari lalu', 'status' => 'Selesai', 'status_class' => 'green'],
         ];
 
+        // ===== Data untuk grafik Dashboard =====
+
+        // Grafik 1: distribusi jumlah pengguna per kategori satuan.
+        $labelKategori = [
+            Satuan::KATEGORI_SATLAK => 'Satlak',
+            Satuan::KATEGORI_DIREKTORAT => 'Direktorat',
+            Satuan::KATEGORI_PIMPINAN => 'Pimpinan',
+            Satuan::KATEGORI_ADMIN => 'Admin',
+        ];
+        $distribusiPenggunaKategori = $semuaSatuan
+            ->groupBy('kategori')
+            ->map(fn ($group, $kategori) => [
+                'kategori' => $labelKategori[$kategori] ?? ucfirst($kategori),
+                'jumlah' => $group->sum('users_count'),
+            ])
+            ->values();
+
+        // Grafik 2: status permintaan reset password.
+        $statusResetPassword = collect($permintaanResetPassword)
+            ->groupBy('status')
+            ->map(fn ($group, $status) => ['status' => $status, 'jumlah' => $group->count()])
+            ->values();
+
+        // Grafik 3: kelengkapan akun tiap satuan (sudah vs belum punya akun).
+        $satuanSudahPunyaAkun = $semuaSatuan->where('users_count', '>', 0)->count();
+        $satuanBelumPunyaAkun = $semuaSatuan->where('users_count', 0)->count();
+
         return view('siberad.dashboards.admin', [
             'user' => $user,
             'satuan' => $satuan,
@@ -75,6 +102,12 @@ class DashboardController extends Controller
             'semuaSatuan' => $semuaSatuan,
             'permintaanResetPassword' => $permintaanResetPassword,
             'aktivitasTerbaru' => $aktivitasTerbaru,
+            'distribusiPenggunaKategori' => $distribusiPenggunaKategori,
+            'statusResetPassword' => $statusResetPassword,
+            'kelengkapanAkunSatuan' => [
+                'sudah' => $satuanSudahPunyaAkun,
+                'belum' => $satuanBelumPunyaAkun,
+            ],
             'stats' => [
                 'total_pengguna' => $semuaPengguna->count(),
                 'total_satuan' => $semuaSatuan->count(),

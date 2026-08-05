@@ -115,4 +115,4 @@
       });
     }
   })();
-</script>
+</script><?php /**PATH D:\Unjani\Kerja Praktek\kelompok5\KP_UNJANI_SI_2026\resources\views/siberad/dashboards/partials/dash-script.blade.php ENDPATH**/ ?>
