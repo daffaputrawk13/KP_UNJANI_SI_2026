@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin — SIBERAD</title>
-<link rel="icon" type="image/jpeg" href="{{ asset('images/logo-pussiberad.jpg') }}">
-@include('siberad.dashboards.partials.dash-styles')
+<link rel="icon" type="image/jpeg" href="<?php echo e(asset('images/logo-pussiberad.jpg')); ?>">
+<?php echo $__env->make('siberad.dashboards.partials.dash-styles', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <style>
   .chart-box{margin-bottom:26px;}
@@ -44,15 +44,15 @@
       <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
     </button>
 
-    {{-- ===== VIEW PROFIL SAYA ===== --}}
+    
     <div class="profile-dropdown-view" id="profilePhotoView" style="display:none;">
       <div class="profile-dropdown-head-lg">
         <div class="profile-dropdown-avatar-lg">
-          <span class="profile-initial" id="profileInitialLarge">{{ strtoupper(mb_substr($user->name ?? 'U', 0, 1)) }}</span>
-          <img class="profile-photo" id="profilePhotoLarge" alt="Foto profil {{ $user->name }}">
+          <span class="profile-initial" id="profileInitialLarge"><?php echo e(strtoupper(mb_substr($user->name ?? 'U', 0, 1))); ?></span>
+          <img class="profile-photo" id="profilePhotoLarge" alt="Foto profil <?php echo e($user->name); ?>">
         </div>
-        <div class="profile-dropdown-name">{{ $user->name }}</div>
-        <div class="profile-dropdown-role">{{ $user->jabatan ?? 'Pengguna' }}</div>
+        <div class="profile-dropdown-name"><?php echo e($user->name); ?></div>
+        <div class="profile-dropdown-role"><?php echo e($user->jabatan ?? 'Pengguna'); ?></div>
       </div>
 
       <button type="button" class="profile-dropdown-item" id="gantiFotoBtn" role="menuitem">
@@ -66,7 +66,7 @@
       <input type="file" id="fotoProfilInput" accept="image/png,image/jpeg,image/webp" hidden>
     </div>
 
-    {{-- ===== VIEW PENGATURAN AKUN ===== --}}
+    
     <div class="profile-dropdown-view" id="profileSettingsView" style="display:none;">
       <div class="profile-modal-title">Pengaturan Akun</div>
 
@@ -92,7 +92,7 @@
       </form>
     </div>
 
-    {{-- ===== VIEW BANTUAN & PANDUAN ===== --}}
+    
     <div class="profile-dropdown-view" id="profileHelpView" style="display:none;">
       <div class="profile-modal-title">Bantuan &amp; Panduan</div>
       <p class="profile-help-text">
@@ -108,7 +108,7 @@
 
   <aside class="sidebar" id="sidebar">
     <div class="side-brand">
-      <img src="{{ asset('images/logo-pussiberad.jpg') }}" alt="Lambang Pussiberad">
+      <img src="<?php echo e(asset('images/logo-pussiberad.jpg')); ?>" alt="Lambang Pussiberad">
       <div class="logo">SIBER<span>AD</span></div>
     </div>
     <nav class="side-nav">
@@ -139,8 +139,8 @@
       </div>
     </nav>
     <div class="side-foot">
-      <form class="logout logout-form" method="POST" action="{{ route('logout') }}">
-        @csrf
+      <form class="logout logout-form" method="POST" action="<?php echo e(route('logout')); ?>">
+        <?php echo csrf_field(); ?>
         <button type="submit">Keluar</button>
       </form>
     </div>
@@ -204,20 +204,20 @@
         </div>
         <div class="profile-menu" id="profileMenu">
           <button type="button" class="profile-menu-btn" id="profileMenuBtn" aria-haspopup="menu" aria-expanded="false" aria-label="Menu profil">
-            <span class="profile-initial" id="profileInitial">{{ strtoupper(mb_substr($user->name ?? 'U', 0, 1)) }}</span>
-            <img class="profile-photo" id="profilePhotoBtn" alt="Foto profil {{ $user->name }}">
+            <span class="profile-initial" id="profileInitial"><?php echo e(strtoupper(mb_substr($user->name ?? 'U', 0, 1))); ?></span>
+            <img class="profile-photo" id="profilePhotoBtn" alt="Foto profil <?php echo e($user->name); ?>">
           </button>
 
           <div class="profile-dropdown" id="profileDropdown" role="menu" aria-label="Menu profil">
 
             <div class="profile-dropdown-head">
               <div class="profile-dropdown-avatar">
-                <span class="profile-initial" id="profileInitialDropdown">{{ strtoupper(mb_substr($user->name ?? 'U', 0, 1)) }}</span>
-                <img class="profile-photo" id="profilePhotoDropdown" alt="Foto profil {{ $user->name }}">
+                <span class="profile-initial" id="profileInitialDropdown"><?php echo e(strtoupper(mb_substr($user->name ?? 'U', 0, 1))); ?></span>
+                <img class="profile-photo" id="profilePhotoDropdown" alt="Foto profil <?php echo e($user->name); ?>">
               </div>
               <div>
-                <div class="profile-dropdown-name">{{ $user->name }}</div>
-                <div class="profile-dropdown-role">{{ $user->jabatan ?? 'Pengguna' }}</div>
+                <div class="profile-dropdown-name"><?php echo e($user->name); ?></div>
+                <div class="profile-dropdown-role"><?php echo e($user->jabatan ?? 'Pengguna'); ?></div>
               </div>
             </div>
 
@@ -236,8 +236,8 @@
 
             <div class="profile-dropdown-divider"></div>
 
-            <form class="logout-form" method="POST" action="{{ route('logout') }}">
-              @csrf
+            <form class="logout-form" method="POST" action="<?php echo e(route('logout')); ?>">
+              <?php echo csrf_field(); ?>
               <button type="submit" class="profile-dropdown-item danger" role="menuitem">
                 <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>
                 Keluar
@@ -251,7 +251,7 @@
     
     <div class="content">
 
-      {{-- ===== DASHBOARD ===== --}}
+      
       <section class="tab-panel active" data-tab-panel="dashboard">
         <div class="section-head">
           <h2>Ringkasan Sistem</h2>
@@ -260,22 +260,22 @@
         <div class="stat-grid">
           <div class="stat-card">
             <div class="lbl">Total Pengguna</div>
-            <div class="val">{{ $stats['total_pengguna'] }}</div>
+            <div class="val"><?php echo e($stats['total_pengguna']); ?></div>
             <div class="sub">Akun terdaftar di sistem</div>
           </div>
           <div class="stat-card">
             <div class="lbl">Total Satuan</div>
-            <div class="val">{{ $stats['total_satuan'] }}</div>
+            <div class="val"><?php echo e($stats['total_satuan']); ?></div>
             <div class="sub">Termasuk Admin</div>
           </div>
           <div class="stat-card">
             <div class="lbl">Permintaan Reset Password</div>
-            <div class="val" style="color:var(--amber);">{{ $stats['reset_password_pending'] }}</div>
+            <div class="val" style="color:var(--amber);"><?php echo e($stats['reset_password_pending']); ?></div>
             <div class="sub">Menunggu diverifikasi</div>
           </div>
           <div class="stat-card">
             <div class="lbl">Satuan Tanpa Pengguna</div>
-            <div class="val" style="color:{{ $stats['satuan_tanpa_pengguna'] > 0 ? 'var(--red)' : 'var(--green)' }};">{{ $stats['satuan_tanpa_pengguna'] }}</div>
+            <div class="val" style="color:<?php echo e($stats['satuan_tanpa_pengguna'] > 0 ? 'var(--red)' : 'var(--green)'); ?>;"><?php echo e($stats['satuan_tanpa_pengguna']); ?></div>
             <div class="sub">Perlu dibuatkan akun</div>
           </div>
         </div>
@@ -326,20 +326,20 @@
             <table class="dtbl" id="tblAktivitas">
               <thead><tr><th>Kegiatan</th><th>Waktu</th><th>Status</th></tr></thead>
               <tbody>
-                @foreach($aktivitasTerbaru as $a)
-                <tr data-filter-value="{{ $a['status'] }}">
-                  <td>{{ $a['kegiatan'] }}</td>
-                  <td>{{ $a['waktu'] }}</td>
-                  <td><span class="status-dot {{ $a['status_class'] }}">{{ $a['status'] }}</span></td>
+                <?php $__currentLoopData = $aktivitasTerbaru; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $a): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <tr data-filter-value="<?php echo e($a['status']); ?>">
+                  <td><?php echo e($a['kegiatan']); ?></td>
+                  <td><?php echo e($a['waktu']); ?></td>
+                  <td><span class="status-dot <?php echo e($a['status_class']); ?>"><?php echo e($a['status']); ?></span></td>
                 </tr>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
               </tbody>
             </table>
           </div>
         </div>
       </section>
 
-      {{-- ===== KELOLA PENGGUNA ===== --}}
+      
       <section class="tab-panel" data-tab-panel="pengguna">
         <div class="section-head">
           <h2>Kelola Pengguna</h2>
@@ -356,35 +356,35 @@
             </div>
             <select class="table-filter" data-table-filter="tblPengguna">
               <option value="">Semua Satuan</option>
-              @foreach($semuaSatuan as $s)
-              <option value="{{ $s->nama }}">{{ $s->nama }}</option>
-              @endforeach
+              <?php $__currentLoopData = $semuaSatuan; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $s): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+              <option value="<?php echo e($s->nama); ?>"><?php echo e($s->nama); ?></option>
+              <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </select>
           </div>
           <div class="tbl-wrap" data-row-limit="5">
             <table class="dtbl" id="tblPengguna">
               <thead><tr><th>Nama</th><th>Username</th><th>Email</th><th>Satuan</th><th>Aksi</th></tr></thead>
               <tbody>
-                @foreach($semuaPengguna as $p)
-                <tr data-filter-value="{{ $p->satuan->nama ?? '' }}">
-                  <td>{{ $p->name }}</td>
-                  <td><span class="badge">{{ $p->username }}</span></td>
-                  <td style="color:var(--text-muted);">{{ $p->email }}</td>
-                  <td>{{ $p->satuan->nama ?? '-' }}</td>
+                <?php $__currentLoopData = $semuaPengguna; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $p): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <tr data-filter-value="<?php echo e($p->satuan->nama ?? ''); ?>">
+                  <td><?php echo e($p->name); ?></td>
+                  <td><span class="badge"><?php echo e($p->username); ?></span></td>
+                  <td style="color:var(--text-muted);"><?php echo e($p->email); ?></td>
+                  <td><?php echo e($p->satuan->nama ?? '-'); ?></td>
                   <td>
                     <div class="btn-row">
-                      <button class="btn btn-sm" type="button" onclick="alert('Prototype — reset password untuk &quot;{{ $p->name }}&quot; belum tersambung ke database.')">Reset Password</button>
+                      <button class="btn btn-sm" type="button" onclick="alert('Prototype — reset password untuk &quot;<?php echo e($p->name); ?>&quot; belum tersambung ke database.')">Reset Password</button>
                     </div>
                   </td>
                 </tr>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
               </tbody>
             </table>
           </div>
         </div>
       </section>
 
-      {{-- ===== PENGATURAN UMUM ===== --}}
+      
       <section class="tab-panel" data-tab-panel="pengaturan-umum">
         <div class="section-head">
           <h2>Pengaturan Umum</h2>
@@ -398,7 +398,7 @@
         </div>
       </section>
 
-      {{-- ===== PERMINTAAN RESET PASSWORD ===== --}}
+      
       <section class="tab-panel" data-tab-panel="reset-password">
         <div class="section-head">
           <h2>Permintaan Reset Password</h2>
@@ -421,24 +421,24 @@
             <table class="dtbl" id="tblResetPassword">
               <thead><tr><th>Satuan</th><th>Catatan</th><th>Tanggal</th><th>Status</th><th>Aksi</th></tr></thead>
               <tbody>
-                @foreach($permintaanResetPassword as $i => $r)
-                <tr id="rowReset{{ $i }}" data-filter-value="{{ $r['status'] }}">
-                  <td>{{ $r['satuan'] }}</td>
-                  <td style="color:var(--text-muted);">{{ $r['catatan'] }}</td>
-                  <td>{{ $r['tanggal'] }}</td>
-                  <td id="statusReset{{ $i }}"><span class="badge {{ $r['status_class'] }}">{{ $r['status'] }}</span></td>
+                <?php $__currentLoopData = $permintaanResetPassword; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i => $r): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <tr id="rowReset<?php echo e($i); ?>" data-filter-value="<?php echo e($r['status']); ?>">
+                  <td><?php echo e($r['satuan']); ?></td>
+                  <td style="color:var(--text-muted);"><?php echo e($r['catatan']); ?></td>
+                  <td><?php echo e($r['tanggal']); ?></td>
+                  <td id="statusReset<?php echo e($i); ?>"><span class="badge <?php echo e($r['status_class']); ?>"><?php echo e($r['status']); ?></span></td>
                   <td>
-                    @if($r['status_class'] === 'amber')
+                    <?php if($r['status_class'] === 'amber'): ?>
                     <div class="btn-row">
-                      <button class="btn btn-primary btn-sm" type="button" onclick="setujuiResetPassword({{ $i }})">Setujui</button>
-                      <button class="btn btn-ghost-red btn-sm" type="button" onclick="tolakResetPassword({{ $i }})">Tolak</button>
+                      <button class="btn btn-primary btn-sm" type="button" onclick="setujuiResetPassword(<?php echo e($i); ?>)">Setujui</button>
+                      <button class="btn btn-ghost-red btn-sm" type="button" onclick="tolakResetPassword(<?php echo e($i); ?>)">Tolak</button>
                     </div>
-                    @else
+                    <?php else: ?>
                       <span style="font-size:11.5px;color:var(--text-dim);">Sudah diproses</span>
-                    @endif
+                    <?php endif; ?>
                   </td>
                 </tr>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
               </tbody>
             </table>
           </div>
@@ -596,7 +596,7 @@
         var MAX_PHOTO_MB = 5;
         var MAX_PHOTO_BYTES = MAX_PHOTO_MB * 1024 * 1024;
         var ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-        var STORAGE_KEY = 'siberad-profile-photo-{{ $user->id ?? "default" }}';
+        var STORAGE_KEY = 'siberad-profile-photo-<?php echo e($user->id ?? "default"); ?>';
 
         var fileInput = document.getElementById('fotoProfilInput');
         var gantiBtn = document.getElementById('gantiFotoBtn');
@@ -746,7 +746,7 @@
 
   </main>
 
-  {{-- ===== KONFIRMASI KELUAR ===== --}}
+  
   <div class="confirm-overlay" id="logoutConfirmOverlay">
     <div class="confirm-box" role="alertdialog" aria-modal="true" aria-labelledby="logoutConfirmTitle">
       <div class="confirm-icon">
@@ -834,7 +834,7 @@
     }
 
     // ===== Grafik 1: Pengguna per Kategori Satuan =====
-    var distribusiKategori = @json($distribusiPenggunaKategori);
+    var distribusiKategori = <?php echo json_encode($distribusiPenggunaKategori, 15, 512) ?>;
     renderDoughnut(
       'chartKategoriSatuan',
       distribusiKategori.map(function (d) { return d.kategori; }),
@@ -843,7 +843,7 @@
     );
 
     // ===== Grafik 2: Status Permintaan Reset Password =====
-    var statusReset = @json($statusResetPassword);
+    var statusReset = <?php echo json_encode($statusResetPassword, 15, 512) ?>;
     var warnaStatus = { 'Menunggu': cAmber, 'Selesai': cGreen, 'Ditolak': cRed };
     renderDoughnut(
       'chartStatusReset',
@@ -853,7 +853,7 @@
     );
 
     // ===== Grafik 3: Kelengkapan Akun Satuan =====
-    var kelengkapan = @json($kelengkapanAkunSatuan);
+    var kelengkapan = <?php echo json_encode($kelengkapanAkunSatuan, 15, 512) ?>;
     renderDoughnut(
       'chartKelengkapanSatuan',
       ['Sudah Punya Akun', 'Belum Punya Akun'],
@@ -929,6 +929,6 @@
   })();
   </script>
 
-@include('siberad.dashboards.partials.dash-script')
+<?php echo $__env->make('siberad.dashboards.partials.dash-script', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </body>
-</html>
+</html><?php /**PATH D:\Unjani\Kerja Praktek\kelompok5\KP_UNJANI_SI_2026\resources\views/siberad/dashboards/admin.blade.php ENDPATH**/ ?>
