@@ -83,10 +83,20 @@
     </div>
     <nav class="side-nav">
       <div class="side-nav-label">Menu</div>
-      <a href="#" class="side-link active" data-tab-link="ringkasan"><span class="dot"></span>Ringkasan</a>
-      <a href="#" class="side-link" data-tab-link="penempatan"><span class="dot"></span>Data Penempatan</a>
-      <a href="#" class="side-link" data-tab-link="riwayat"><span class="dot"></span>Riwayat Penempatan</a>
-      <a href="#" class="side-link" data-tab-link="lapor"><span class="dot"></span>Verifikasi Laporan</a>
+      <a href="#" class="side-link active" data-tab-link="dashboard"><span class="dot"></span>Dashboard</a>
+
+      <div class="side-dropdown" id="laporanDropdown">
+        <button type="button" class="side-link side-dropdown-toggle" id="laporanToggle" aria-expanded="false" aria-controls="laporanSubmenu">
+          <span class="dot"></span>
+          <span class="side-link-label">Laporan</span>
+          <svg class="side-dropdown-arrow" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg>
+        </button>
+        <div class="side-dropdown-menu" id="laporanSubmenu">
+          <a href="#" class="side-link side-sublink" data-tab-link="tambah-laporan">Tambah Laporan</a>
+          <a href="#" class="side-link side-sublink" data-tab-link="status-laporan">Status Laporan</a>
+          <a href="#" class="side-link side-sublink" data-tab-link="riwayat-laporan">Riwayat Laporan</a>
+        </div>
+      </div>
     </nav>
     <div class="side-foot">
       <form class="logout logout-form" method="POST" action="{{ route('logout') }}">
@@ -95,6 +105,23 @@
       </form>
     </div>
   </aside>
+
+  <script>
+  (function () {
+    var dropdown = document.getElementById('laporanDropdown');
+    var toggle = document.getElementById('laporanToggle');
+    if (!dropdown || !toggle) return;
+
+    var subActive = dropdown.querySelector('.side-sublink.active');
+    if (subActive) dropdown.classList.add('open');
+
+    toggle.addEventListener('click', function (e) {
+      e.preventDefault();
+      var isOpen = dropdown.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+  })();
+  </script>
 
   <main class="main">
     <div class="topbar">
@@ -179,7 +206,7 @@
     <div class="content">
 
       {{-- ===== RINGKASAN ===== --}}
-      <section class="tab-panel active" data-tab-panel="ringkasan">
+      <section class="tab-panel active" data-tab-panel="dashboard">
         <div class="section-head">
           <h2>Ringkasan Penempatan Personel</h2>
           <p>Status penempatan personel yang ditangani Binfung bulan ini.</p>
@@ -289,7 +316,50 @@
       </section>
 
       {{-- ===== LAPOR / VERIFIKASI ===== --}}
-      <section class="tab-panel" data-tab-panel="lapor">
+      {{-- ===== LAPORAN › TAMBAH LAPORAN ===== --}}
+      <section class="tab-panel" data-tab-panel="tambah-laporan">
+        <div class="section-head">
+          <h2>Tambah Laporan</h2>
+          <p>Catat kendala, kebutuhan, atau perkembangan baru terkait penempatan personel.</p>
+        </div>
+        <div class="panel">
+          <form class="form-grid" id="formTambahLaporan" style="padding:22px;" novalidate>
+            <div class="form-field">
+              <label for="personelTambahLaporan">Personel Terkait</label>
+              <select id="personelTambahLaporan" required>
+                @foreach($penempatan as $p)
+                  <option>{{ $p['nama'] }}</option>
+                @endforeach
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="prioritasTambahLaporan">Prioritas</label>
+              <select id="prioritasTambahLaporan" required>
+                <option>Tinggi</option><option>Sedang</option><option>Rendah</option>
+              </select>
+            </div>
+            <div class="form-field full">
+              <label for="perihalTambahLaporan">Perihal</label>
+              <input id="perihalTambahLaporan" type="text" placeholder="Contoh: Pengajuan penempatan personel baru" required>
+            </div>
+            <div class="form-field full">
+              <label for="deskripsiTambahLaporan">Deskripsi</label>
+              <textarea id="deskripsiTambahLaporan" rows="4" placeholder="Jelaskan kronologi dan dampaknya..." required></textarea>
+            </div>
+            <div class="form-field full">
+              <label for="lampiranTambahLaporan">Lampiran (bukti / dokumentasi)</label>
+              <input id="lampiranTambahLaporan" type="file" accept="application/pdf,.pdf">
+              <span class="form-hint">Format PDF, maksimal 20 MB.</span>
+            </div>
+            <div class="form-field full">
+              <button class="btn btn-primary" type="button" onclick="alert('Prototype — form Tambah Laporan belum tersambung ke database.')">Simpan Laporan</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      {{-- ===== LAPORAN › STATUS LAPORAN ===== --}}
+      <section class="tab-panel" data-tab-panel="status-laporan">
           <div class="section-head">
             <h2>Verifikasi &amp; Teruskan Laporan</h2>
             <p>Pengajuan penempatan personel yang menunggu diteruskan ke WADAN.</p>
@@ -318,6 +388,31 @@
               </table>
             </div>
           </div>
+      </section>
+
+      {{-- ===== LAPORAN › RIWAYAT LAPORAN ===== --}}
+      <section class="tab-panel" data-tab-panel="riwayat-laporan">
+        <div class="section-head">
+          <h2>Riwayat Laporan</h2>
+          <p>Log aktivitas penempatan personel yang pernah tercatat.</p>
+        </div>
+        <div class="panel">
+          <div class="tbl-wrap">
+            <table class="dtbl">
+              <thead><tr><th>Nama</th><th>Kegiatan</th><th>Waktu</th><th>Status</th></tr></thead>
+              <tbody>
+                @foreach($aktivitasTerbaru as $a)
+                <tr>
+                  <td>{{ $a['nama'] }}</td>
+                  <td>{{ $a['kegiatan'] }}</td>
+                  <td>{{ $a['waktu'] }}</td>
+                  <td><span class="status-dot {{ $a['status_class'] }}">{{ $a['status'] }}</span></td>
+                </tr>
+                @endforeach
+              </tbody>
+            </table>
+          </div>
+        </div>
       </section>
 
     </div>
