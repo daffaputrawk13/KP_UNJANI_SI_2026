@@ -29,7 +29,7 @@ class SatuanSeeder extends Seeder
 
             // --- DIR (Direktorat) ---
             ['kode' => 'BINFUNG', 'username' => 'binfung', 'nama' => 'Binfung (Pembinaan Fungsi)',    'kategori' => Satuan::KATEGORI_DIREKTORAT, 'deskripsi' => 'Penempatan personel yang masuk.',                  'urutan' => 50],
-            ['kode' => 'BINKUM',  'username' => 'binum',  'nama' => 'Binkum (Pembinaan Umum)',      'kategori' => Satuan::KATEGORI_DIREKTORAT, 'deskripsi' => 'Pengawasan satuan, lomba internal, personel baru.', 'urutan' => 60],
+            ['kode' => 'BINUM',  'username' => 'binum',  'nama' => 'Binum (Pembinaan Umum)',      'kategori' => Satuan::KATEGORI_DIREKTORAT, 'deskripsi' => 'Pengawasan satuan, lomba internal, personel baru.', 'urutan' => 60],
             ['kode' => 'DIKLAT',  'username' => 'diklat', 'nama' => 'Diklat (Pendidikan & Latihan)', 'kategori' => Satuan::KATEGORI_DIREKTORAT, 'deskripsi' => 'Pendidikan dan latihan satuan.',                   'urutan' => 70],
             ['kode' => 'BINMAT',  'username' => 'binmat', 'nama' => 'Binmat (Pembinaan Materiil)',  'kategori' => Satuan::KATEGORI_DIREKTORAT, 'deskripsi' => 'Pengurusan material/perlengkapan satuan.',         'urutan' => 80],
 

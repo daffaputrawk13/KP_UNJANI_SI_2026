@@ -13,7 +13,7 @@ class DashboardController extends Controller
      * Mengarahkan user ke halaman dashboard sesuai satuan (role) tempat ia login.
      * Seluruh 12 role sudah punya halaman dashboard khusus (ADMIN, DANPUS, WADAN,
      * Satlakal (Penangkalan), Satlak Sibersos, Satlak Penindakan, Satlok Duktek (Dukungan Teknologi),
-     * Binfung, binum, Diklat, Binmat, SDIR). ADMIN bukan satuan operasional —
+     * Binfung, Binum, Diklat, Binmat, SDIR). ADMIN bukan satuan operasional —
      * perannya khusus mengelola akun pengguna, data satuan, dan permintaan
      * reset password. Dashboard generik tetap dipertahankan sebagai fallback
      * jika ada satuan baru di kemudian hari.
@@ -23,7 +23,13 @@ class DashboardController extends Controller
         $user = $request->user()->load('satuan');
         $satuan = $user->satuan;
 
-        return match ($satuan?->kode) {
+        // Normalisasi kode (trim + uppercase) supaya pencocokan di bawah tidak
+        // meleset gara-gara spasi tersembunyi atau perbedaan huruf besar/kecil
+        // pada data di database — penyebab dashboard jatuh ke tampilan generic
+        // padahal view khususnya sudah ada.
+        $kode = $satuan?->kode ? strtoupper(trim($satuan->kode)) : null;
+
+        return match ($kode) {
             'ADMIN' => $this->admin($user, $satuan),
             'DANPUS' => $this->danpus($user, $satuan),
             'WADAN' => $this->wadan($user, $satuan),
@@ -351,7 +357,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * binum — pembinaan umum: pengawasan satuan, lomba internal, personel baru.
+     * Binum — pembinaan umum: pengawasan satuan, lomba internal, personel baru.
      */
     private function binum($user, $satuan): View
     {
@@ -381,7 +387,7 @@ class DashboardController extends Controller
                 ['nama' => 'Lomba Kedisiplinan Pelaporan', 'peserta' => '11 Satuan', 'periode' => 'Apr – Jun 2026', 'status' => 'Selesai', 'status_class' => 'green'],
             ],
             'laporanPiket' => [
-                ['satuan' => 'Satlok Duktek (Dukungan Teknologi)', 'perihal' => 'Temuan pelanggaran ringan keamanan dokumen riset', 'pelapor' => 'Piket binum', 'tanggal' => '25 Jul 2026', 'prioritas' => 'Sedang', 'prioritas_class' => 'warn'],
+                ['satuan' => 'Satlok Duktek (Dukungan Teknologi)', 'perihal' => 'Temuan pelanggaran ringan keamanan dokumen riset', 'pelapor' => 'Piket Binum', 'tanggal' => '25 Jul 2026', 'prioritas' => 'Sedang', 'prioritas_class' => 'warn'],
             ],
         ]);
     }
