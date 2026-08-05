@@ -83,10 +83,22 @@
     </div>
     <nav class="side-nav">
       <div class="side-nav-label">Menu</div>
-      <a href="#" class="side-link active" data-tab-link="ringkasan"><span class="dot"></span>Ringkasan</a>
+      <a href="#" class="side-link active" data-tab-link="dashboard"><span class="dot"></span>Dashboard</a>
       <a href="#" class="side-link" data-tab-link="ancaman"><span class="dot"></span>Deteksi Ancaman</a>
       <a href="#" class="side-link" data-tab-link="penanganan"><span class="dot"></span>Log Penanganan</a>
-      <a href="#" class="side-link" data-tab-link="lapor"><span class="dot"></span>Verifikasi Laporan</a>
+
+      <div class="side-dropdown" id="laporanDropdown">
+        <button type="button" class="side-link side-dropdown-toggle" id="laporanToggle" aria-expanded="false" aria-controls="laporanSubmenu">
+          <span class="dot"></span>
+          <span class="side-link-label">Laporan</span>
+          <svg class="side-dropdown-arrow" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg>
+        </button>
+        <div class="side-dropdown-menu" id="laporanSubmenu">
+          <a href="#" class="side-link side-sublink" data-tab-link="tambah-laporan">Tambah Laporan</a>
+          <a href="#" class="side-link side-sublink" data-tab-link="status-laporan">Status Laporan</a>
+          <a href="#" class="side-link side-sublink" data-tab-link="riwayat-laporan">Riwayat Laporan</a>
+        </div>
+      </div>
     </nav>
     <div class="side-foot">
       <form class="logout logout-form" method="POST" action="{{ route('logout') }}">
@@ -95,6 +107,23 @@
       </form>
     </div>
   </aside>
+
+  <script>
+  (function () {
+    var dropdown = document.getElementById('laporanDropdown');
+    var toggle = document.getElementById('laporanToggle');
+    if (!dropdown || !toggle) return;
+
+    var subActive = dropdown.querySelector('.side-sublink.active');
+    if (subActive) dropdown.classList.add('open');
+
+    toggle.addEventListener('click', function (e) {
+      e.preventDefault();
+      var isOpen = dropdown.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+  })();
+  </script>
 
   <main class="main">
     <div class="topbar">
@@ -179,7 +208,7 @@
     <div class="content">
 
       {{-- ===== RINGKASAN ===== --}}
-      <section class="tab-panel active" data-tab-panel="ringkasan">
+      <section class="tab-panel active" data-tab-panel="dashboard">
         <div class="section-head">
           <h2>Ringkasan Penanganan Ancaman</h2>
           <p>Status ancaman siber yang ditangani Satlak Penindakan hari ini.</p>
@@ -287,47 +316,107 @@
         </div>
       </section>
 
-      {{-- ===== LAPOR / VERIFIKASI ===== --}}
-      <section class="tab-panel" data-tab-panel="lapor">
-          <div class="section-head">
-            <h2>Verifikasi &amp; Teruskan Laporan</h2>
-            <p>Laporan insiden yang menunggu diteruskan langsung ke DANPUS.</p>
-          </div>
-          <div class="panel">
-            <div class="tbl-wrap">
-              <table class="dtbl">
-                <thead><tr><th>Aset</th><th>Perihal</th><th>Dilaporkan Oleh</th><th>Tanggal</th><th>Prioritas</th><th>Aksi</th></tr></thead>
-                <tbody>
-                  @foreach($laporanPiket as $l)
-                  <tr>
-                    <td>{{ $l['aset'] }}</td>
-                    <td>{{ $l['perihal'] }}</td>
-                    <td>{{ $l['pelapor'] }}</td>
-                    <td>{{ $l['tanggal'] }}</td>
-                    <td><span class="status-dot {{ $l['prioritas_class'] }}">{{ $l['prioritas'] }}</span></td>
-                    <td>
-                      <div class="btn-row">
-                        <button class="btn btn-primary btn-sm" type="button">Verifikasi & Teruskan ke DANPUS</button>
-                        <button class="btn btn-ghost-red btn-sm" type="button">Tolak</button>
-                      </div>
-                    </td>
-                  </tr>
-                  @endforeach
-                </tbody>
-              </table>
+      {{-- ===== LAPORAN › TAMBAH LAPORAN ===== --}}
+      <section class="tab-panel" data-tab-panel="tambah-laporan">
+        <div class="section-head">
+          <h2>Tambah Laporan</h2>
+          <p>Catat insiden ancaman siber baru yang terdeteksi atau ditangani Satlak Penindakan.</p>
+        </div>
+        <div class="panel">
+          <form class="form-grid" id="formTambahLaporan" style="padding:22px;" novalidate>
+            <div class="form-field">
+              <label for="asetTambahLaporan">Aset Terdampak</label>
+              <select id="asetTambahLaporan" required>
+                @foreach($ancamanTerdeteksi as $a)
+                  <option>{{ $a['nama'] }}</option>
+                @endforeach
+              </select>
             </div>
-          </div>
-        <div class="panel" style="margin-top:20px;">
-          <div class="panel-head">
-            <div><h3>Koordinasi dengan SDIR</h3><p>Ajukan permintaan koordinasi (bukan laporan insiden) ke SDIR bila diperlukan.</p></div>
-          </div>
-          <div class="form-grid" style="padding:0 22px 22px;">
+            <div class="form-field">
+              <label for="prioritasTambahLaporan">Prioritas</label>
+              <select id="prioritasTambahLaporan" required>
+                <option>Tinggi</option><option>Sedang</option><option>Rendah</option>
+              </select>
+            </div>
             <div class="form-field full">
-              <button class="btn btn-sm" type="button" onclick="alert('Prototype — form koordinasi ke SDIR belum tersambung ke database.')">Ajukan Koordinasi ke SDIR</button>
+              <label for="perihalTambahLaporan">Perihal</label>
+              <input id="perihalTambahLaporan" type="text" placeholder="Contoh: Indikasi ransomware mengenkripsi file bersama" required>
             </div>
+            <div class="form-field full">
+              <label for="deskripsiTambahLaporan">Deskripsi Kejadian</label>
+              <textarea id="deskripsiTambahLaporan" rows="4" placeholder="Jelaskan kronologi dan dampak insiden..." required></textarea>
+            </div>
+            <div class="form-field full">
+              <label for="lampiranTambahLaporan">Lampiran (bukti / dokumentasi)</label>
+              <input id="lampiranTambahLaporan" type="file" accept="application/pdf,.pdf">
+              <span class="form-hint">Format PDF, maksimal 20 MB.</span>
+            </div>
+            <div class="form-field full">
+              <button class="btn btn-primary" type="button" onclick="alert('Prototype — form Tambah Laporan belum tersambung ke database.')">Simpan Laporan</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      {{-- ===== LAPORAN › STATUS LAPORAN ===== --}}
+      <section class="tab-panel" data-tab-panel="status-laporan">
+        <div class="section-head">
+          <h2>Status Laporan</h2>
+          <p>Pantau progres laporan yang sudah diajukan oleh Satlak Penindakan.</p>
+        </div>
+        <div class="panel">
+          <div class="tbl-wrap">
+            <table class="dtbl">
+              <thead><tr><th>Aset</th><th>Perihal</th><th>Tanggal</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td>Server File Sharing Ditjen</td>
+                  <td>Indikasi ransomware mengenkripsi file bersama</td>
+                  <td>02 Agu 2026</td>
+                  <td><span class="status-dot amber">Menunggu Verifikasi</span></td>
+                </tr>
+                <tr>
+                  <td>Endpoint Staf Binmat #14</td>
+                  <td>Trojan terdeteksi via antivirus terpusat</td>
+                  <td>02 Agu 2026</td>
+                  <td><span class="status-dot warn">Diteruskan ke DANPUS</span></td>
+                </tr>
+                <tr>
+                  <td>Gateway Email Satlok Duktek (Dukungan Teknologi)</td>
+                  <td>Phishing campaign berhasil diblokir</td>
+                  <td>02 Agu 2026</td>
+                  <td><span class="status-dot green">Disetujui DANPUS</span></td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
+      </section>
 
+      {{-- ===== LAPORAN › RIWAYAT LAPORAN ===== --}}
+      <section class="tab-panel" data-tab-panel="riwayat-laporan">
+        <div class="section-head">
+          <h2>Riwayat Laporan</h2>
+          <p>Log lengkap ancaman dan tindak lanjut yang pernah ditangani Satlak Penindakan.</p>
+        </div>
+        <div class="panel">
+          <div class="tbl-wrap">
+            <table class="dtbl">
+              <thead><tr><th>Aset</th><th>Jenis Ancaman</th><th>Waktu</th><th>Tindakan</th><th>Status</th></tr></thead>
+              <tbody>
+                @foreach($logPenanganan as $l)
+                <tr>
+                  <td>{{ $l['aset'] }}</td>
+                  <td>{{ $l['jenis'] }}</td>
+                  <td>{{ $l['waktu'] }}</td>
+                  <td>{{ $l['tindakan'] }}</td>
+                  <td><span class="status-dot {{ $l['status_class'] }}">{{ $l['status'] }}</span></td>
+                </tr>
+                @endforeach
+              </tbody>
+            </table>
+          </div>
+        </div>
       </section>
 
     </div>

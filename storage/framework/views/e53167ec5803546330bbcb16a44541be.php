@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Satlok Duktek (Dukungan Teknologi) — SIBERAD</title>
-<link rel="icon" type="image/jpeg" href="{{ asset('images/logo-pussiberad.jpg') }}">
-@include('siberad.dashboards.partials.dash-styles')
+<title>Satlak Penindakan — SIBERAD</title>
+<link rel="icon" type="image/jpeg" href="<?php echo e(asset('images/logo-pussiberad.jpg')); ?>">
+<?php echo $__env->make('siberad.dashboards.partials.dash-styles', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </head>
 <body>
 <div class="profile-modal-overlay" id="profileModalOverlay">
@@ -14,15 +14,15 @@
       <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
     </button>
 
-    {{-- ===== VIEW PROFIL SAYA ===== --}}
+    
     <div class="profile-dropdown-view" id="profilePhotoView" style="display:none;">
       <div class="profile-dropdown-head-lg">
         <div class="profile-dropdown-avatar-lg">
-          <span class="profile-initial" id="profileInitialLarge">{{ strtoupper(mb_substr($user->name ?? 'U', 0, 1)) }}</span>
-          <img class="profile-photo" id="profilePhotoLarge" alt="Foto profil {{ $user->name }}">
+          <span class="profile-initial" id="profileInitialLarge"><?php echo e(strtoupper(mb_substr($user->name ?? 'U', 0, 1))); ?></span>
+          <img class="profile-photo" id="profilePhotoLarge" alt="Foto profil <?php echo e($user->name); ?>">
         </div>
-        <div class="profile-dropdown-name">{{ $user->name }}</div>
-        <div class="profile-dropdown-role">{{ $user->jabatan ?? 'Pengguna' }}</div>
+        <div class="profile-dropdown-name"><?php echo e($user->name); ?></div>
+        <div class="profile-dropdown-role"><?php echo e($user->jabatan ?? 'Pengguna'); ?></div>
       </div>
 
       <button type="button" class="profile-dropdown-item" id="gantiFotoBtn" role="menuitem">
@@ -36,7 +36,7 @@
       <input type="file" id="fotoProfilInput" accept="image/png,image/jpeg,image/webp" hidden>
     </div>
 
-    {{-- ===== VIEW PENGATURAN AKUN ===== --}}
+    
     <div class="profile-dropdown-view" id="profileSettingsView" style="display:none;">
       <div class="profile-modal-title">Pengaturan Akun</div>
 
@@ -62,7 +62,7 @@
       </form>
     </div>
 
-    {{-- ===== VIEW BANTUAN & PANDUAN ===== --}}
+    
     <div class="profile-dropdown-view" id="profileHelpView" style="display:none;">
       <div class="profile-modal-title">Bantuan &amp; Panduan</div>
       <p class="profile-help-text">
@@ -78,14 +78,14 @@
 
   <aside class="sidebar" id="sidebar">
     <div class="side-brand">
-      <img src="{{ asset('images/logo-pussiberad.jpg') }}" alt="Lambang Pussiberad">
+      <img src="<?php echo e(asset('images/logo-pussiberad.jpg')); ?>" alt="Lambang Pussiberad">
       <div class="logo">SIBER<span>AD</span></div>
     </div>
     <nav class="side-nav">
       <div class="side-nav-label">Menu</div>
       <a href="#" class="side-link active" data-tab-link="dashboard"><span class="dot"></span>Dashboard</a>
-      <a href="#" class="side-link" data-tab-link="proyek"><span class="dot"></span>Proyek Riset</a>
-      <a href="#" class="side-link" data-tab-link="uji"><span class="dot"></span>Log Uji & Pengembangan</a>
+      <a href="#" class="side-link" data-tab-link="ancaman"><span class="dot"></span>Deteksi Ancaman</a>
+      <a href="#" class="side-link" data-tab-link="penanganan"><span class="dot"></span>Log Penanganan</a>
 
       <div class="side-dropdown" id="laporanDropdown">
         <button type="button" class="side-link side-dropdown-toggle" id="laporanToggle" aria-expanded="false" aria-controls="laporanSubmenu">
@@ -101,8 +101,8 @@
       </div>
     </nav>
     <div class="side-foot">
-      <form class="logout logout-form" method="POST" action="{{ route('logout') }}">
-        @csrf
+      <form class="logout logout-form" method="POST" action="<?php echo e(route('logout')); ?>">
+        <?php echo csrf_field(); ?>
         <button type="submit">Keluar</button>
       </form>
     </div>
@@ -160,20 +160,20 @@
         </div>
         <div class="profile-menu" id="profileMenu">
           <button type="button" class="profile-menu-btn" id="profileMenuBtn" aria-haspopup="menu" aria-expanded="false" aria-label="Menu profil">
-            <span class="profile-initial" id="profileInitial">{{ strtoupper(mb_substr($user->name ?? 'U', 0, 1)) }}</span>
-            <img class="profile-photo" id="profilePhotoBtn" alt="Foto profil {{ $user->name }}">
+            <span class="profile-initial" id="profileInitial"><?php echo e(strtoupper(mb_substr($user->name ?? 'U', 0, 1))); ?></span>
+            <img class="profile-photo" id="profilePhotoBtn" alt="Foto profil <?php echo e($user->name); ?>">
           </button>
 
           <div class="profile-dropdown" id="profileDropdown" role="menu" aria-label="Menu profil">
 
             <div class="profile-dropdown-head">
               <div class="profile-dropdown-avatar">
-                <span class="profile-initial" id="profileInitialDropdown">{{ strtoupper(mb_substr($user->name ?? 'U', 0, 1)) }}</span>
-                <img class="profile-photo" id="profilePhotoDropdown" alt="Foto profil {{ $user->name }}">
+                <span class="profile-initial" id="profileInitialDropdown"><?php echo e(strtoupper(mb_substr($user->name ?? 'U', 0, 1))); ?></span>
+                <img class="profile-photo" id="profilePhotoDropdown" alt="Foto profil <?php echo e($user->name); ?>">
               </div>
               <div>
-                <div class="profile-dropdown-name">{{ $user->name }}</div>
-                <div class="profile-dropdown-role">{{ $user->jabatan ?? 'Pengguna' }}</div>
+                <div class="profile-dropdown-name"><?php echo e($user->name); ?></div>
+                <div class="profile-dropdown-role"><?php echo e($user->jabatan ?? 'Pengguna'); ?></div>
               </div>
             </div>
 
@@ -192,8 +192,8 @@
 
             <div class="profile-dropdown-divider"></div>
 
-            <form class="logout-form" method="POST" action="{{ route('logout') }}">
-              @csrf
+            <form class="logout-form" method="POST" action="<?php echo e(route('logout')); ?>">
+              <?php echo csrf_field(); ?>
               <button type="submit" class="profile-dropdown-item danger" role="menuitem">
                 <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>
                 Keluar
@@ -207,121 +207,129 @@
     
     <div class="content">
 
-      {{-- ===== RINGKASAN ===== --}}
+      
       <section class="tab-panel active" data-tab-panel="dashboard">
         <div class="section-head">
-          <h2>Ringkasan Riset & Pengembangan</h2>
-          <p>Status proyek teknologi yang dikerjakan Satlok Duktek (Dukungan Teknologi) saat ini.</p>
+          <h2>Ringkasan Penanganan Ancaman</h2>
+          <p>Status ancaman siber yang ditangani Satlak Penindakan hari ini.</p>
         </div>
         <div class="stat-grid">
           <div class="stat-card">
-            <div class="lbl">Proyek Aktif</div>
-            <div class="val">{{ $stats['proyek_aktif'] }}</div>
-            <div class="sub">Sedang dikerjakan</div>
+            <div class="lbl">Ancaman Aktif</div>
+            <div class="val" style="color:var(--red);"><?php echo e($stats['ancaman_aktif']); ?></div>
+            <div class="sub">Sedang ditangani</div>
           </div>
           <div class="stat-card">
-            <div class="lbl">Proyek AI</div>
-            <div class="val" style="color:var(--green);">{{ $stats['proyek_ai'] }}</div>
-            <div class="sub">Machine learning & NLP</div>
+            <div class="lbl">Ransomware</div>
+            <div class="val" style="color:var(--red);"><?php echo e($stats['ransomware']); ?></div>
+            <div class="sub">Kasus berjalan</div>
           </div>
           <div class="stat-card">
-            <div class="lbl">Unit Drone Diuji</div>
-            <div class="val" style="color:var(--amber);">{{ $stats['unit_drone_uji'] }}</div>
-            <div class="sub">Tahap uji lapangan</div>
+            <div class="lbl">Malware Dikarantina</div>
+            <div class="val" style="color:var(--amber);"><?php echo e($stats['malware_dikarantina']); ?></div>
+            <div class="sub">Bulan ini</div>
           </div>
           <div class="stat-card">
-            <div class="lbl">Prototipe Selesai</div>
-            <div class="val" style="color:var(--green);">{{ $stats['prototipe_selesai'] }}</div>
+            <div class="lbl">Insiden Selesai</div>
+            <div class="val" style="color:var(--green);"><?php echo e($stats['insiden_selesai_bulan_ini']); ?></div>
             <div class="sub">Bulan ini</div>
           </div>
         </div>
 
         <div class="panel">
-          <div class="panel-head"><div><h3>Aktivitas Terbaru</h3><p>Kegiatan riset & pengembangan yang baru berlangsung.</p></div></div>
+          <div class="panel-head"><div><h3>Insiden Terbaru</h3><p>Ancaman siber yang baru terdeteksi dan sedang ditangani.</p></div></div>
           <div class="tbl-wrap">
             <table class="dtbl">
-              <thead><tr><th>Proyek</th><th>Kegiatan</th><th>Waktu</th><th>Status</th></tr></thead>
+              <thead><tr><th>Aset</th><th>Jenis Ancaman</th><th>Terdeteksi</th><th>Status</th></tr></thead>
               <tbody>
-                @foreach($aktivitasTerbaru as $i)
+                <?php $__currentLoopData = $insidenTerbaru; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $i): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <tr>
-                  <td>{{ $i['proyek'] }}</td>
-                  <td>{{ $i['kegiatan'] }}</td>
-                  <td>{{ $i['waktu'] }}</td>
-                  <td><span class="status-dot {{ $i['status_class'] }}">{{ $i['status'] }}</span></td>
+                  <td><?php echo e($i['aset']); ?></td>
+                  <td><?php echo e($i['jenis']); ?></td>
+                  <td><?php echo e($i['waktu']); ?></td>
+                  <td><span class="status-dot <?php echo e($i['status_class']); ?>"><?php echo e($i['status']); ?></span></td>
                 </tr>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
               </tbody>
             </table>
           </div>
         </div>
       </section>
 
-      {{-- ===== PROYEK RISET ===== --}}
-      <section class="tab-panel" data-tab-panel="proyek">
+      
+      <section class="tab-panel" data-tab-panel="ancaman">
         <div class="section-head">
-          <h2>Proyek Riset & Pengembangan</h2>
-          <p>Daftar proyek teknologi beserta progres dan target penyelesaian.</p>
+          <h2>Deteksi Ancaman</h2>
+          <p>Daftar ancaman siber yang terdeteksi sistem monitoring beserta tingkat keparahannya.</p>
         </div>
         <div class="panel">
           <div class="tbl-wrap">
             <table class="dtbl">
-              <thead><tr><th>Nama Proyek</th><th>Kategori</th><th>Progres</th><th>Status</th><th>Target</th></tr></thead>
+              <thead><tr><th>Aset Terdampak</th><th>Jenis Ancaman</th><th>Tingkat</th><th>Terdeteksi</th><th>Aksi</th></tr></thead>
               <tbody>
-                @foreach($proyekRiset as $p)
+                <?php $__currentLoopData = $ancamanTerdeteksi; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $a): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <tr>
-                  <td>{{ $p['nama'] }}</td>
-                  <td style="color:var(--text-muted);">{{ $p['kategori'] }}</td>
-                  <td style="font-family:var(--mono);">{{ $p['progres'] }}%</td>
-                  <td><span class="status-dot {{ $p['status_class'] }}">{{ $p['status'] }}</span></td>
-                  <td>{{ $p['target'] }}</td>
+                  <td><?php echo e($a['nama']); ?></td>
+                  <td style="color:var(--text-muted);"><?php echo e($a['jenis']); ?></td>
+                  <td><span class="status-dot <?php echo e($a['tingkat_class']); ?>"><?php echo e($a['tingkat']); ?></span></td>
+                  <td><?php echo e($a['terdeteksi']); ?></td>
+                  <td>
+                    <div class="btn-row">
+                      <?php if($a['tingkat_class'] === 'bad'): ?>
+                        <button class="btn btn-primary btn-sm" type="button">Isolasi & Tangani</button>
+                      <?php else: ?>
+                        <button class="btn btn-sm" type="button">Investigasi</button>
+                      <?php endif; ?>
+                    </div>
+                  </td>
                 </tr>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
               </tbody>
             </table>
           </div>
         </div>
       </section>
 
-      {{-- ===== LOG UJI & PENGEMBANGAN ===== --}}
-      <section class="tab-panel" data-tab-panel="uji">
+      
+      <section class="tab-panel" data-tab-panel="penanganan">
         <div class="section-head">
-          <h2>Log Uji & Pengembangan</h2>
-          <p>Riwayat pengujian prototipe dan hasil yang didapat.</p>
+          <h2>Log Penanganan Insiden</h2>
+          <p>Riwayat lengkap ancaman siber dan tindakan penanganan yang sudah dilakukan.</p>
         </div>
         <div class="panel">
           <div class="tbl-wrap">
             <table class="dtbl">
-              <thead><tr><th>Proyek</th><th>Kegiatan Uji</th><th>Waktu</th><th>Hasil</th><th>Status</th></tr></thead>
+              <thead><tr><th>Aset</th><th>Jenis Ancaman</th><th>Waktu Insiden</th><th>Tindakan</th><th>Status</th></tr></thead>
               <tbody>
-                @foreach($logUji as $l)
+                <?php $__currentLoopData = $logPenanganan; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $l): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <tr>
-                  <td>{{ $l['proyek'] }}</td>
-                  <td>{{ $l['kegiatan'] }}</td>
-                  <td>{{ $l['waktu'] }}</td>
-                  <td>{{ $l['hasil'] }}</td>
-                  <td><span class="badge {{ $l['status_class'] }}">{{ $l['status'] }}</span></td>
+                  <td><?php echo e($l['aset']); ?></td>
+                  <td><?php echo e($l['jenis']); ?></td>
+                  <td><?php echo e($l['waktu']); ?></td>
+                  <td><?php echo e($l['tindakan']); ?></td>
+                  <td><span class="badge <?php echo e($l['status_class']); ?>"><?php echo e($l['status']); ?></span></td>
                 </tr>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
               </tbody>
             </table>
           </div>
         </div>
       </section>
 
-      {{-- ===== LAPORAN › TAMBAH LAPORAN ===== --}}
+      
       <section class="tab-panel" data-tab-panel="tambah-laporan">
         <div class="section-head">
           <h2>Tambah Laporan</h2>
-          <p>Catat kendala, kebutuhan, atau perkembangan baru dari proyek riset dan pengembangan.</p>
+          <p>Catat insiden ancaman siber baru yang terdeteksi atau ditangani Satlak Penindakan.</p>
         </div>
         <div class="panel">
           <form class="form-grid" id="formTambahLaporan" style="padding:22px;" novalidate>
             <div class="form-field">
-              <label for="proyekTambahLaporan">Proyek Terkait</label>
-              <select id="proyekTambahLaporan" required>
-                @foreach($proyekRiset as $p)
-                  <option>{{ $p['nama'] }}</option>
-                @endforeach
+              <label for="asetTambahLaporan">Aset Terdampak</label>
+              <select id="asetTambahLaporan" required>
+                <?php $__currentLoopData = $ancamanTerdeteksi; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $a): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                  <option><?php echo e($a['nama']); ?></option>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
               </select>
             </div>
             <div class="form-field">
@@ -332,11 +340,11 @@
             </div>
             <div class="form-field full">
               <label for="perihalTambahLaporan">Perihal</label>
-              <input id="perihalTambahLaporan" type="text" placeholder="Contoh: Pengajuan anggaran komponen gimbal kamera baru" required>
+              <input id="perihalTambahLaporan" type="text" placeholder="Contoh: Indikasi ransomware mengenkripsi file bersama" required>
             </div>
             <div class="form-field full">
               <label for="deskripsiTambahLaporan">Deskripsi Kejadian</label>
-              <textarea id="deskripsiTambahLaporan" rows="4" placeholder="Jelaskan kronologi dan dampaknya terhadap proyek..." required></textarea>
+              <textarea id="deskripsiTambahLaporan" rows="4" placeholder="Jelaskan kronologi dan dampak insiden..." required></textarea>
             </div>
             <div class="form-field full">
               <label for="lampiranTambahLaporan">Lampiran (bukti / dokumentasi)</label>
@@ -350,33 +358,33 @@
         </div>
       </section>
 
-      {{-- ===== LAPORAN › STATUS LAPORAN ===== --}}
+      
       <section class="tab-panel" data-tab-panel="status-laporan">
         <div class="section-head">
           <h2>Status Laporan</h2>
-          <p>Pantau progres laporan yang sudah diajukan oleh Satlok Duktek (Dukungan Teknologi).</p>
+          <p>Pantau progres laporan yang sudah diajukan oleh Satlak Penindakan.</p>
         </div>
         <div class="panel">
           <div class="tbl-wrap">
             <table class="dtbl">
-              <thead><tr><th>Proyek</th><th>Perihal</th><th>Tanggal</th><th>Status</th></tr></thead>
+              <thead><tr><th>Aset</th><th>Perihal</th><th>Tanggal</th><th>Status</th></tr></thead>
               <tbody>
                 <tr>
-                  <td>Drone Pemantau Perbatasan Gen-2</td>
-                  <td>Pengajuan anggaran komponen gimbal kamera baru</td>
+                  <td>Server File Sharing Ditjen</td>
+                  <td>Indikasi ransomware mengenkripsi file bersama</td>
                   <td>02 Agu 2026</td>
                   <td><span class="status-dot amber">Menunggu Verifikasi</span></td>
                 </tr>
                 <tr>
-                  <td>Deteksi Anomali Jaringan berbasis AI</td>
-                  <td>Permintaan data insiden tambahan dari Satlak Penindakan</td>
-                  <td>30 Jul 2026</td>
+                  <td>Endpoint Staf Binmat #14</td>
+                  <td>Trojan terdeteksi via antivirus terpusat</td>
+                  <td>02 Agu 2026</td>
                   <td><span class="status-dot warn">Diteruskan ke DANPUS</span></td>
                 </tr>
                 <tr>
-                  <td>Chatbot Internal Layanan Personel</td>
-                  <td>Laporan hasil uji terima pengguna (UAT)</td>
-                  <td>25 Jul 2026</td>
+                  <td>Gateway Email Satlok Duktek (Dukungan Teknologi)</td>
+                  <td>Phishing campaign berhasil diblokir</td>
+                  <td>02 Agu 2026</td>
                   <td><span class="status-dot green">Disetujui DANPUS</span></td>
                 </tr>
               </tbody>
@@ -385,26 +393,26 @@
         </div>
       </section>
 
-      {{-- ===== LAPORAN › RIWAYAT LAPORAN ===== --}}
+      
       <section class="tab-panel" data-tab-panel="riwayat-laporan">
         <div class="section-head">
           <h2>Riwayat Laporan</h2>
-          <p>Log lengkap kegiatan uji dan pengembangan yang pernah ditangani Satlok Duktek (Dukungan Teknologi).</p>
+          <p>Log lengkap ancaman dan tindak lanjut yang pernah ditangani Satlak Penindakan.</p>
         </div>
         <div class="panel">
           <div class="tbl-wrap">
             <table class="dtbl">
-              <thead><tr><th>Proyek</th><th>Kegiatan</th><th>Waktu</th><th>Hasil</th><th>Status</th></tr></thead>
+              <thead><tr><th>Aset</th><th>Jenis Ancaman</th><th>Waktu</th><th>Tindakan</th><th>Status</th></tr></thead>
               <tbody>
-                @foreach($logUji as $l)
+                <?php $__currentLoopData = $logPenanganan; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $l): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <tr>
-                  <td>{{ $l['proyek'] }}</td>
-                  <td>{{ $l['kegiatan'] }}</td>
-                  <td>{{ $l['waktu'] }}</td>
-                  <td>{{ $l['hasil'] }}</td>
-                  <td><span class="status-dot {{ $l['status_class'] }}">{{ $l['status'] }}</span></td>
+                  <td><?php echo e($l['aset']); ?></td>
+                  <td><?php echo e($l['jenis']); ?></td>
+                  <td><?php echo e($l['waktu']); ?></td>
+                  <td><?php echo e($l['tindakan']); ?></td>
+                  <td><span class="status-dot <?php echo e($l['status_class']); ?>"><?php echo e($l['status']); ?></span></td>
                 </tr>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
               </tbody>
             </table>
           </div>
@@ -541,7 +549,7 @@
         var MAX_PHOTO_MB = 5;
         var MAX_PHOTO_BYTES = MAX_PHOTO_MB * 1024 * 1024;
         var ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-        var STORAGE_KEY = 'siberad-profile-photo-{{ $user->id ?? "default" }}';
+        var STORAGE_KEY = 'siberad-profile-photo-<?php echo e($user->id ?? "default"); ?>';
 
         var fileInput = document.getElementById('fotoProfilInput');
         var gantiBtn = document.getElementById('gantiFotoBtn');
@@ -691,7 +699,7 @@
 
   </main>
 
-  {{-- ===== KONFIRMASI KELUAR ===== --}}
+  
   <div class="confirm-overlay" id="logoutConfirmOverlay">
     <div class="confirm-box" role="alertdialog" aria-modal="true" aria-labelledby="logoutConfirmTitle">
       <div class="confirm-icon">
@@ -745,6 +753,6 @@
 })();
 </script>
 
-@include('siberad.dashboards.partials.dash-script')
+<?php echo $__env->make('siberad.dashboards.partials.dash-script', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 </body>
-</html>
+</html><?php /**PATH D:\Unjani\Kerja Praktek\kelompok5\KP_UNJANI_SI_2026\resources\views/siberad/dashboards/satlakrindak.blade.php ENDPATH**/ ?>
