@@ -89,10 +89,20 @@
     </div>
     <nav class="side-nav">
       <div class="side-nav-label">Menu</div>
-      <a href="#" class="side-link active" data-tab-link="ringkasan"><span class="dot"></span>Ringkasan</a>
-      <a href="#" class="side-link" data-tab-link="lapor"><span class="dot"></span>Verifikasi Laporan</a>
-      <a href="#" class="side-link" data-tab-link="danpus"><span class="dot"></span>Lapor ke DANPUS</a>
-      <a href="#" class="side-link" data-tab-link="sdir"><span class="dot"></span>Koordinasi SDIR</a>
+      <a href="#" class="side-link active" data-tab-link="dashboard"><span class="dot"></span>Dashboard</a>
+
+      <div class="side-dropdown" id="laporanDropdown">
+        <button type="button" class="side-link side-dropdown-toggle" id="laporanToggle" aria-expanded="false" aria-controls="laporanSubmenu">
+          <span class="dot"></span>
+          <span class="side-link-label">Laporan</span>
+          <svg class="side-dropdown-arrow" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg>
+        </button>
+        <div class="side-dropdown-menu" id="laporanSubmenu">
+          <a href="#" class="side-link side-sublink" data-tab-link="tambah-laporan">Tambah Laporan</a>
+          <a href="#" class="side-link side-sublink" data-tab-link="status-laporan">Status Laporan</a>
+          <a href="#" class="side-link side-sublink" data-tab-link="riwayat-laporan">Riwayat Laporan</a>
+        </div>
+      </div>
     </nav>
     <div class="side-foot">
       <form class="logout logout-form" method="POST" action="{{ route('logout') }}">
@@ -101,6 +111,25 @@
       </form>
     </div>
   </aside>
+
+  <script>
+  (function () {
+    var dropdown = document.getElementById('laporanDropdown');
+    var toggle = document.getElementById('laporanToggle');
+    if (!dropdown || !toggle) return;
+
+    // Kalau salah satu sub-menu Laporan sedang aktif saat halaman dimuat,
+    // buka dropdown-nya supaya kelihatan item mana yang aktif.
+    var subActive = dropdown.querySelector('.side-sublink.active');
+    if (subActive) dropdown.classList.add('open');
+
+    toggle.addEventListener('click', function (e) {
+      e.preventDefault();
+      var isOpen = dropdown.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+  })();
+  </script>
 
   <main class="main">
     <div class="topbar">
@@ -184,8 +213,8 @@
 
     <div class="content">
 
-      {{-- ===== RINGKASAN ===== --}}
-      <section class="tab-panel active" data-tab-panel="ringkasan">
+      {{-- ===== DASHBOARD ===== --}}
+      <section class="tab-panel active" data-tab-panel="dashboard">
         <div class="section-head">
           <h2>Ringkasan Pemantauan</h2>
           <p>Status aset/website yang dipantau Satlakal (Penangkalan) hari ini.</p>
@@ -233,95 +262,106 @@
         </div>
       </section>
 
-      {{-- ===== LAPOR / VERIFIKASI ===== --}}
-      <section class="tab-panel" data-tab-panel="lapor">
-          <div class="section-head">
-            <h2>Verifikasi &amp; Teruskan Laporan</h2>
-            <p>Laporan insiden yang menunggu diteruskan langsung ke DANPUS.</p>
-          </div>
-          <div class="panel">
-            <div class="tbl-wrap">
-              <table class="dtbl">
-                <thead><tr><th>Aset</th><th>Perihal</th><th>Dilaporkan Oleh</th><th>Tanggal</th><th>Prioritas</th><th>Aksi</th></tr></thead>
-                <tbody>
-                  @foreach($laporanPiket as $l)
-                  <tr>
-                    <td>{{ $l['aset'] }}</td>
-                    <td>{{ $l['perihal'] }}</td>
-                    <td>{{ $l['pelapor'] }}</td>
-                    <td>{{ $l['tanggal'] }}</td>
-                    <td><span class="status-dot {{ $l['prioritas_class'] }}">{{ $l['prioritas'] }}</span></td>
-                    <td>
-                      <div class="btn-row">
-                        <button class="btn btn-primary btn-sm" type="button">Verifikasi & Teruskan ke DANPUS</button>
-                        <button class="btn btn-ghost-red btn-sm" type="button">Tolak</button>
-                      </div>
-                    </td>
-                  </tr>
-                  @endforeach
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-      </section>
-
-      {{-- ===== KOORDINASI DENGAN SDIR ===== --}}
-      <section class="tab-panel" data-tab-panel="sdir">
+      {{-- ===== LAPORAN › TAMBAH LAPORAN ===== --}}
+      <section class="tab-panel" data-tab-panel="tambah-laporan">
         <div class="section-head">
-          <h2>Koordinasi dengan SDIR</h2>
-          <p>Ajukan permintaan koordinasi (bukan laporan insiden) ke SDIR bila diperlukan.</p>
+          <h2>Tambah Laporan</h2>
+          <p>Catat insiden atau gangguan baru pada aset/website yang dipantau Satlakal.</p>
         </div>
         <div class="panel">
-          <div class="form-grid" style="padding:22px;">
-            <div class="form-field full">
-              <button class="btn btn-sm" type="button" onclick="alert('Prototype — form koordinasi ke SDIR belum tersambung ke database.')">Ajukan Koordinasi ke SDIR</button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {{-- ===== LAPOR LANGSUNG KE DANPUS ===== --}}
-      <section class="tab-panel" data-tab-panel="danpus">
-        <div class="section-head">
-          <h2>Lapor ke DANPUS</h2>
-          <p>Laporan insiden yang dikirim langsung ke DANPUS, lengkap dengan lampiran bukti dalam format PDF.</p>
-        </div>
-        <div class="panel">
-          <form class="form-grid" id="formDanpus" novalidate>
+          <form class="form-grid" id="formTambahLaporan" style="padding:22px;" novalidate>
             <div class="form-field">
-              <label for="asetDanpus">Aset / Website Terdampak</label>
-              <select id="asetDanpus" required>
+              <label for="asetTambahLaporan">Aset / Website Terdampak</label>
+              <select id="asetTambahLaporan" required>
                 @foreach($asetMonitoring as $a)
                   <option>{{ $a['nama'] }}</option>
                 @endforeach
               </select>
             </div>
             <div class="form-field">
-              <label for="prioritasDanpus">Prioritas</label>
-              <select id="prioritasDanpus" required>
+              <label for="prioritasTambahLaporan">Prioritas</label>
+              <select id="prioritasTambahLaporan" required>
                 <option>Tinggi</option><option>Sedang</option><option>Rendah</option>
               </select>
             </div>
             <div class="form-field full">
-              <label for="perihalDanpus">Perihal</label>
-              <input id="perihalDanpus" type="text" placeholder="Contoh: Website diserang DDoS" required>
+              <label for="perihalTambahLaporan">Perihal</label>
+              <input id="perihalTambahLaporan" type="text" placeholder="Contoh: Percobaan akses ilegal terdeteksi" required>
             </div>
             <div class="form-field full">
-              <label for="deskripsiDanpus">Deskripsi Kejadian</label>
-              <textarea id="deskripsiDanpus" rows="4" placeholder="Jelaskan kronologi dan dampak insiden..." required></textarea>
+              <label for="deskripsiTambahLaporan">Deskripsi Kejadian</label>
+              <textarea id="deskripsiTambahLaporan" rows="4" placeholder="Jelaskan kronologi dan dampak insiden..." required></textarea>
             </div>
             <div class="form-field full">
-              <label for="lampiranDanpus">Lampiran (bukti / dokumentasi)</label>
-              <input id="lampiranDanpus" type="file" accept="application/pdf,.pdf">
-              <span class="form-hint">Format PDF, maksimal 20 MB, dikirim langsung ke DANPUS.</span>
-              <span class="form-hint" id="lampiranDanpusInfo" style="display:none;"></span>
-              <span class="form-hint" id="lampiranDanpusError" style="display:none;color:var(--red);"></span>
+              <label for="lampiranTambahLaporan">Lampiran (bukti / dokumentasi)</label>
+              <input id="lampiranTambahLaporan" type="file" accept="application/pdf,.pdf">
+              <span class="form-hint">Format PDF, maksimal 20 MB.</span>
             </div>
             <div class="form-field full">
-              <button class="btn btn-primary" type="submit">Kirim Laporan ke DANPUS</button>
+              <button class="btn btn-primary" type="button" onclick="alert('Prototype — form Tambah Laporan belum tersambung ke database.')">Simpan Laporan</button>
             </div>
           </form>
+        </div>
+      </section>
+
+      {{-- ===== LAPORAN › STATUS LAPORAN ===== --}}
+      <section class="tab-panel" data-tab-panel="status-laporan">
+        <div class="section-head">
+          <h2>Status Laporan</h2>
+          <p>Pantau progres laporan yang sudah diajukan oleh Satlakal (Penangkalan).</p>
+        </div>
+        <div class="panel">
+          <div class="tbl-wrap">
+            <table class="dtbl">
+              <thead><tr><th>Aset</th><th>Perihal</th><th>Tanggal</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td>Portal Utama Pussiberad</td>
+                  <td>Serangan DDoS pada portal utama</td>
+                  <td>02 Agu 2026</td>
+                  <td><span class="status-dot amber">Menunggu Verifikasi</span></td>
+                </tr>
+                <tr>
+                  <td>Sistem Layanan Internal</td>
+                  <td>Percobaan SQL Injection terdeteksi</td>
+                  <td>02 Agu 2026</td>
+                  <td><span class="status-dot warn">Diteruskan ke DANPUS</span></td>
+                </tr>
+                <tr>
+                  <td>Portal Data Kodim</td>
+                  <td>Defacement pada halaman utama</td>
+                  <td>28 Jul 2026</td>
+                  <td><span class="status-dot green">Disetujui DANPUS</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      {{-- ===== LAPORAN › RIWAYAT LAPORAN ===== --}}
+      <section class="tab-panel" data-tab-panel="riwayat-laporan">
+        <div class="section-head">
+          <h2>Riwayat Laporan</h2>
+          <p>Log lengkap insiden dan tindak lanjut yang pernah ditangani Satlakal.</p>
+        </div>
+        <div class="panel">
+          <div class="tbl-wrap">
+            <table class="dtbl">
+              <thead><tr><th>Aset</th><th>Jenis Gangguan</th><th>Waktu</th><th>Tindakan</th><th>Status</th></tr></thead>
+              <tbody>
+                @foreach($logInsiden as $log)
+                <tr>
+                  <td>{{ $log['aset'] }}</td>
+                  <td>{{ $log['jenis'] }}</td>
+                  <td>{{ $log['waktu'] }}</td>
+                  <td>{{ $log['tindakan'] }}</td>
+                  <td><span class="status-dot {{ $log['status_class'] }}">{{ $log['status'] }}</span></td>
+                </tr>
+                @endforeach
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
 
@@ -549,78 +589,6 @@
             fileInput.value = '';
           };
           reader.readAsDataURL(file);
-        });
-      })();
-      </script>
-
-      <script>
-      (function () {
-        var MAX_SIZE_MB = 20;
-        var MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
-
-        var form = document.getElementById('formDanpus');
-        var fileInput = document.getElementById('lampiranDanpus');
-        var infoEl = document.getElementById('lampiranDanpusInfo');
-        var errorEl = document.getElementById('lampiranDanpusError');
-
-        if (!form || !fileInput) return;
-
-        function resetFileMessages() {
-          infoEl.style.display = 'none';
-          infoEl.textContent = '';
-          errorEl.style.display = 'none';
-          errorEl.textContent = '';
-        }
-
-        function formatSize(bytes) {
-          return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
-        }
-
-        function validateFile() {
-          resetFileMessages();
-
-          var file = fileInput.files && fileInput.files[0];
-          if (!file) return null;
-
-          var isPdfType = file.type === 'application/pdf';
-          var isPdfExt = /\.pdf$/i.test(file.name);
-
-          if (!isPdfType && !isPdfExt) {
-            errorEl.textContent = 'File "' + file.name + '" ditolak: hanya format PDF yang diperbolehkan.';
-            errorEl.style.display = 'block';
-            fileInput.value = '';
-            return null;
-          }
-
-          if (file.size > MAX_SIZE_BYTES) {
-            errorEl.textContent = 'File "' + file.name + '" (' + formatSize(file.size) + ') melebihi batas maksimal ' + MAX_SIZE_MB + ' MB.';
-            errorEl.style.display = 'block';
-            fileInput.value = '';
-            return null;
-          }
-
-          infoEl.textContent = 'Lampiran dipilih: ' + file.name + ' (' + formatSize(file.size) + ')';
-          infoEl.style.display = 'block';
-          return file;
-        }
-
-        fileInput.addEventListener('change', validateFile);
-
-        form.addEventListener('submit', function (e) {
-          e.preventDefault();
-
-          if (!form.checkValidity()) {
-            form.reportValidity();
-            return;
-          }
-
-          var file = validateFile();
-          if (fileInput.files.length > 0 && !file) {
-            // File dipilih tapi tidak lolos validasi
-            return;
-          }
-
-          alert('Prototype — form ini belum tersambung ke database. ' + (file ? 'Lampiran "' + file.name + '" siap dikirim.' : 'Tidak ada lampiran.'));
         });
       })();
       </script>

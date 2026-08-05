@@ -152,6 +152,18 @@
   .side-link:hover{background:var(--hover-tint);color:var(--text);}
   .side-link.active{background:var(--gold-dim);color:var(--gold-bright);border-color:var(--border);font-weight:600;}
   .side-link .dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.6;flex-shrink:0;}
+
+  /* ===== sidebar dropdown (mis. menu "Laporan") ===== */
+  .side-dropdown{display:flex;flex-direction:column;}
+  .side-dropdown-toggle{width:100%;background:none;border:1px solid transparent;text-align:left;}
+  .side-link-label{flex:1;}
+  .side-dropdown-arrow{width:13px;height:13px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:2.3;opacity:.65;transition:transform .2s ease;}
+  .side-dropdown.open .side-dropdown-toggle{color:var(--text);}
+  .side-dropdown.open .side-dropdown-arrow{transform:rotate(180deg);}
+  .side-dropdown-menu{max-height:0;overflow:hidden;transition:max-height .22s ease;display:flex;flex-direction:column;gap:2px;}
+  .side-dropdown.open .side-dropdown-menu{max-height:220px;margin-top:2px;}
+  .side-sublink{padding-left:32px;}
+
   .side-foot{padding:14px 22px 20px;border-top:1px solid var(--border-soft);}
   .side-user{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
   .side-avatar{width:34px;height:34px;border-radius:50%;background:var(--gold-dim);color:var(--gold-bright);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:700;font-size:13px;flex-shrink:0;border:1px solid var(--border);}
