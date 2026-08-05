@@ -51,7 +51,7 @@
           <div class="val" style="font-size:16px;text-transform:capitalize;"><?php echo e($satuan?->kategori ?? '-'); ?></div>
         </div>
         <div class="stat-card">
-          <div class="lbl">NIP / Username</div>
+          <div class="lbl">NRP / Username</div>
           <div class="val" style="font-size:16px;"><?php echo e($user->username); ?></div>
         </div>
         <div class="stat-card">

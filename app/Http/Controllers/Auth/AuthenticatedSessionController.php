@@ -27,7 +27,7 @@ class AuthenticatedSessionController extends Controller
             'password' => $credentials['password'],
         ], $request->boolean('remember'))) {
             throw ValidationException::withMessages([
-                'username' => 'NIP/Username atau password salah.',
+                'username' => 'NRP/Username atau password salah.',
             ]);
         }
 
