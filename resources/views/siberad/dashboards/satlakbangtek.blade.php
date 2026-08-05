@@ -6,6 +6,28 @@
 <title>Satlak Duktek (Dukungan Teknologi) — SIBERAD</title>
 <link rel="icon" type="image/jpeg" href="{{ asset('images/logo-pussiberad.jpg') }}">
 @include('siberad.dashboards.partials.dash-styles')
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<style>
+  .chart-box{margin-bottom:26px;}
+  .chart-box-head-row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:16px;}
+  .chart-filter-group{display:flex;gap:8px;flex-wrap:wrap;flex-shrink:0;}
+  .chart-type-select{background:var(--panel);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:11px;border-radius:6px;padding:5px 8px;cursor:pointer;flex-shrink:0;}
+  .chart-type-select:focus{outline:none;border-color:var(--gold);}
+  .chart-box-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;transition:all .2s ease;}
+  .chart-mini{background:var(--panel-alt);border:1px solid var(--border-soft);border-radius:10px;padding:14px;}
+  .chart-mini-head{margin-bottom:8px;}
+  .chart-mini-head h4{font-family:var(--display);font-size:13px;font-weight:700;letter-spacing:.01em;line-height:1.3;}
+  .chart-mini-head p{font-size:11px;color:var(--text-muted);margin-top:2px;}
+  .chart-mini .chart-wrap{position:relative;height:210px;transition:height .2s ease;}
+
+  /* Mode terpisah — dipicu otomatis saat jenis grafik diganti selain "Batang" */
+  .chart-box-grid.split-mode{grid-template-columns:1fr;gap:18px;}
+  .chart-box-grid.split-mode .chart-mini{padding:18px 20px;border-color:var(--border);}
+  .chart-box-grid.split-mode .chart-mini .chart-wrap{height:320px;}
+
+  .chart-legend-note{font-size:11px;color:var(--text-dim);margin-top:14px;line-height:1.5;}
+  @media(max-width:980px){.chart-box-grid{grid-template-columns:1fr;}.chart-mini .chart-wrap{height:230px;}}
+</style>
 </head>
 <body>
 <div class="profile-modal-overlay" id="profileModalOverlay">
@@ -232,6 +254,51 @@
             <div class="val" style="color:var(--green);">{{ $stats['prototipe_selesai'] }}</div>
             <div class="sub">Bulan ini</div>
           </div>
+        </div>
+
+        <div class="panel chart-box">
+          <div class="chart-box-head-row">
+            <div><h3 style="font-family:var(--display);font-size:17px;font-weight:700;">Analitik Riset & Perbandingan Satlak</h3><p style="font-size:12px;color:var(--text-muted);margin-top:2px;">Progres proyek, komposisi kategori, dan posisi Satlok Duktek (Dukungan Teknologi) dibanding tiga Satlak lainnya.</p></div>
+            <div class="chart-filter-group">
+              <select class="chart-type-select" id="chartDateFilterGlobal">
+                <option value="7d">7 Hari Terakhir</option>
+                <option value="30d">30 Hari Terakhir</option>
+                <option value="90d">3 Bulan Terakhir</option>
+                <option value="all" selected>Semua Waktu</option>
+              </select>
+              <select class="chart-type-select" id="chartTypeFilterGlobal">
+                <option value="bar" selected>Grafik Batang</option>
+                <option value="line">Grafik Garis</option>
+                <option value="radar">Grafik Radar</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="chart-box-grid" id="chartBoxGrid">
+
+            <div class="chart-mini">
+              <div class="chart-mini-head">
+                <h4>Progres Proyek Riset</h4><p>Per proyek yang ditangani.</p>
+              </div>
+              <div class="chart-wrap"><canvas id="chartProgresProyek"></canvas></div>
+            </div>
+
+            <div class="chart-mini">
+              <div class="chart-mini-head">
+                <h4>Distribusi Kategori</h4><p>Komposisi bidang riset.</p>
+              </div>
+              <div class="chart-wrap"><canvas id="chartKategoriProyek"></canvas></div>
+            </div>
+
+            <div class="chart-mini">
+              <div class="chart-mini-head">
+                <h4>Perbandingan Antar Satlak</h4><p>Bangtek jadi acuan utama.</p>
+              </div>
+              <div class="chart-wrap"><canvas id="chartPerbandinganSatlak"></canvas></div>
+            </div>
+
+          </div>
+          <p class="chart-legend-note">Emas = Satlok Duktek (Dukungan Teknologi), disorot sebagai Satlak yang paling krusial pada riset & pengembangan teknologi. Ganti jenis grafik lewat dropdown di kanan atas — pilihan selain "Batang" akan otomatis memisah tiap grafik menjadi tampilan yang lebih besar. Filter tanggal masih simulasi proporsional karena histori progres per tanggal belum tersambung ke database.</p>
         </div>
 
         <div class="panel">
@@ -740,6 +807,226 @@
   confirmBtn.addEventListener('click', function () {
     if (pendingForm) pendingForm.submit();
   });
+})();
+</script>
+
+<script>
+(function () {
+  if (typeof Chart === 'undefined') return;
+
+  var root = getComputedStyle(document.documentElement);
+  var cGold = root.getPropertyValue('--gold-bright').trim() || '#f3cd5c';
+  var cGreen = root.getPropertyValue('--green-bright').trim() || '#3fc27d';
+  var cAmber = root.getPropertyValue('--amber').trim() || '#e0a83a';
+  var cMuted = root.getPropertyValue('--text-muted').trim() || '#9fb3a5';
+  var cBorder = root.getPropertyValue('--border-soft').trim() || 'rgba(212,175,55,.13)';
+  var cText = root.getPropertyValue('--text').trim() || '#f4f1e6';
+
+  Chart.defaults.color = cMuted;
+  Chart.defaults.font.family = "'JetBrains Mono', monospace";
+  Chart.defaults.font.size = 11;
+
+  // Ubah warna hex jadi rgba supaya area fill (misal grafik radar) bisa transparan, nggak solid penuh.
+  function hexToRgba(hex, alpha) {
+    hex = String(hex).trim().replace('#', '');
+    if (hex.length === 3) hex = hex.split('').map(function (c) { return c + c; }).join('');
+    var r = parseInt(hex.substring(0, 2), 16);
+    var g = parseInt(hex.substring(2, 4), 16);
+    var b = parseInt(hex.substring(4, 6), 16);
+    if (isNaN(r) || isNaN(g) || isNaN(b)) return 'rgba(212,175,55,' + alpha + ')'; // fallback warna emas
+    return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
+  }
+
+  var proyekRiset = @json($proyekRiset);
+  var kategoriDistribusi = @json($kategoriDistribusi);
+  var perbandinganSatlak = @json($perbandinganSatlak);
+
+  var registry = {}; // simpan instance Chart per canvas id, biar bisa di-destroy saat ganti jenis
+
+  // Pecah label panjang jadi beberapa baris (bukan dirotasi/dimiringkan), biar tetap presisi dan jelas dibaca.
+  function wrapLabel(text, maxCharsPerLine) {
+    maxCharsPerLine = maxCharsPerLine || 14;
+    var words = String(text).split(' ');
+    var lines = [];
+    var current = '';
+    words.forEach(function (w) {
+      var test = current ? current + ' ' + w : w;
+      if (test.length > maxCharsPerLine && current) {
+        lines.push(current);
+        current = w;
+      } else {
+        current = test;
+      }
+    });
+    if (current) lines.push(current);
+    return lines;
+  }
+
+  // Beberapa jenis grafik (radar, polarArea) butuh scale berbeda dari bar/line biasa,
+  // jadi opsi dibangun ulang tiap kali jenis grafik diganti lewat fungsi ini.
+  function buildOptions(type, opts) {
+    opts = opts || {};
+    if (type === 'radar' || type === 'polarArea') {
+      return {
+        responsive: true,
+        maintainAspectRatio: false,
+        layout: { padding: 0 },
+        plugins: { legend: { display: type === 'polarArea', position: 'bottom', labels: { color: cText, boxWidth: 9, padding: 10 } } },
+        scales: {
+          r: {
+            min: 0, max: opts.max || 100,
+            grid: { color: cBorder }, angleLines: { color: cBorder },
+            pointLabels: { color: cMuted, font: { size: 10 } },
+            ticks: { display: false, backdropColor: 'transparent' }
+          }
+        }
+      };
+    }
+    if (type === 'doughnut' || type === 'pie') {
+      return {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: type === 'doughnut' ? '62%' : 0,
+        plugins: { legend: { position: 'bottom', labels: { color: cText, boxWidth: 10, padding: 12 } } }
+      };
+    }
+    // bar / line — sumbu kategori dibuat offset:false & tanpa rotasi supaya grafik presisi penuh dari kiri ke kanan.
+    return {
+      indexAxis: opts.horizontal ? 'y' : 'x',
+      responsive: true,
+      maintainAspectRatio: false,
+      layout: { padding: { left: 4, right: 12, top: 8, bottom: 0 } },
+      plugins: { legend: { display: false } },
+      scales: {
+        x: opts.horizontal
+          ? { min: 0, max: opts.max || 100, grid: { color: cBorder }, ticks: { callback: function (v) { return v + '%'; } } }
+          : { offset: false, grid: { display: false }, ticks: { maxRotation: 0, minRotation: 0, autoSkip: false, font: { size: 10 } } },
+        y: opts.horizontal
+          ? { offset: false, grid: { display: false }, ticks: { autoSkip: false } }
+          : { min: 0, max: opts.max || 100, grid: { color: cBorder }, ticks: { callback: function (v) { return v + '%'; } } }
+      }
+    };
+  }
+
+  function renderChart(canvasId, type, rawLabels, values, colors, opts) {
+    var el = document.getElementById(canvasId);
+    if (!el) return;
+    if (registry[canvasId]) registry[canvasId].destroy();
+
+    // Label dipecah jadi beberapa baris untuk sumbu kategori vertikal (x), supaya tidak perlu dimiringkan.
+    var labels = (type !== 'doughnut' && type !== 'pie' && !opts.horizontal)
+      ? rawLabels.map(function (l) { return wrapLabel(l, 14); })
+      : rawLabels;
+
+    var isFillType = (type === 'doughnut' || type === 'pie' || type === 'polarArea' || type === 'radar');
+
+    // Khusus radar: area fill dibuat transparan (bukan solid) supaya garis & grid di baliknya tetap kebaca.
+    var fillColor = (type === 'radar')
+      ? hexToRgba(opts.lineColor || cGold, 0.28)
+      : colors;
+
+    var dataset = {
+      label: opts.label || '',
+      data: values,
+      backgroundColor: isFillType ? fillColor : colors,
+      borderColor: type === 'line' ? (opts.lineColor || cGold) : (type === 'radar' ? (opts.lineColor || cGold) : 'transparent'),
+      borderWidth: (type === 'line' || type === 'radar') ? 2 : 0,
+      borderRadius: (type === 'bar') ? 4 : 0,
+      maxBarThickness: opts.horizontal ? 34 : 44,
+      fill: type === 'radar' ? true : (type === 'line' ? false : undefined),
+      tension: 0, // garis lurus & presisi, hindari lengkungan berlebihan (overshoot) yang bikin grafik terlihat miring
+      pointBackgroundColor: (type === 'line' || type === 'radar') ? (opts.lineColor || cGold) : undefined,
+      pointRadius: type === 'line' ? 3 : undefined,
+    };
+
+    registry[canvasId] = new Chart(el, {
+      type: type,
+      data: { labels: labels, datasets: [dataset] },
+      options: buildOptions(type, opts)
+    });
+  }
+
+  // Faktor simulasi per rentang tanggal — dashboard ini masih prototype (data belum tersambung
+  // ke histori tanggal di database), jadi rentang waktu disimulasikan secara proporsional dari
+  // data progres saat ini. Kalau nanti sudah ada log progres bertanggal di database, bagian ini
+  // tinggal diganti pemanggilan data asli sesuai rentang yang dipilih.
+  var DATE_RANGE_FACTOR = { '7d': 0.35, '30d': 0.7, '90d': 0.9, 'all': 1 };
+
+  function scaledProyekRiset(factor) {
+    return proyekRiset.map(function (p) {
+      return { nama: p.nama, progres: Math.min(100, Math.round(p.progres * factor)) };
+    });
+  }
+  function scaledKategoriDistribusi(factor) {
+    return kategoriDistribusi.map(function (k) {
+      return { kategori: k.kategori, jumlah: Math.max(0, Math.round(k.jumlah * factor)) };
+    });
+  }
+  function scaledPerbandinganSatlak(factor) {
+    return perbandinganSatlak.map(function (s) {
+      return { singkatan: s.singkatan, progres: Math.min(100, Math.round(s.progres * factor)), highlight: s.highlight };
+    });
+  }
+
+  // ===== Grafik 1: Progres tiap proyek riset =====
+  function drawProgresProyek(type, data) {
+    renderChart(
+      'chartProgresProyek', type,
+      data.map(function (p) { return p.nama; }),
+      data.map(function (p) { return p.progres; }),
+      type === 'line' || type === 'radar'
+        ? cGold
+        : data.map(function (p) { return p.progres >= 100 ? cGreen : (p.progres >= 50 ? cAmber : cMuted); }),
+      { horizontal: type === 'bar', max: 100, label: 'Progres (%)', lineColor: cGold }
+    );
+  }
+
+  // ===== Grafik 2: Distribusi kategori proyek =====
+  function drawKategoriProyek(type, data) {
+    renderChart(
+      'chartKategoriProyek', type,
+      data.map(function (k) { return k.kategori; }),
+      data.map(function (k) { return k.jumlah; }),
+      [cGold, cGreen, cAmber, cMuted],
+      { label: 'Jumlah Proyek', max: Math.max.apply(null, data.map(function (k) { return k.jumlah; })) + 1 }
+    );
+  }
+
+  // ===== Grafik 3: Perbandingan progres antar Satlak =====
+  function drawPerbandinganSatlak(type, data) {
+    renderChart(
+      'chartPerbandinganSatlak', type,
+      data.map(function (s) { return s.singkatan; }),
+      data.map(function (s) { return s.progres; }),
+      type === 'line' || type === 'radar'
+        ? cGold
+        : data.map(function (s) { return s.highlight ? cGold : cMuted; }),
+      { horizontal: false, max: 100, label: 'Progres Aktivitas (%)', lineColor: cGold }
+    );
+  }
+
+  var typeFilterEl = document.getElementById('chartTypeFilterGlobal');
+  var dateFilterEl = document.getElementById('chartDateFilterGlobal');
+  var gridEl = document.getElementById('chartBoxGrid');
+
+  function redrawAll() {
+    var type = typeFilterEl ? typeFilterEl.value : 'bar';
+    var factor = DATE_RANGE_FACTOR[dateFilterEl ? dateFilterEl.value : 'all'] || 1;
+
+    // "Batang" = tampilan default (gabung 1 kotak). Selain itu = mode terpisah, tiap grafik jadi besar.
+    if (gridEl) gridEl.classList.toggle('split-mode', type !== 'bar');
+
+    drawProgresProyek(type, scaledProyekRiset(factor));
+    // Grafik distribusi kategori tetap dalam bentuk lingkaran kalau filternya "Batang" (default),
+    // tapi ikut berubah ke garis/radar juga saat filter jenis grafik diubah.
+    drawKategoriProyek(type === 'bar' ? 'doughnut' : type, scaledKategoriDistribusi(factor));
+    drawPerbandinganSatlak(type, scaledPerbandinganSatlak(factor));
+  }
+
+  redrawAll();
+
+  if (typeFilterEl) typeFilterEl.addEventListener('change', redrawAll);
+  if (dateFilterEl) dateFilterEl.addEventListener('change', redrawAll);
 })();
 </script>
 

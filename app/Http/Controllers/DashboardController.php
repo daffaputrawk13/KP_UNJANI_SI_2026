@@ -294,10 +294,28 @@ class DashboardController extends Controller
             ['nama' => 'Sistem Enkripsi Komunikasi Lapangan', 'kategori' => 'Keamanan Siber', 'progres' => 20, 'status' => 'Riset Awal', 'status_class' => 'ok', 'target' => 'Feb 2027'],
         ];
 
+        // Distribusi kategori proyek — untuk grafik komposisi riset Satlok Duktek (Dukungan Teknologi).
+        $kategoriDistribusi = [
+            ['kategori' => 'AI / Machine Learning', 'jumlah' => 2],
+            ['kategori' => 'Drone / UAV', 'jumlah' => 1],
+            ['kategori' => 'Keamanan Siber', 'jumlah' => 1],
+        ];
+
+        // Perbandingan progres aktivitas antar Satlak — Satlok Duktek (Dukungan Teknologi)
+        // menjadi tumpuan riset & pengembangan seluruh Satlak, sehingga disorot sebagai pembanding utama.
+        $perbandinganSatlak = [
+            ['nama' => 'Duktek (Bangtek)', 'singkatan' => 'Bangtek', 'progres' => round(collect($proyekRiset)->avg('progres')), 'highlight' => true],
+            ['nama' => 'Penangkalan (Almon)', 'singkatan' => 'Almon', 'progres' => 60, 'highlight' => false],
+            ['nama' => 'Sosial Media (Sibersos)', 'singkatan' => 'Sibersos', 'progres' => 67, 'highlight' => false],
+            ['nama' => 'Penindakan (Rindak)', 'singkatan' => 'Rindak', 'progres' => 50, 'highlight' => false],
+        ];
+
         return view('siberad.dashboards.satlakbangtek', [
             'user' => $user,
             'satuan' => $satuan,
             'proyekRiset' => $proyekRiset,
+            'kategoriDistribusi' => $kategoriDistribusi,
+            'perbandinganSatlak' => $perbandinganSatlak,
             'stats' => [
                 'proyek_aktif' => 3,
                 'proyek_ai' => 2,
