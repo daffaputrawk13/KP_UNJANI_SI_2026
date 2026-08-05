@@ -704,7 +704,7 @@
       <p class="login-sub">Masuk menggunakan akun personel yang terdaftar.</p>
       <form class="login-form" id="loginForm" method="POST" action="{{ route('login') }}">
         @csrf
-        <label class="login-label" for="loginUser">NIP / Username</label>
+        <label class="login-label" for="loginUser">NRP / Username</label>
         <input class="login-input" id="loginUser" name="username" type="text" value="{{ old('username') }}" autocomplete="username" required>
         @error('username')
           <span class="login-error">{{ $message }}</span>
@@ -741,11 +741,6 @@
           <p>Mendigitalisasi alur pelaporan kegiatan seluruh Satuan Pelaksana Pusat Siber Angkatan Darat — dari input laporan di lapangan, verifikasi berjenjang, hingga visualisasi real-time bagi pengambil keputusan.</p>
           <div class="hero-actions">
             <a class="btn btn-primary" href="#fitur">Selengkapnya</a>
-          </div>
-          <div class="hero-badge-row">
-            <span class="pill"><span class="dot"></span>Satuan Resmi TNI AD</span>
-            <span class="pill"><span class="dot"></span>4 Satuan Pelaksana</span>
-            <span class="pill"><span class="dot"></span>Monitoring 24/7</span>
           </div>
         </div>
         <div data-reveal>
@@ -1010,7 +1005,7 @@
   document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeLogin(); });
   // form login dikirim langsung via POST ke route('login') — tanpa intercept JS
 
-  // ---------- toggle tampilkan/sembunyikan NIP/Username & Password ----------
+  // ---------- toggle tampilkan/sembunyikan NRP/Username & Password ----------
   document.querySelectorAll('.field-toggle').forEach(btn => {
     btn.addEventListener('click', () => {
       const input = document.getElementById(btn.dataset.target);

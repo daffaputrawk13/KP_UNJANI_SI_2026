@@ -704,7 +704,7 @@
       <p class="login-sub">Masuk menggunakan akun personel yang terdaftar.</p>
       <form class="login-form" id="loginForm" method="POST" action="<?php echo e(route('login')); ?>">
         <?php echo csrf_field(); ?>
-        <label class="login-label" for="loginUser">NIP / Username</label>
+        <label class="login-label" for="loginUser">NRP / Username</label>
         <input class="login-input" id="loginUser" name="username" type="text" value="<?php echo e(old('username')); ?>" autocomplete="username" required>
         <?php $__errorArgs = ['username'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
@@ -755,11 +755,6 @@ unset($__errorArgs, $__bag); ?>
           <p>Mendigitalisasi alur pelaporan kegiatan seluruh Satuan Pelaksana Pusat Siber Angkatan Darat — dari input laporan di lapangan, verifikasi berjenjang, hingga visualisasi real-time bagi pengambil keputusan.</p>
           <div class="hero-actions">
             <a class="btn btn-primary" href="#fitur">Selengkapnya</a>
-          </div>
-          <div class="hero-badge-row">
-            <span class="pill"><span class="dot"></span>Satuan Resmi TNI AD</span>
-            <span class="pill"><span class="dot"></span>4 Satuan Pelaksana</span>
-            <span class="pill"><span class="dot"></span>Monitoring 24/7</span>
           </div>
         </div>
         <div data-reveal>
@@ -1024,7 +1019,7 @@ unset($__errorArgs, $__bag); ?>
   document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeLogin(); });
   // form login dikirim langsung via POST ke route('login') — tanpa intercept JS
 
-  // ---------- toggle tampilkan/sembunyikan NIP/Username & Password ----------
+  // ---------- toggle tampilkan/sembunyikan NRP/Username & Password ----------
   document.querySelectorAll('.field-toggle').forEach(btn => {
     btn.addEventListener('click', () => {
       const input = document.getElementById(btn.dataset.target);
