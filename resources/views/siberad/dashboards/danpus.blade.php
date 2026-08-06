@@ -261,6 +261,12 @@
           <div class="chart-box-head-row">
             <div><h3 style="font-family:var(--display);font-size:17px;font-weight:700;">Analitik Pengawasan Organisasi</h3><p style="font-size:12px;color:var(--text-muted);margin-top:2px;">Distribusi status satuan, beban laporan berdasarkan prioritas, dan satuan paling aktif melapor.</p></div>
             <div class="chart-filter-group">
+              <select class="chart-type-select" id="chartDateFilterGlobal">
+                <option value="7d">7 Hari Terakhir</option>
+                <option value="30d">30 Hari Terakhir</option>
+                <option value="90d">3 Bulan Terakhir</option>
+                <option value="all" selected>Semua Waktu</option>
+              </select>
               <select class="chart-type-select" id="chartTypeFilterGlobal">
                 <option value="bar" selected>Grafik Batang</option>
                 <option value="line">Grafik Garis</option>
@@ -293,7 +299,7 @@
             </div>
 
           </div>
-          <p class="chart-legend-note">Merah = butuh perhatian segera (insiden aktif / prioritas tinggi). Ganti jenis grafik lewat dropdown di kanan atas — pilihan selain "Batang" akan otomatis memisah tiap grafik menjadi tampilan yang lebih besar.</p>
+          <p class="chart-legend-note">Merah = butuh perhatian segera (insiden aktif / prioritas tinggi). Ganti jenis grafik lewat dropdown di kanan atas — pilihan selain "Batang" akan otomatis memisah tiap grafik menjadi tampilan yang lebih besar. Filter tanggal masih simulasi proporsional karena histori laporan per tanggal belum tersambung ke database.</p>
         </div>
 
         <div class="panel">
@@ -331,39 +337,24 @@
         <div class="panel">
           <div class="tbl-wrap">
             <table class="dtbl">
-              <thead><tr><th>Asal Satuan</th><th>Perihal</th><th>Diteruskan Oleh</th><th>Tanggal</th><th>Prioritas</th><th>Status</th>
-              <th>Lampiran</th>
-              <th>Aksi</th>
+              <thead><tr><th>Asal Satuan</th><th>Perihal</th><th>Tanggal</th><th>Prioritas</th><th>Status</th>
+              <th>Detail</th>
               </tr></thead>
               <tbody>
                 @forelse($laporanMasuk as $i => $l)
                 <tr id="rowLaporan{{ $i }}">
                   <td>{{ $l['satuan'] }}</td>
                   <td>{{ $l['perihal'] }}</td>
-                  <td>{{ $l['diteruskan_oleh'] }}</td>
                   <td>{{ $l['tanggal'] }}</td>
                   <td><span class="status-dot {{ $l['prioritas_class'] }}">{{ $l['prioritas'] }}</span></td>
                   <td id="statusLaporan{{ $i }}"><span class="badge {{ $l['status_class'] }}">{{ $l['status'] }}</span></td>
                   <td>
-                    @if(!empty($l['lampiran_url']))
-                      <div class="btn-row">
-                        <a href="{{ $l['lampiran_url'] }}" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">Lihat PDF</a>
-                        <a href="{{ $l['lampiran_url'] }}" download class="btn btn-ghost btn-sm">Unduh</a>
-                      </div>
-                    @else
-                      <span style="font-size:11.5px;color:var(--text-dim);">Tidak ada lampiran</span>
-                    @endif
-                  </td>
-                  <td id="aksiLaporan{{ $i }}">
-                    <div class="btn-row">
-                      <button class="btn btn-primary btn-sm" type="button" onclick="bukaKonfirmasiLaporan({{ $i }}, 'setuju', '{{ addslashes($l['satuan']) }}', '{{ addslashes($l['perihal']) }}')">Setujui</button>
-                      <button class="btn btn-ghost-red btn-sm" type="button" onclick="bukaKonfirmasiLaporan({{ $i }}, 'tolak', '{{ addslashes($l['satuan']) }}', '{{ addslashes($l['perihal']) }}')">Tolak</button>
-                    </div>
+                    <button class="btn btn-ghost btn-sm" type="button" onclick="bukaDetailLaporan({{ $i }})">Lihat Detail</button>
                   </td>
                 </tr>
                 @empty
                 <tr>
-                  <td colspan="8" style="text-align:center;color:var(--text-muted);padding:20px;">Belum ada laporan masuk.</td>
+                  <td colspan="6" style="text-align:center;color:var(--text-muted);padding:20px;">Belum ada laporan masuk.</td>
                 </tr>
                 @endforelse
               </tbody>
@@ -381,13 +372,11 @@
         <div class="panel">
           <div class="tbl-wrap" data-row-limit="5">
             <table class="dtbl">
-              <thead><tr><th>Kode</th><th>Nama Satuan</th><th>Kategori</th><th>Status</th><th>Update Terakhir</th><th>Detail</th></tr></thead>
+              <thead><tr><th>Nama Satuan</th><th>Status</th><th>Update Terakhir</th><th>Detail</th></tr></thead>
               <tbody>
                 @foreach($semuaSatuan as $s)
                 <tr>
-                  <td><span class="badge">{{ $s->kode }}</span></td>
                   <td>{{ $s->nama }}</td>
-                  <td style="text-transform:capitalize;">{{ $s->kategori }}</td>
                   <td><span class="status-dot {{ $statusSatuan[$s->kode]['class'] ?? 'ok' }}">{{ $statusSatuan[$s->kode]['label'] ?? 'Normal' }}</span></td>
                   <td>{{ $statusSatuan[$s->kode]['update'] ?? '-' }}</td>
                   <td>
@@ -731,16 +720,13 @@
       const { index, aksi } = laporanAktif;
 
       const statusCell = document.getElementById('statusLaporan' + index);
-      const aksiCell = document.getElementById('aksiLaporan' + index);
 
       if(aksi === 'setuju'){
         statusCell.innerHTML = '<span class="badge green">Disetujui</span>';
+        if(laporanMasukData[index]){ laporanMasukData[index].status = 'Disetujui DANPUS'; laporanMasukData[index].status_class = 'green'; }
       } else {
         statusCell.innerHTML = '<span class="badge red">Ditolak</span>';
-      }
-
-      if(aksiCell){
-        aksiCell.innerHTML = '<span style="font-size:11.5px;color:var(--text-dim);">Sudah diproses</span>';
+        if(laporanMasukData[index]){ laporanMasukData[index].status = 'Ditolak DANPUS'; laporanMasukData[index].status_class = 'red'; }
       }
 
       // Catatan (jika ada) saat ini baru tersimpan sementara di sisi tampilan.
@@ -752,6 +738,98 @@
 
     document.getElementById('modalKonfirmasiLaporan').addEventListener('click', function(e){
       if(e.target === this) tutupKonfirmasiLaporan();
+    });
+  </script>
+
+  {{-- ===== MODAL DETAIL LAPORAN MASUK ===== --}}
+  <div class="modal-overlay" id="modalDetailLaporan">
+    <div class="modal-box" style="max-width:560px;">
+      <div class="modal-head">
+        <div>
+          <h3 id="detailLaporanJudul">-</h3>
+          <p id="detailLaporanSub" style="margin:2px 0 0;font-size:12.5px;color:var(--text-muted);">-</p>
+        </div>
+        <button type="button" class="modal-close" onclick="tutupDetailLaporan()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="detail-grid">
+          <div class="detail-item">
+            <span class="detail-label">Diteruskan Oleh</span>
+            <span id="detailDiteruskan">-</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Tanggal</span>
+            <span id="detailTanggal">-</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Prioritas</span>
+            <span id="detailPrioritas">-</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Status</span>
+            <span id="detailStatus">-</span>
+          </div>
+        </div>
+        <div class="detail-item full" style="margin-top:14px;">
+          <span class="detail-label">Lampiran</span>
+          <div id="detailLampiran">-</div>
+        </div>
+        <div id="detailAksi" class="btn-row" style="margin-top:20px;justify-content:flex-end;"></div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 20px;}
+    .detail-item{display:flex;flex-direction:column;gap:4px;}
+    .detail-item.full{grid-column:1 / -1;}
+    .detail-label{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-dim);}
+  </style>
+
+  <script>
+    const laporanMasukData = @json($laporanMasuk);
+
+    function bukaDetailLaporan(index){
+      const l = laporanMasukData[index];
+      if(!l) return;
+
+      document.getElementById('detailLaporanJudul').textContent = l.perihal;
+      document.getElementById('detailLaporanSub').textContent = l.satuan;
+      document.getElementById('detailDiteruskan').textContent = l.diteruskan_oleh;
+      document.getElementById('detailTanggal').textContent = l.tanggal;
+      document.getElementById('detailPrioritas').innerHTML = '<span class="status-dot ' + l.prioritas_class + '">' + l.prioritas + '</span>';
+      document.getElementById('detailStatus').innerHTML = '<span class="badge ' + l.status_class + '">' + l.status + '</span>';
+
+      const lampiranWrap = document.getElementById('detailLampiran');
+      if(l.lampiran_url){
+        lampiranWrap.innerHTML = '<div class="btn-row">' +
+          '<a href="' + l.lampiran_url + '" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">Lihat PDF</a>' +
+          '<a href="' + l.lampiran_url + '" download class="btn btn-ghost btn-sm">Unduh</a>' +
+          '</div>';
+      } else {
+        lampiranWrap.innerHTML = '<span style="font-size:12.5px;color:var(--text-dim);">Tidak ada lampiran</span>';
+      }
+
+      const aksiWrap = document.getElementById('detailAksi');
+      const satuanEsc = l.satuan.replace(/'/g, "\\'");
+      const perihalEsc = l.perihal.replace(/'/g, "\\'");
+      if(l.status === 'Menunggu'){
+        aksiWrap.innerHTML =
+          '<button type="button" class="btn btn-ghost-red" onclick="tutupDetailLaporan(); bukaKonfirmasiLaporan(' + index + ", 'tolak', '" + satuanEsc + "', '" + perihalEsc + "')\">Tolak Laporan</button>" +
+          '<button type="button" class="btn btn-primary" onclick="tutupDetailLaporan(); bukaKonfirmasiLaporan(' + index + ", 'setuju', '" + satuanEsc + "', '" + perihalEsc + "')\">Setujui Laporan</button>";
+      } else {
+        aksiWrap.innerHTML = '<span style="font-size:12.5px;color:var(--text-dim);">Laporan ini sudah diproses.</span>';
+      }
+
+      document.getElementById('modalDetailLaporan').classList.add('open');
+    }
+
+    function tutupDetailLaporan(){
+      document.getElementById('modalDetailLaporan').classList.remove('open');
+    }
+
+    document.getElementById('modalDetailLaporan').addEventListener('click', function(e){
+      if(e.target === this) tutupDetailLaporan();
     });
   </script>
 
@@ -1004,54 +1082,73 @@
   }
 
   // ===== Grafik 1: Status seluruh satuan =====
-  function drawStatusSatuan(type) {
+  function drawStatusSatuan(type, data) {
     var t = type === 'bar' ? 'doughnut' : type; // status komposisi tetap lingkaran di mode default
     renderChart(
       'chartStatusSatuan', t,
-      statusSatuan.map(function (s) { return s.label; }),
-      statusSatuan.map(function (s) { return s.jumlah; }),
+      data.map(function (s) { return s.label; }),
+      data.map(function (s) { return s.jumlah; }),
       [cGreen, cAmber, cRed],
       { label: 'Jumlah Satuan' }
     );
   }
 
   // ===== Grafik 2: Laporan per prioritas =====
-  function drawLaporanPrioritas(type) {
+  function drawLaporanPrioritas(type, data) {
     renderChart(
       'chartLaporanPrioritas', type,
-      laporanPrioritas.map(function (p) { return p.label; }),
-      laporanPrioritas.map(function (p) { return p.jumlah; }),
+      data.map(function (p) { return p.label; }),
+      data.map(function (p) { return p.jumlah; }),
       type === 'line' || type === 'radar' ? cGold : [cRed, cAmber, cMuted],
       { label: 'Jumlah Laporan', lineColor: cGold }
     );
   }
 
   // ===== Grafik 3: Satuan paling aktif melapor =====
-  function drawLaporanPerSatuan(type) {
+  function drawLaporanPerSatuan(type, data) {
     renderChart(
       'chartLaporanPerSatuan', type,
-      laporanPerSatuan.map(function (s) { return s.satuan; }),
-      laporanPerSatuan.map(function (s) { return s.jumlah; }),
+      data.map(function (s) { return s.satuan; }),
+      data.map(function (s) { return s.jumlah; }),
       type === 'line' || type === 'radar' ? cGold : cGold,
       { horizontal: type === 'bar', label: 'Jumlah Laporan', lineColor: cGold }
     );
   }
 
+  // Filter tanggal di sini murni simulasi proporsional di sisi tampilan (mengecilkan
+  // angka jumlah sesuai rentang yang dipilih), karena histori laporan per tanggal
+  // belum tersambung ke database. Kalau nanti sudah ada, bagian ini tinggal diganti
+  // pemanggilan data asli sesuai rentang yang dipilih.
+  var DATE_RANGE_FACTOR = { '7d': 0.35, '30d': 0.7, '90d': 0.9, 'all': 1 };
+
+  function scaledStatusSatuan(factor) {
+    return statusSatuan.map(function (s) { return { label: s.label, jumlah: Math.max(0, Math.round(s.jumlah * factor)) }; });
+  }
+  function scaledLaporanPrioritas(factor) {
+    return laporanPrioritas.map(function (p) { return { label: p.label, jumlah: Math.max(0, Math.round(p.jumlah * factor)) }; });
+  }
+  function scaledLaporanPerSatuan(factor) {
+    return laporanPerSatuan.map(function (s) { return { satuan: s.satuan, jumlah: Math.max(0, Math.round(s.jumlah * factor)) }; });
+  }
+
   var typeFilterEl = document.getElementById('chartTypeFilterGlobal');
+  var dateFilterEl = document.getElementById('chartDateFilterGlobal');
   var gridEl = document.getElementById('chartBoxGrid');
 
   function redrawAll() {
     var type = typeFilterEl ? typeFilterEl.value : 'bar';
+    var factor = DATE_RANGE_FACTOR[dateFilterEl ? dateFilterEl.value : 'all'] || 1;
     if (gridEl) gridEl.classList.toggle('split-mode', type !== 'bar');
 
-    drawStatusSatuan(type);
-    drawLaporanPrioritas(type);
-    drawLaporanPerSatuan(type);
+    drawStatusSatuan(type, scaledStatusSatuan(factor));
+    drawLaporanPrioritas(type, scaledLaporanPrioritas(factor));
+    drawLaporanPerSatuan(type, scaledLaporanPerSatuan(factor));
   }
 
   redrawAll();
 
   if (typeFilterEl) typeFilterEl.addEventListener('change', redrawAll);
+  if (dateFilterEl) dateFilterEl.addEventListener('change', redrawAll);
 })();
 </script>
 

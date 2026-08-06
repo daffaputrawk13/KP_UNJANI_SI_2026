@@ -189,8 +189,8 @@
 
   .badge{
     display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;
-    background:var(--gold-dim);color:var(--gold-bright);padding:0 14px;height:42px;border-radius:8px;
-    text-transform:uppercase;border:1px solid var(--border);box-sizing:border-box;
+    background:var(--gold-dim);color:var(--gold-bright);padding:7px 14px;border-radius:8px;
+    text-transform:uppercase;border:1px solid var(--border);box-sizing:border-box;line-height:1.2;
   }
   .badge.green{background:var(--green-dim);color:var(--green-bright);border-color:rgba(63,194,125,.28);}
   .badge.amber{background:var(--amber-dim);color:var(--amber);border-color:rgba(224,168,58,.3);}
@@ -372,6 +372,8 @@
   }
   table.dtbl td{padding:13px 12px;border-bottom:1px solid var(--border-soft);vertical-align:middle;color:var(--text);}
   table.dtbl tr:last-child td{border-bottom:none;}
+  table.dtbl .btn-row{flex-wrap:nowrap;}
+  table.dtbl .btn-row .btn{white-space:nowrap;}
 
   .tbl-wrap.tbl-scroll{overflow-y:auto;}
   .tbl-wrap.tbl-scroll thead th{position:sticky;top:0;z-index:1;background:var(--panel);}
