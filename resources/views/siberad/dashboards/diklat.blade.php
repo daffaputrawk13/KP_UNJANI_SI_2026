@@ -6,6 +6,28 @@
 <title>Diklat — SIBERAD</title>
 <link rel="icon" type="image/jpeg" href="{{ asset('images/logo-pussiberad.jpg') }}">
 @include('siberad.dashboards.partials.dash-styles')
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<style>
+  .chart-box{margin-bottom:26px;}
+  .chart-box-head-row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:16px;}
+  .chart-filter-group{display:flex;gap:8px;flex-wrap:wrap;flex-shrink:0;}
+  .chart-type-select{background:var(--panel);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:11px;border-radius:6px;padding:5px 8px;cursor:pointer;flex-shrink:0;}
+  .chart-type-select:focus{outline:none;border-color:var(--gold);}
+  .chart-box-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;transition:all .2s ease;}
+  .chart-mini{background:var(--panel-alt);border:1px solid var(--border-soft);border-radius:10px;padding:14px;}
+  .chart-mini-head{margin-bottom:8px;}
+  .chart-mini-head h4{font-family:var(--display);font-size:13px;font-weight:700;letter-spacing:.01em;line-height:1.3;}
+  .chart-mini-head p{font-size:11px;color:var(--text-muted);margin-top:2px;}
+  .chart-mini .chart-wrap{position:relative;height:210px;transition:height .2s ease;}
+
+  /* Mode terpisah — dipicu otomatis saat jenis grafik diganti selain "Batang" */
+  .chart-box-grid.split-mode{grid-template-columns:1fr;gap:18px;}
+  .chart-box-grid.split-mode .chart-mini{padding:18px 20px;border-color:var(--border);}
+  .chart-box-grid.split-mode .chart-mini .chart-wrap{height:320px;}
+
+  .chart-legend-note{font-size:11px;color:var(--text-dim);margin-top:14px;line-height:1.5;}
+  @media(max-width:980px){.chart-box-grid{grid-template-columns:1fr;}.chart-mini .chart-wrap{height:230px;}}
+</style>
 </head>
 <body>
 <div class="profile-modal-overlay" id="profileModalOverlay">
@@ -232,6 +254,41 @@
             <div class="val" style="color:var(--green);">{{ $stats['lulus_bulan_ini'] }}</div>
             <div class="sub">Personel bersertifikat</div>
           </div>
+        </div>
+
+        <div class="panel chart-box">
+          <div class="chart-box-head-row">
+            <div><h3 style="font-family:var(--display);font-size:17px;font-weight:700;">Analitik Program Diklat</h3><p style="font-size:12px;color:var(--text-muted);margin-top:2px;">Peserta per program, kategori program, dan progres pelaksanaan.</p></div>
+            <div class="chart-filter-group">
+              <select class="chart-type-select" id="chartDateFilterGlobal">
+                <option value="7d">7 Hari Terakhir</option>
+                <option value="30d">30 Hari Terakhir</option>
+                <option value="90d">3 Bulan Terakhir</option>
+                <option value="all" selected>Semua Waktu</option>
+              </select>
+              <select class="chart-type-select" id="chartTypeFilterGlobal">
+                <option value="bar" selected>Grafik Batang</option>
+                <option value="line">Grafik Garis</option>
+                <option value="radar">Grafik Radar</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="chart-box-grid" id="chartBoxGrid">
+            <div class="chart-mini">
+              <div class="chart-mini-head"><h4>Peserta per Program</h4><p>Jumlah peserta tiap program diklat.</p></div>
+              <div class="chart-wrap"><canvas id="chartPesertaProgram"></canvas></div>
+            </div>
+            <div class="chart-mini">
+              <div class="chart-mini-head"><h4>Kategori Program</h4><p>Pendidikan vs Latihan.</p></div>
+              <div class="chart-wrap"><canvas id="chartKategoriProgram"></canvas></div>
+            </div>
+            <div class="chart-mini">
+              <div class="chart-mini-head"><h4>Progres Program</h4><p>Persentase penyelesaian tiap program.</p></div>
+              <div class="chart-wrap"><canvas id="chartProgresProgram"></canvas></div>
+            </div>
+          </div>
+          <p class="chart-legend-note">Emas = progres berjalan. Ganti jenis grafik lewat dropdown di kanan atas — pilihan selain "Batang" akan otomatis memisah tiap grafik menjadi tampilan yang lebih besar. Filter tanggal masih simulasi proporsional karena histori per tanggal belum tersambung ke database.</p>
         </div>
 
         <div class="panel">
@@ -738,6 +795,198 @@
   confirmBtn.addEventListener('click', function () {
     if (pendingForm) pendingForm.submit();
   });
+})();
+</script>
+
+{{-- ===== ANALITIK PROGRAM DIKLAT (RINGKASAN) ===== --}}
+<script>
+(function () {
+  var canvasCheck = document.getElementById('chartPesertaProgram');
+  if (!canvasCheck || typeof Chart === 'undefined') return;
+
+  var css = getComputedStyle(document.documentElement);
+  var cGold = css.getPropertyValue('--gold-bright').trim() || '#f2c14e';
+  var cGreen = css.getPropertyValue('--green').trim() || '#3ddc84';
+  var cAmber = css.getPropertyValue('--amber').trim() || '#f2a93b';
+  var cRed = css.getPropertyValue('--red').trim() || '#e5484d';
+  var cMuted = css.getPropertyValue('--text-dim').trim() || '#7d8f87';
+  var cText = css.getPropertyValue('--text').trim() || '#e8efe9';
+  var cBorder = css.getPropertyValue('--border-soft').trim() || '#22302a';
+
+  var pesertaProgram = @json($pesertaProgramChart ?? []);
+  var kategoriProgram = @json($kategoriProgramChart ?? []);
+  var progresProgram = @json($progresProgramChart ?? []);
+
+  var registry = {};
+
+  function wrapLabel(text, maxCharsPerLine) {
+    maxCharsPerLine = maxCharsPerLine || 14;
+    var words = String(text).split(' ');
+    var lines = [];
+    var current = '';
+    words.forEach(function (w) {
+      var test = current ? current + ' ' + w : w;
+      if (test.length > maxCharsPerLine && current) {
+        lines.push(current);
+        current = w;
+      } else {
+        current = test;
+      }
+    });
+    if (current) lines.push(current);
+    return lines;
+  }
+
+  function buildOptions(type, opts) {
+    opts = opts || {};
+    if (type === 'radar') {
+      return {
+        responsive: true,
+        maintainAspectRatio: false,
+        layout: { padding: 0 },
+        plugins: { legend: { display: false, position: 'bottom', labels: { color: cText, boxWidth: 9, padding: 10 } } },
+        scales: {
+          r: {
+            min: 0, max: opts.max || 100,
+            grid: { color: cBorder }, angleLines: { color: cBorder },
+            pointLabels: { color: cMuted, font: { size: 10 } },
+            ticks: { display: false, backdropColor: 'transparent' }
+          }
+        }
+      };
+    }
+    if (type === 'doughnut') {
+      return {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '62%',
+        plugins: { legend: { position: 'bottom', labels: { color: cText, boxWidth: 10, padding: 12 } } }
+      };
+    }
+    return {
+      indexAxis: opts.horizontal ? 'y' : 'x',
+      responsive: true,
+      maintainAspectRatio: false,
+      layout: { padding: { left: 4, right: 12, top: 8, bottom: 0 } },
+      plugins: { legend: { display: false } },
+      scales: {
+        x: opts.horizontal
+          ? { min: 0, max: opts.max, grid: { color: cBorder }, ticks: { precision: 0 } }
+          : { offset: false, grid: { display: false }, ticks: { maxRotation: 0, minRotation: 0, autoSkip: false, font: { size: 10 } } },
+        y: opts.horizontal
+          ? { offset: false, grid: { display: false }, ticks: { autoSkip: false } }
+          : { min: 0, max: opts.max, grid: { color: cBorder }, ticks: { precision: 0 } }
+      }
+    };
+  }
+
+  function renderChart(canvasId, type, rawLabels, values, colors, opts) {
+    var el = document.getElementById(canvasId);
+    if (!el) return;
+    if (registry[canvasId]) registry[canvasId].destroy();
+
+    var labels = (type !== 'doughnut' && !opts.horizontal)
+      ? rawLabels.map(function (l) { return wrapLabel(l, 14); })
+      : rawLabels;
+
+    var isFillType = (type === 'doughnut' || type === 'radar');
+    var fillColor = (type === 'radar') ? hexToRgba(opts.lineColor || cGold, 0.28) : colors;
+
+    var dataset = {
+      label: opts.label || '',
+      data: values,
+      backgroundColor: isFillType ? fillColor : colors,
+      borderColor: type === 'line' ? (opts.lineColor || cGold) : (type === 'radar' ? (opts.lineColor || cGold) : 'transparent'),
+      borderWidth: (type === 'line' || type === 'radar') ? 2 : 0,
+      borderRadius: (type === 'bar') ? 4 : 0,
+      maxBarThickness: opts.horizontal ? 34 : 44,
+      fill: type === 'radar' ? true : (type === 'line' ? false : undefined),
+      tension: 0,
+      pointBackgroundColor: (type === 'line' || type === 'radar') ? (opts.lineColor || cGold) : undefined,
+      pointRadius: type === 'line' ? 3 : undefined,
+    };
+
+    registry[canvasId] = new Chart(el, {
+      type: type,
+      data: { labels: labels, datasets: [dataset] },
+      options: buildOptions(type, opts)
+    });
+  }
+
+  function hexToRgba(hex, alpha) {
+    hex = (hex || '').replace('#', '');
+    if (hex.length === 3) hex = hex.split('').map(function (c) { return c + c; }).join('');
+    var r = parseInt(hex.substring(0, 2), 16) || 0;
+    var g = parseInt(hex.substring(2, 4), 16) || 0;
+    var b = parseInt(hex.substring(4, 6), 16) || 0;
+    return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
+  }
+
+  // ===== Grafik 1: Peserta per program =====
+  function drawPesertaProgram(type, data) {
+    renderChart(
+      'chartPesertaProgram', type,
+      data.map(function (s) { return s.program; }),
+      data.map(function (s) { return s.jumlah; }),
+      type === 'line' || type === 'radar' ? cGold : cGold,
+      { horizontal: type === 'bar', label: 'Jumlah Peserta', lineColor: cGold }
+    );
+  }
+
+  // ===== Grafik 2: Kategori program (Pendidikan vs Latihan) =====
+  function drawKategoriProgram(type, data) {
+    var t = type === 'bar' ? 'doughnut' : type;
+    renderChart(
+      'chartKategoriProgram', t,
+      data.map(function (s) { return s.kategori; }),
+      data.map(function (s) { return s.jumlah; }),
+      [cGold, cAmber],
+      { label: 'Jumlah Program' }
+    );
+  }
+
+  // ===== Grafik 3: Progres tiap program (%) =====
+  function drawProgresProgram(type, data) {
+    renderChart(
+      'chartProgresProgram', type,
+      data.map(function (s) { return s.program; }),
+      data.map(function (s) { return s.progres; }),
+      type === 'line' || type === 'radar' ? cGold : cGreen,
+      { horizontal: type === 'bar', label: 'Progres (%)', lineColor: cGold, max: 100 }
+    );
+  }
+
+  var DATE_RANGE_FACTOR = { '7d': 0.35, '30d': 0.7, '90d': 0.9, 'all': 1 };
+
+  function scaledPesertaProgram(factor) {
+    return pesertaProgram.map(function (s) { return { program: s.program, jumlah: Math.max(0, Math.round(s.jumlah * factor)) }; });
+  }
+  function scaledKategoriProgram(factor) {
+    return kategoriProgram.map(function (s) { return { kategori: s.kategori, jumlah: Math.max(0, Math.round(s.jumlah * factor)) }; });
+  }
+  function scaledProgresProgram() {
+    // Progres (%) tidak diskalakan oleh filter tanggal — nilainya tetap apa adanya.
+    return progresProgram;
+  }
+
+  var typeFilterEl = document.getElementById('chartTypeFilterGlobal');
+  var dateFilterEl = document.getElementById('chartDateFilterGlobal');
+  var gridEl = document.getElementById('chartBoxGrid');
+
+  function redrawAll() {
+    var type = typeFilterEl ? typeFilterEl.value : 'bar';
+    var factor = DATE_RANGE_FACTOR[dateFilterEl ? dateFilterEl.value : 'all'] || 1;
+    if (gridEl) gridEl.classList.toggle('split-mode', type !== 'bar');
+
+    drawPesertaProgram(type, scaledPesertaProgram(factor));
+    drawKategoriProgram(type, scaledKategoriProgram(factor));
+    drawProgresProgram(type, scaledProgresProgram());
+  }
+
+  redrawAll();
+
+  if (typeFilterEl) typeFilterEl.addEventListener('change', redrawAll);
+  if (dateFilterEl) dateFilterEl.addEventListener('change', redrawAll);
 })();
 </script>
 
