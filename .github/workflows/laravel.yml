@@ -41,6 +41,15 @@ jobs:
           DB_DATABASE: database/database.sqlite
         run: php artisan migrate --force
 
+      - name: Siapkan folder storage yang wajib ada
+        run: |
+          mkdir -p storage/framework/sessions
+          mkdir -p storage/framework/views
+          mkdir -p storage/framework/cache/data
+          mkdir -p storage/framework/testing
+          mkdir -p storage/logs
+          mkdir -p bootstrap/cache
+
       - name: Set permission folder storage & cache
         run: chmod -R 777 storage bootstrap/cache
 
