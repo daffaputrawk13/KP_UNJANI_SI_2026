@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             SatuanSeeder::class,
+            SosmedSeeder::class,
         ]);
     }
 }

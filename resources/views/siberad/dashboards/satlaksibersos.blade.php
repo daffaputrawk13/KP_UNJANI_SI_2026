@@ -116,6 +116,22 @@
           <a href="#" class="side-link side-sublink" data-tab-link="riwayat-laporan">Riwayat Laporan</a>
         </div>
       </div>
+
+      <div class="side-dropdown" id="medsosDropdown">
+        <button type="button" class="side-link side-dropdown-toggle" id="medsosToggle" aria-expanded="false" aria-controls="medsosSubmenu">
+          <span class="dot"></span>
+          <span class="side-link-label">Media Sosial</span>
+          <svg class="side-dropdown-arrow" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg>
+        </button>
+        <div class="side-dropdown-menu" id="medsosSubmenu">
+          <a href="#" class="side-link side-sublink" data-tab-link="akun-medsos">Manajemen Akun</a>
+          <a href="#" class="side-link side-sublink" data-tab-link="buat-posting">Buat &amp; Jadwalkan Posting</a>
+          <a href="#" class="side-link side-sublink" data-tab-link="kalender-konten">Kalender Konten</a>
+          <a href="#" class="side-link side-sublink" data-tab-link="monitoring-engagement">Monitoring Engagement</a>
+          <a href="#" class="side-link side-sublink" data-tab-link="statistik-performa">Statistik Performa</a>
+          <a href="#" class="side-link side-sublink" data-tab-link="arsip-posting">Arsip Posting</a>
+        </div>
+      </div>
     </nav>
     <div class="side-foot">
       <form class="logout logout-form" method="POST" action="{{ route('logout') }}">
@@ -127,17 +143,20 @@
 
   <script>
   (function () {
-    var dropdown = document.getElementById('laporanDropdown');
-    var toggle = document.getElementById('laporanToggle');
-    if (!dropdown || !toggle) return;
+    // Berlaku untuk semua dropdown sidebar (Laporan, Media Sosial, dst),
+    // bukan cuma satu — supaya dropdown baru tidak perlu skrip terpisah.
+    document.querySelectorAll('.side-dropdown').forEach(function (dropdown) {
+      var toggle = dropdown.querySelector('.side-dropdown-toggle');
+      if (!toggle) return;
 
-    var subActive = dropdown.querySelector('.side-sublink.active');
-    if (subActive) dropdown.classList.add('open');
+      var subActive = dropdown.querySelector('.side-sublink.active');
+      if (subActive) dropdown.classList.add('open');
 
-    toggle.addEventListener('click', function (e) {
-      e.preventDefault();
-      var isOpen = dropdown.classList.toggle('open');
-      toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      toggle.addEventListener('click', function (e) {
+        e.preventDefault();
+        var isOpen = dropdown.classList.toggle('open');
+        toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      });
     });
   })();
   </script>
@@ -471,6 +490,341 @@
                   <td><span class="badge {{ $r['status_class'] }}">{{ $r['status'] }}</span></td>
                 </tr>
                 @endforeach
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      {{-- ===== MEDIA SOSIAL › MANAJEMEN AKUN ===== --}}
+      <section class="tab-panel" data-tab-panel="akun-medsos">
+        <div class="section-head">
+          <h2>Manajemen Akun Media Sosial</h2>
+          <p>Kelola akun media sosial resmi yang dipegang langsung oleh Satlak Sibersos.</p>
+        </div>
+
+        @if (session('status'))
+          <div class="notice">{{ session('status') }}</div>
+        @endif
+
+        <div class="panel">
+          <div class="panel-head"><div><h3>Tambah Akun Baru</h3><p>Daftarkan akun media sosial resmi satuan.</p></div></div>
+          <form class="form-grid" method="POST" action="{{ route('akun-medsos.store') }}" enctype="multipart/form-data">
+            @csrf
+            <div class="form-field">
+              <label for="namaAkunBaru">Nama Akun</label>
+              <input id="namaAkunBaru" name="nama_akun" type="text" placeholder="Contoh: Instagram Resmi Satlak Sibersos" required>
+            </div>
+            <div class="form-field">
+              <label for="platformAkunBaru">Platform</label>
+              <select id="platformAkunBaru" name="platform" required>
+                <option value="Instagram">Instagram</option>
+                <option value="Facebook">Facebook</option>
+                <option value="X (Twitter)">X (Twitter)</option>
+                <option value="TikTok">TikTok</option>
+                <option value="YouTube">YouTube</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="usernameAkunBaru">Username / Handle</label>
+              <input id="usernameAkunBaru" name="username_platform" type="text" placeholder="@satlaksibersos" required>
+            </div>
+            <div class="form-field">
+              <label for="urlAkunBaru">URL Profil (opsional)</label>
+              <input id="urlAkunBaru" name="url_profil" type="url" placeholder="https://instagram.com/satlaksibersos">
+            </div>
+            <div class="form-field full">
+              <label for="fotoAkunBaru">Foto Profil (opsional)</label>
+              <input id="fotoAkunBaru" name="foto_profil" type="file" accept="image/png,image/jpeg,image/webp">
+              <span class="form-hint">Format gambar, maksimal 5 MB.</span>
+            </div>
+            <div class="form-field full">
+              <button class="btn btn-primary" type="submit">Simpan Akun</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><div><h3>Daftar Akun Terdaftar</h3><p>Seluruh akun resmi yang dikelola satuan ini.</p></div></div>
+          <div class="tbl-wrap">
+            <table class="dtbl">
+              <thead><tr><th>Nama Akun</th><th>Platform</th><th>Username</th><th>Status</th><th>Aksi</th></tr></thead>
+              <tbody>
+                @forelse($akunMedsosList as $a)
+                <tr>
+                  <td>{{ $a->nama_akun }}</td>
+                  <td>{{ $a->platform }}</td>
+                  <td>{{ $a->username_platform }}</td>
+                  <td><span class="status-dot {{ $a->status === 'Aktif' ? 'ok' : 'warn' }}">{{ $a->status }}</span></td>
+                  <td>
+                    <div class="btn-row">
+                      <form method="POST" action="{{ route('akun-medsos.update', $a) }}">
+                        @csrf @method('PATCH')
+                        <input type="hidden" name="status" value="{{ $a->status === 'Aktif' ? 'Nonaktif' : 'Aktif' }}">
+                        <button class="btn btn-sm" type="submit">{{ $a->status === 'Aktif' ? 'Nonaktifkan' : 'Aktifkan' }}</button>
+                      </form>
+                      <form method="POST" action="{{ route('akun-medsos.destroy', $a) }}" onsubmit="return confirm('Hapus akun ini beserta seluruh postingannya?');">
+                        @csrf @method('DELETE')
+                        <button class="btn btn-sm btn-ghost-red" type="submit">Hapus</button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+                @empty
+                <tr><td colspan="5" style="color:var(--text-dim);text-align:center;padding:24px;">Belum ada akun media sosial terdaftar.</td></tr>
+                @endforelse
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      {{-- ===== MEDIA SOSIAL › BUAT & JADWALKAN POSTING ===== --}}
+      <section class="tab-panel" data-tab-panel="buat-posting">
+        <div class="section-head">
+          <h2>Buat &amp; Jadwalkan Posting</h2>
+          <p>Buat konten baru — simpan sebagai draft, jadwalkan tayang, atau terbitkan langsung.</p>
+        </div>
+
+        @if (session('status'))
+          <div class="notice">{{ session('status') }}</div>
+        @endif
+
+        <div class="panel">
+          @if ($akunMedsosList->isEmpty())
+            <p style="color:var(--text-muted);font-size:13px;">Tambahkan akun media sosial terlebih dahulu di menu <b>Manajemen Akun</b> sebelum membuat postingan.</p>
+          @else
+          <form class="form-grid" method="POST" action="{{ route('posting.store') }}" enctype="multipart/form-data">
+            @csrf
+            <div class="form-field">
+              <label for="akunPosting">Akun Tujuan</label>
+              <select id="akunPosting" name="akun_medsos_id" required>
+                @foreach($akunMedsosList as $a)
+                  <option value="{{ $a->id }}">{{ $a->nama_akun }} ({{ $a->platform }})</option>
+                @endforeach
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="jenisPosting">Jenis Konten</label>
+              <select id="jenisPosting" name="jenis_konten" required>
+                <option value="Feed">Feed / Foto</option>
+                <option value="Reels/Video">Reels / Video</option>
+                <option value="Story">Story</option>
+                <option value="Carousel">Carousel</option>
+              </select>
+            </div>
+            <div class="form-field full">
+              <label for="judulPosting">Judul Internal</label>
+              <input id="judulPosting" name="judul" type="text" placeholder="Contoh: Edukasi Anti-Hoaks Minggu Ini" required>
+            </div>
+            <div class="form-field full">
+              <label for="captionPosting">Caption</label>
+              <textarea id="captionPosting" name="caption" rows="4" placeholder="Tulis caption postingan di sini..." required></textarea>
+            </div>
+            <div class="form-field full">
+              <label for="mediaPosting">Upload Foto / Video</label>
+              <input id="mediaPosting" name="media" type="file" accept="image/png,image/jpeg,image/webp,video/mp4,video/quicktime">
+              <span class="form-hint">Foto (JPG/PNG/WEBP) atau video (MP4/MOV), maksimal 50 MB.</span>
+            </div>
+            <div class="form-field full">
+              <label for="jadwalPosting">Jadwalkan Tayang (opsional)</label>
+              <input id="jadwalPosting" name="scheduled_at" type="datetime-local">
+              <span class="form-hint">Isi kalau ingin dijadwalkan. Kosongkan kalau mau disimpan draft atau langsung diterbitkan.</span>
+            </div>
+            <div class="form-field full btn-row">
+              <button class="btn" type="submit" name="aksi" value="simpan_draft">Simpan Draft</button>
+              <button class="btn" type="submit" name="aksi" value="jadwalkan">Jadwalkan</button>
+              <button class="btn btn-primary" type="submit" name="aksi" value="terbitkan">Terbitkan Sekarang</button>
+            </div>
+          </form>
+          @endif
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><div><h3>Draft &amp; Terjadwal</h3><p>Postingan yang belum tayang.</p></div></div>
+          <div class="tbl-wrap">
+            <table class="dtbl">
+              <thead><tr><th>Judul</th><th>Akun</th><th>Jenis</th><th>Status</th><th>Jadwal Tayang</th><th>Aksi</th></tr></thead>
+              <tbody>
+                @forelse($postinganDraftJadwal as $p)
+                <tr>
+                  <td>{{ $p->judul }}</td>
+                  <td>{{ $p->akunMedsos->nama_akun ?? '-' }}</td>
+                  <td>{{ $p->jenis_konten }}</td>
+                  <td><span class="status-dot {{ $p->status === 'Terjadwal' ? 'warn' : 'ok' }}">{{ $p->status }}</span></td>
+                  <td>{{ $p->scheduled_at?->translatedFormat('d M Y, H:i') ?? '—' }}</td>
+                  <td>
+                    <div class="btn-row">
+                      <form method="POST" action="{{ route('posting.terbitkan', $p) }}">
+                        @csrf
+                        <button class="btn btn-sm btn-primary" type="submit">Terbitkan</button>
+                      </form>
+                      <form method="POST" action="{{ route('posting.destroy', $p) }}" onsubmit="return confirm('Hapus postingan ini?');">
+                        @csrf @method('DELETE')
+                        <button class="btn btn-sm btn-ghost-red" type="submit">Hapus</button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+                @empty
+                <tr><td colspan="6" style="color:var(--text-dim);text-align:center;padding:24px;">Belum ada draft atau postingan terjadwal.</td></tr>
+                @endforelse
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      {{-- ===== MEDIA SOSIAL › KALENDER KONTEN ===== --}}
+      <section class="tab-panel" data-tab-panel="kalender-konten">
+        <div class="section-head">
+          <h2>Kalender Konten</h2>
+          <p>Jadwal tayang seluruh konten, dikelompokkan per tanggal.</p>
+        </div>
+        <div class="panel">
+          @forelse($kalenderKonten as $tanggal => $daftar)
+            <div style="margin-bottom:22px;">
+              <div style="font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;color:var(--gold-bright);text-transform:uppercase;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border-soft);">
+                {{ \Illuminate\Support\Carbon::parse($tanggal)->translatedFormat('l, d F Y') }}
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px;">
+                @foreach($daftar as $p)
+                  <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 14px;background:var(--panel-alt);border:1px solid var(--border-soft);border-radius:9px;flex-wrap:wrap;">
+                    <div>
+                      <div style="font-weight:600;font-size:13.5px;">{{ $p->judul }}</div>
+                      <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px;">{{ $p->akunMedsos->nama_akun ?? '-' }} · {{ $p->jenis_konten }}</div>
+                    </div>
+                    <span class="status-dot {{ $p->status === 'Terjadwal' ? 'warn' : 'ok' }}">
+                      {{ $p->status === 'Terjadwal' ? 'Terjadwal ' . $p->scheduled_at?->translatedFormat('H:i') : 'Terbit ' . $p->published_at?->translatedFormat('H:i') }}
+                    </span>
+                  </div>
+                @endforeach
+              </div>
+            </div>
+          @empty
+            <p style="color:var(--text-dim);text-align:center;padding:24px;">Belum ada konten terjadwal maupun terbit.</p>
+          @endforelse
+        </div>
+      </section>
+
+      {{-- ===== MEDIA SOSIAL › MONITORING ENGAGEMENT ===== --}}
+      <section class="tab-panel" data-tab-panel="monitoring-engagement">
+        <div class="section-head">
+          <h2>Monitoring Engagement</h2>
+          <p>Pantau dan perbarui angka like, komentar, dan share tiap postingan yang sudah tayang.</p>
+        </div>
+        <div class="panel">
+          <div class="tbl-wrap">
+            <table class="dtbl">
+              <thead><tr><th>Postingan</th><th>Akun</th><th>Tayang</th><th>Like</th><th>Komentar</th><th>Share</th><th>Dilihat</th><th>Aksi</th></tr></thead>
+              <tbody>
+                @forelse($postinganTerbit as $p)
+                <tr>
+                  <td>{{ $p->judul }}</td>
+                  <td>{{ $p->akunMedsos->nama_akun ?? '-' }}</td>
+                  <td>{{ $p->published_at?->translatedFormat('d M Y') }}</td>
+                  <td colspan="4">
+                    <form method="POST" action="{{ route('posting.engagement', $p) }}" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                      @csrf @method('PATCH')
+                      <input type="number" name="likes" value="{{ $p->likes }}" min="0" style="width:80px;border:1px solid var(--border);border-radius:6px;padding:6px 8px;background:var(--bg-deep);color:var(--text);font-size:12.5px;">
+                      <input type="number" name="komentar" value="{{ $p->komentar }}" min="0" style="width:80px;border:1px solid var(--border);border-radius:6px;padding:6px 8px;background:var(--bg-deep);color:var(--text);font-size:12.5px;">
+                      <input type="number" name="share" value="{{ $p->share }}" min="0" style="width:80px;border:1px solid var(--border);border-radius:6px;padding:6px 8px;background:var(--bg-deep);color:var(--text);font-size:12.5px;">
+                      <input type="number" name="dilihat" value="{{ $p->dilihat }}" min="0" style="width:90px;border:1px solid var(--border);border-radius:6px;padding:6px 8px;background:var(--bg-deep);color:var(--text);font-size:12.5px;">
+                      <button class="btn btn-sm" type="submit">Simpan</button>
+                    </form>
+                  </td>
+                </tr>
+                @empty
+                <tr><td colspan="8" style="color:var(--text-dim);text-align:center;padding:24px;">Belum ada postingan yang tayang.</td></tr>
+                @endforelse
+              </tbody>
+            </table>
+          </div>
+          <p class="chart-legend-note">Kolom Like / Komentar / Share / Dilihat bisa diedit langsung lalu klik "Simpan" — dipakai untuk mencatat hasil pantauan manual karena sistem belum tersambung API resmi tiap platform.</p>
+        </div>
+      </section>
+
+      {{-- ===== MEDIA SOSIAL › STATISTIK PERFORMA ===== --}}
+      <section class="tab-panel" data-tab-panel="statistik-performa">
+        <div class="section-head">
+          <h2>Statistik Performa Posting</h2>
+          <p>Ringkasan performa seluruh konten yang sudah diterbitkan.</p>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="lbl">Total Akun Dikelola</div>
+            <div class="val">{{ $statsMedsos['total_akun'] }}</div>
+            <div class="sub">Akun media sosial resmi</div>
+          </div>
+          <div class="stat-card">
+            <div class="lbl">Total Postingan</div>
+            <div class="val">{{ $statsMedsos['total_posting'] }}</div>
+            <div class="sub">Draft, terjadwal &amp; terbit</div>
+          </div>
+          <div class="stat-card">
+            <div class="lbl">Sudah Terbit</div>
+            <div class="val" style="color:var(--green-bright);">{{ $statsMedsos['sudah_terbit'] }}</div>
+            <div class="sub">{{ $statsMedsos['terjadwal'] }} menunggu jadwal tayang</div>
+          </div>
+          <div class="stat-card">
+            <div class="lbl">Total Engagement</div>
+            <div class="val">{{ number_format($statsMedsos['total_engagement'], 0, ',', '.') }}</div>
+            <div class="sub">Like + komentar + share</div>
+          </div>
+        </div>
+
+        <div class="panel chart-box">
+          <div class="panel-head"><div><h3>Engagement per Postingan</h3><p>Perbandingan like, komentar, dan share tiap konten yang sudah tayang.</p></div></div>
+          <div class="chart-wrap" style="height:280px;"><canvas id="chartEngagementPosting"></canvas></div>
+        </div>
+
+        @if($statsMedsos['postingan_terbaik'])
+        <div class="panel">
+          <div class="panel-head"><div><h3>Postingan Paling Engaging</h3><p>Konten dengan total interaksi tertinggi.</p></div></div>
+          <div style="padding:4px 2px;">
+            <div style="font-weight:700;font-size:15px;">{{ $statsMedsos['postingan_terbaik']->judul }}</div>
+            <div style="font-size:12.5px;color:var(--text-muted);margin-top:4px;">{{ $statsMedsos['postingan_terbaik']->akunMedsos->nama_akun ?? '-' }} · Tayang {{ $statsMedsos['postingan_terbaik']->published_at?->translatedFormat('d M Y') }}</div>
+            <div class="btn-row" style="margin-top:12px;">
+              <span class="badge green">{{ $statsMedsos['postingan_terbaik']->likes }} Like</span>
+              <span class="badge">{{ $statsMedsos['postingan_terbaik']->komentar }} Komentar</span>
+              <span class="badge amber">{{ $statsMedsos['postingan_terbaik']->share }} Share</span>
+            </div>
+          </div>
+        </div>
+        @endif
+      </section>
+
+      {{-- ===== MEDIA SOSIAL › ARSIP POSTING ===== --}}
+      <section class="tab-panel" data-tab-panel="arsip-posting">
+        <div class="section-head">
+          <h2>Arsip Seluruh Posting</h2>
+          <p>Riwayat lengkap seluruh konten yang pernah dibuat, baik draft, terjadwal, maupun sudah tayang.</p>
+        </div>
+        <div class="panel">
+          <div class="tbl-wrap" data-row-limit="8">
+            <table class="dtbl">
+              <thead><tr><th>Judul</th><th>Akun</th><th>Jenis</th><th>Dibuat Oleh</th><th>Status</th><th>Tanggal</th><th>Aksi</th></tr></thead>
+              <tbody>
+                @forelse($postinganDraftJadwal->concat($postinganTerbit)->sortByDesc('created_at') as $p)
+                <tr>
+                  <td>{{ $p->judul }}</td>
+                  <td>{{ $p->akunMedsos->nama_akun ?? '-' }}</td>
+                  <td>{{ $p->jenis_konten }}</td>
+                  <td>{{ $p->user->name ?? '-' }}</td>
+                  <td>
+                    <span class="badge {{ match($p->status) { 'Terbit' => 'green', 'Terjadwal' => 'amber', default => '' } }}">{{ $p->status }}</span>
+                  </td>
+                  <td>{{ $p->created_at->translatedFormat('d M Y') }}</td>
+                  <td>
+                    <form method="POST" action="{{ route('posting.destroy', $p) }}" onsubmit="return confirm('Hapus postingan ini dari arsip?');">
+                      @csrf @method('DELETE')
+                      <button class="btn btn-sm btn-ghost-red" type="submit">Hapus</button>
+                    </form>
+                  </td>
+                </tr>
+                @empty
+                <tr><td colspan="7" style="color:var(--text-dim);text-align:center;padding:24px;">Arsip masih kosong.</td></tr>
+                @endforelse
               </tbody>
             </table>
           </div>
@@ -994,6 +1348,48 @@
 
   if (typeFilterEl) typeFilterEl.addEventListener('change', redrawAll);
   if (dateFilterEl) dateFilterEl.addEventListener('change', redrawAll);
+})();
+</script>
+
+{{-- ===== STATISTIK PERFORMA POSTING (tab Media Sosial) ===== --}}
+<script>
+(function () {
+  var canvas = document.getElementById('chartEngagementPosting');
+  if (!canvas || typeof Chart === 'undefined') return;
+
+  var css = getComputedStyle(document.documentElement);
+  var cGold = css.getPropertyValue('--gold-bright').trim() || '#f2c14e';
+  var cGreen = css.getPropertyValue('--green-bright').trim() || '#3ddc84';
+  var cAmber = css.getPropertyValue('--amber').trim() || '#f2a93b';
+  var cText = css.getPropertyValue('--text').trim() || '#e8efe9';
+  var cBorder = css.getPropertyValue('--border-soft').trim() || '#22302a';
+
+  var postingan = @json($postinganTerbit->values()->map(function ($p) {
+      return ['judul' => $p->judul, 'likes' => $p->likes, 'komentar' => $p->komentar, 'share' => $p->share];
+  }));
+
+  if (!postingan.length) return;
+
+  new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: postingan.map(function (p) { return p.judul; }),
+      datasets: [
+        { label: 'Like', data: postingan.map(function (p) { return p.likes; }), backgroundColor: cGold, borderRadius: 4, maxBarThickness: 34 },
+        { label: 'Komentar', data: postingan.map(function (p) { return p.komentar; }), backgroundColor: cGreen, borderRadius: 4, maxBarThickness: 34 },
+        { label: 'Share', data: postingan.map(function (p) { return p.share; }), backgroundColor: cAmber, borderRadius: 4, maxBarThickness: 34 }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom', labels: { color: cText, boxWidth: 10, padding: 12 } } },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: cText, font: { size: 10 }, maxRotation: 0, autoSkip: false } },
+        y: { min: 0, grid: { color: cBorder }, ticks: { color: cText, precision: 0 } }
+      }
+    }
+  });
 })();
 </script>
 

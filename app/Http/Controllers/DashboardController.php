@@ -397,6 +397,32 @@ class DashboardController extends Controller
             ['nama' => 'Kanal Info Karawang', 'platform' => 'TikTok', 'wilayah' => 'Karawang', 'status' => 'Normal', 'status_class' => 'ok', 'terakhir' => '1 jam lalu'],
         ];
 
+        // ===== Data manajemen akun & posting media sosial (REAL, dari DB) =====
+        // Berbeda dari $akunMonitoring di atas (akun pihak luar yang dipantau
+        // untuk isu/hoaks), ini akun RESMI milik Satlak Sibersos sendiri yang
+        // dipakai untuk publikasi konten.
+        $akunMedsosList = $satuan->akunMedsos()->orderBy('nama_akun')->get();
+
+        $semuaPosting = $satuan->postingan()
+            ->with('akunMedsos', 'user')
+            ->orderByDesc('created_at')
+            ->get();
+
+        $postinganDraftJadwal = $semuaPosting->whereIn('status', ['Draft', 'Terjadwal']);
+        $postinganTerbit = $semuaPosting->where('status', 'Terbit');
+
+        // Kalender konten: kelompokkan postingan terjadwal & yang sudah
+        // terbit per tanggal (format Y-m-d) supaya mudah dirender per hari.
+        $kalenderKonten = $semuaPosting
+            ->whereIn('status', ['Terjadwal', 'Terbit'])
+            ->groupBy(function ($p) {
+                return ($p->status === 'Terjadwal' ? $p->scheduled_at : $p->published_at)?->format('Y-m-d');
+            })
+            ->sortKeys();
+
+        $totalEngagement = $postinganTerbit->sum(fn ($p) => $p->likes + $p->komentar + $p->share);
+        $postinganTerbaik = $postinganTerbit->sortByDesc(fn ($p) => $p->likes + $p->komentar + $p->share)->first();
+
         return view('siberad.dashboards.satlaksibersos', [
             'user' => $user,
             'satuan' => $satuan,
@@ -418,6 +444,20 @@ class DashboardController extends Controller
             ],
             'laporanPiket' => [
                 ['platform' => 'Facebook', 'wilayah' => 'Jawa Barat', 'ringkasan' => 'Hoaks rekrutmen mengatasnamakan TNI AD', 'pelapor' => 'Piket Satlak Sibersos', 'prioritas' => 'Sedang', 'prioritas_class' => 'warn'],
+            ],
+
+            // ---- Data baru: manajemen konten media sosial ----
+            'akunMedsosList' => $akunMedsosList,
+            'postinganDraftJadwal' => $postinganDraftJadwal,
+            'postinganTerbit' => $postinganTerbit,
+            'kalenderKonten' => $kalenderKonten,
+            'statsMedsos' => [
+                'total_akun' => $akunMedsosList->count(),
+                'total_posting' => $semuaPosting->count(),
+                'terjadwal' => $semuaPosting->where('status', 'Terjadwal')->count(),
+                'sudah_terbit' => $postinganTerbit->count(),
+                'total_engagement' => $totalEngagement,
+                'postingan_terbaik' => $postinganTerbaik,
             ],
         ]);
     }

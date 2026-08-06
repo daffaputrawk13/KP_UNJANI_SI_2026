@@ -46,4 +46,21 @@ class Satuan extends Model
     {
         return $this->hasMany(Laporan::class, 'tujuan_satuan_id');
     }
+
+    /**
+     * Akun media sosial resmi yang dikelola satuan ini (mis. akun Instagram
+     * resmi Satlak Sibersos) — dipakai fitur manajemen & posting konten.
+     */
+    public function akunMedsos(): HasMany
+    {
+        return $this->hasMany(AkunMedsos::class);
+    }
+
+    /**
+     * Seluruh postingan media sosial yang dibuat oleh satuan ini.
+     */
+    public function postingan(): HasMany
+    {
+        return $this->hasMany(Postingan::class);
+    }
 }
