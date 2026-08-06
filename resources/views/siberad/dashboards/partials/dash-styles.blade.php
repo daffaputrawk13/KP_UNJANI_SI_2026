@@ -388,6 +388,33 @@
   .status-dot.warn{color:var(--amber);}
   .status-dot.bad{color:var(--red);}
 
+  /* ===== monitoring resource (CPU/RAM/Storage/Network) ===== */
+  .gauge-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;}
+  .gauge-card{
+    padding:16px;position:relative;
+    background:var(--panel-alt);border:1px solid var(--border-soft);border-radius:10px;
+  }
+  .gauge-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:14px;}
+  .gauge-card-name{font-family:var(--display);font-weight:700;font-size:14px;}
+  .gauge-card-url{font-family:var(--mono);font-size:10.5px;color:var(--text-dim);margin-top:2px;}
+  .meter{margin-bottom:10px;}
+  .meter-row{display:flex;justify-content:space-between;font-size:11.5px;color:var(--text-muted);margin-bottom:5px;}
+  .meter-row span:last-child{font-family:var(--mono);color:var(--text);font-weight:600;}
+  .progress-bar{height:7px;border-radius:5px;background:var(--bg-deep);border:1px solid var(--border-soft);overflow:hidden;}
+  .progress-fill{height:100%;border-radius:5px;transition:width .3s ease;}
+  .progress-fill.ok{background:var(--green-bright);}
+  .progress-fill.warn{background:var(--amber);}
+  .progress-fill.bad{background:var(--red);}
+  .meter-foot{
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;
+    font-size:11px;color:var(--text-dim);margin-top:12px;padding-top:10px;border-top:1px solid var(--border-soft);
+  }
+  .meter-foot b{color:var(--text);}
+
+  /* ===== toggle periode (harian/mingguan/bulanan) ===== */
+  .period-toggle{display:flex;gap:8px;flex-wrap:wrap;}
+  .period-toggle .btn{text-transform:none;}
+
   /* ===== konfirmasi keluar ===== */
   .confirm-overlay{
     position:fixed;inset:0;z-index:80;

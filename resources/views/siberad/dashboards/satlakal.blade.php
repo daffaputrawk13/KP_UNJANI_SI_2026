@@ -6,6 +6,11 @@
 <title>Satlakal (Penangkalan) — SIBERAD</title>
 <link rel="icon" type="image/jpeg" href="{{ asset('images/logo-pussiberad.jpg') }}">
 @include('siberad.dashboards.partials.dash-styles')
+{{-- Library untuk fitur "Export PDF/Excel" pada tab Laporan Periodik.
+     Hanya dimuat di dashboard Satlakal karena fitur ini spesifik di sini. --}}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
 
@@ -103,6 +108,9 @@
           <a href="#" class="side-link side-sublink" data-tab-link="riwayat-laporan">Riwayat Laporan</a>
         </div>
       </div>
+
+      <a href="#" class="side-link" data-tab-link="monitoring-sistem"><span class="dot"></span>Monitoring Sistem</a>
+      <a href="#" class="side-link" data-tab-link="laporan-periodik"><span class="dot"></span>Laporan Periodik</a>
     </nav>
     <div class="side-foot">
       <form class="logout logout-form" method="POST" action="{{ route('logout') }}">
@@ -364,6 +372,260 @@
           </div>
         </div>
       </section>
+
+      {{-- ===== MONITORING SISTEM ===== --}}
+      <section class="tab-panel" data-tab-panel="monitoring-sistem">
+        <div class="section-head">
+          <h2>Monitoring Sistem</h2>
+          <p>Pemakaian resource server dan uptime untuk setiap aset/website yang dipantau Satlakal (Penangkalan).</p>
+        </div>
+
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="lbl">Rata-rata CPU</div>
+            <div class="val">{{ $resourceSummary['avg_cpu'] }}%</div>
+            <div class="sub">Seluruh aset dipantau</div>
+          </div>
+          <div class="stat-card">
+            <div class="lbl">Rata-rata RAM</div>
+            <div class="val">{{ $resourceSummary['avg_ram'] }}%</div>
+            <div class="sub">Seluruh aset dipantau</div>
+          </div>
+          <div class="stat-card">
+            <div class="lbl">Rata-rata Storage</div>
+            <div class="val">{{ $resourceSummary['avg_storage'] }}%</div>
+            <div class="sub">Seluruh aset dipantau</div>
+          </div>
+          <div class="stat-card">
+            <div class="lbl">Rata-rata Uptime (30 Hari)</div>
+            <div class="val" style="color:var(--green);">{{ $resourceSummary['avg_uptime_30h'] }}%</div>
+            <div class="sub">Seluruh aset dipantau</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <div><h3>Pemakaian Resource per Aset</h3><p>CPU, RAM, Storage, dan trafik jaringan (prototype — belum ditarik dari agent monitoring nyata).</p></div>
+          </div>
+          <div class="gauge-grid">
+            @foreach($asetMonitoring as $a)
+            @php
+              $cpuClass = $a['cpu'] >= 80 ? 'bad' : ($a['cpu'] >= 60 ? 'warn' : 'ok');
+              $ramClass = $a['ram'] >= 80 ? 'bad' : ($a['ram'] >= 60 ? 'warn' : 'ok');
+              $storClass = $a['storage'] >= 80 ? 'bad' : ($a['storage'] >= 60 ? 'warn' : 'ok');
+            @endphp
+            <div class="gauge-card">
+              <div class="gauge-card-head">
+                <div>
+                  <div class="gauge-card-name">{{ $a['nama'] }}</div>
+                  <div class="gauge-card-url">{{ $a['url'] }}</div>
+                </div>
+                <span class="status-dot {{ $a['status_class'] }}">{{ $a['status'] }}</span>
+              </div>
+
+              <div class="meter">
+                <div class="meter-row"><span>CPU</span><span>{{ $a['cpu'] }}%</span></div>
+                <div class="progress-bar"><div class="progress-fill {{ $cpuClass }}" style="width:{{ $a['cpu'] }}%"></div></div>
+              </div>
+              <div class="meter">
+                <div class="meter-row"><span>RAM</span><span>{{ $a['ram'] }}%</span></div>
+                <div class="progress-bar"><div class="progress-fill {{ $ramClass }}" style="width:{{ $a['ram'] }}%"></div></div>
+              </div>
+              <div class="meter">
+                <div class="meter-row"><span>Storage</span><span>{{ $a['storage'] }}%</span></div>
+                <div class="progress-bar"><div class="progress-fill {{ $storClass }}" style="width:{{ $a['storage'] }}%"></div></div>
+              </div>
+
+              <div class="meter-foot">
+                <span>Trafik Jaringan: <b>{{ $a['network'] }} Mbps</b></span>
+                <span>Cek terakhir: {{ $a['cek_terakhir'] }}</span>
+              </div>
+            </div>
+            @endforeach
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <div><h3>Uptime &amp; Waktu Respons</h3><p>Ketersediaan layanan dalam 24 jam dan 30 hari terakhir.</p></div>
+          </div>
+          <div class="tbl-wrap">
+            <table class="dtbl">
+              <thead><tr><th>Aset</th><th>Uptime 24 Jam</th><th>Uptime 30 Hari</th><th>Rata-rata Respons</th><th>Status</th></tr></thead>
+              <tbody>
+                @foreach($asetMonitoring as $a)
+                <tr>
+                  <td>{{ $a['nama'] }}</td>
+                  <td>{{ number_format($a['uptime_24h'], 2) }}%</td>
+                  <td>{{ number_format($a['uptime_30h'], 2) }}%</td>
+                  <td>{{ $a['avg_response'] }} ms</td>
+                  <td><span class="status-dot {{ $a['status_class'] }}">{{ $a['status'] }}</span></td>
+                </tr>
+                @endforeach
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      {{-- ===== LAPORAN PERIODIK ===== --}}
+      <section class="tab-panel" data-tab-panel="laporan-periodik">
+        <div class="section-head">
+          <h2>Laporan Monitoring Periodik</h2>
+          <p>Rekap insiden dan uptime dalam periode harian, mingguan, dan bulanan. Bisa diexport ke PDF atau Excel.</p>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <div><h3>Rekap Periodik</h3><p>Pilih periode di bawah, lalu export laporannya.</p></div>
+            <div class="period-toggle">
+              <button type="button" class="btn btn-primary btn-sm" data-period-tab="harian">Harian</button>
+              <button type="button" class="btn btn-sm" data-period-tab="mingguan">Mingguan</button>
+              <button type="button" class="btn btn-sm" data-period-tab="bulanan">Bulanan</button>
+            </div>
+          </div>
+
+          <div class="btn-row" style="margin-bottom:18px;">
+            <button type="button" class="btn btn-sm" id="btnExportPdfPeriodik">
+              <svg viewBox="0 0 24 24" width="14" height="14" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path></svg>
+              Export PDF
+            </button>
+            <button type="button" class="btn btn-sm" id="btnExportExcelPeriodik">
+              <svg viewBox="0 0 24 24" width="14" height="14" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M8 8l8 8M16 8l-8 8"></path></svg>
+              Export Excel
+            </button>
+          </div>
+
+          <div class="tbl-wrap">
+            <table class="dtbl" id="tabelLaporanPeriodik" data-active-period="harian">
+              <thead><tr><th>Periode</th><th>Total Insiden</th><th>Diselesaikan</th><th>Rata-rata Waktu Tangani</th><th>Uptime</th></tr></thead>
+              <tbody id="periodeHarian">
+                @foreach($laporanPeriodik['harian'] as $row)
+                <tr>
+                  <td>{{ $row['periode'] }}</td>
+                  <td>{{ $row['total_insiden'] }}</td>
+                  <td>{{ $row['diselesaikan'] }}</td>
+                  <td>{{ $row['rata_waktu'] }}</td>
+                  <td>{{ $row['uptime'] }}</td>
+                </tr>
+                @endforeach
+              </tbody>
+              <tbody id="periodeMingguan" style="display:none;">
+                @foreach($laporanPeriodik['mingguan'] as $row)
+                <tr>
+                  <td>{{ $row['periode'] }}</td>
+                  <td>{{ $row['total_insiden'] }}</td>
+                  <td>{{ $row['diselesaikan'] }}</td>
+                  <td>{{ $row['rata_waktu'] }}</td>
+                  <td>{{ $row['uptime'] }}</td>
+                </tr>
+                @endforeach
+              </tbody>
+              <tbody id="periodeBulanan" style="display:none;">
+                @foreach($laporanPeriodik['bulanan'] as $row)
+                <tr>
+                  <td>{{ $row['periode'] }}</td>
+                  <td>{{ $row['total_insiden'] }}</td>
+                  <td>{{ $row['diselesaikan'] }}</td>
+                  <td>{{ $row['rata_waktu'] }}</td>
+                  <td>{{ $row['uptime'] }}</td>
+                </tr>
+                @endforeach
+              </tbody>
+            </table>
+          </div>
+          <p class="form-hint" style="margin-top:12px;">
+            Prototype — data rekap masih statis. Export mengambil data dari tabel periode yang sedang aktif.
+          </p>
+        </div>
+      </section>
+
+      <script>
+      (function () {
+        // ===== Toggle periode Harian/Mingguan/Bulanan =====
+        var periodBtns = document.querySelectorAll('[data-period-tab]');
+        var bodies = {
+          harian: document.getElementById('periodeHarian'),
+          mingguan: document.getElementById('periodeMingguan'),
+          bulanan: document.getElementById('periodeBulanan')
+        };
+        var tabelPeriodik = document.getElementById('tabelLaporanPeriodik');
+
+        periodBtns.forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            var period = btn.getAttribute('data-period-tab');
+            periodBtns.forEach(function (b) { b.classList.remove('btn-primary'); });
+            btn.classList.add('btn-primary');
+            Object.keys(bodies).forEach(function (key) {
+              if (bodies[key]) bodies[key].style.display = (key === period) ? '' : 'none';
+            });
+            if (tabelPeriodik) tabelPeriodik.setAttribute('data-active-period', period);
+          });
+        });
+
+        // ===== Ambil baris tabel dari periode yang sedang aktif =====
+        function ambilDataPeriodikAktif() {
+          var period = (tabelPeriodik && tabelPeriodik.getAttribute('data-active-period')) || 'harian';
+          var tbody = bodies[period];
+          var rows = [];
+          if (tbody) {
+            tbody.querySelectorAll('tr').forEach(function (tr) {
+              var sel = [];
+              tr.querySelectorAll('td').forEach(function (td) { sel.push(td.textContent.trim()); });
+              rows.push(sel);
+            });
+          }
+          return { period: period, rows: rows };
+        }
+
+        var HEADER_PERIODIK = ['Periode', 'Total Insiden', 'Diselesaikan', 'Rata-rata Waktu Tangani', 'Uptime'];
+
+        // ===== Export Excel (SheetJS) =====
+        var btnExcel = document.getElementById('btnExportExcelPeriodik');
+        if (btnExcel) {
+          btnExcel.addEventListener('click', function () {
+            if (typeof XLSX === 'undefined') {
+              alert('Pustaka export Excel belum termuat (periksa koneksi internet), coba lagi.');
+              return;
+            }
+            var data = ambilDataPeriodikAktif();
+            var ws = XLSX.utils.aoa_to_sheet([HEADER_PERIODIK].concat(data.rows));
+            var wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Laporan ' + data.period);
+            XLSX.writeFile(wb, 'laporan-monitoring-satlakal-' + data.period + '.xlsx');
+          });
+        }
+
+        // ===== Export PDF (jsPDF + autoTable) =====
+        var btnPdf = document.getElementById('btnExportPdfPeriodik');
+        if (btnPdf) {
+          btnPdf.addEventListener('click', function () {
+            if (typeof window.jspdf === 'undefined') {
+              alert('Pustaka export PDF belum termuat (periksa koneksi internet), coba lagi.');
+              return;
+            }
+            var data = ambilDataPeriodikAktif();
+            var doc = new window.jspdf.jsPDF();
+            var namaPeriode = data.period.charAt(0).toUpperCase() + data.period.slice(1);
+
+            doc.setFontSize(14);
+            doc.text('Laporan Monitoring — Satlakal (Penangkalan)', 14, 16);
+            doc.setFontSize(10);
+            doc.text('Periode: ' + namaPeriode + '  |  Dicetak: ' + new Date().toLocaleString('id-ID'), 14, 23);
+
+            doc.autoTable({
+              startY: 29,
+              head: [HEADER_PERIODIK],
+              body: data.rows,
+              styles: { fontSize: 9 },
+              headStyles: { fillColor: [212, 175, 55], textColor: [36, 26, 5] }
+            });
+
+            doc.save('laporan-monitoring-satlakal-' + data.period + '.pdf');
+          });
+        }
+      })();
+      </script>
 
       <script>
       (function () {
