@@ -1364,9 +1364,13 @@
   var cText = css.getPropertyValue('--text').trim() || '#e8efe9';
   var cBorder = css.getPropertyValue('--border-soft').trim() || '#22302a';
 
-  var postingan = @json($postinganTerbit->values()->map(function ($p) {
-      return ['judul' => $p->judul, 'likes' => $p->likes, 'komentar' => $p->komentar, 'share' => $p->share];
-  }));
+  
+  @php
+        $postinganChartData = $postinganTerbit->values()->map(function ($p) {
+            return ['judul' => $p->judul, 'likes' => $p->likes, 'komentar' => $p->komentar, 'share' => $p->share];
+        });
+    @endphp
+    var postingan = @json($postinganChartData);
 
   if (!postingan.length) return;
 
