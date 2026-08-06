@@ -6,6 +6,28 @@
 <title>DANPUS — SIBERAD</title>
 <link rel="icon" type="image/jpeg" href="{{ asset('images/logo-pussiberad.jpg') }}">
 @include('siberad.dashboards.partials.dash-styles')
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<style>
+  .chart-box{margin-bottom:26px;}
+  .chart-box-head-row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:16px;}
+  .chart-filter-group{display:flex;gap:8px;flex-wrap:wrap;flex-shrink:0;}
+  .chart-type-select{background:var(--panel);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:11px;border-radius:6px;padding:5px 8px;cursor:pointer;flex-shrink:0;}
+  .chart-type-select:focus{outline:none;border-color:var(--gold);}
+  .chart-box-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;transition:all .2s ease;}
+  .chart-mini{background:var(--panel-alt);border:1px solid var(--border-soft);border-radius:10px;padding:14px;}
+  .chart-mini-head{margin-bottom:8px;}
+  .chart-mini-head h4{font-family:var(--display);font-size:13px;font-weight:700;letter-spacing:.01em;line-height:1.3;}
+  .chart-mini-head p{font-size:11px;color:var(--text-muted);margin-top:2px;}
+  .chart-mini .chart-wrap{position:relative;height:210px;transition:height .2s ease;}
+
+  /* Mode terpisah — dipicu otomatis saat jenis grafik diganti selain "Batang" */
+  .chart-box-grid.split-mode{grid-template-columns:1fr;gap:18px;}
+  .chart-box-grid.split-mode .chart-mini{padding:18px 20px;border-color:var(--border);}
+  .chart-box-grid.split-mode .chart-mini .chart-wrap{height:320px;}
+
+  .chart-legend-note{font-size:11px;color:var(--text-dim);margin-top:14px;line-height:1.5;}
+  @media(max-width:980px){.chart-box-grid{grid-template-columns:1fr;}.chart-mini .chart-wrap{height:230px;}}
+</style>
 </head>
 <body>
 @php
@@ -87,7 +109,7 @@
     </div>
     <nav class="side-nav">
       <div class="side-nav-label">Menu</div>
-      <a href="#" class="side-link active" data-tab-link="ringkasan"><span class="dot"></span>Ringkasan</a>
+      <a href="#" class="side-link active" data-tab-link="ringkasan"><span class="dot"></span>Dashboard</a>
       <a href="#" class="side-link" data-tab-link="laporan"><span class="dot"></span>Laporan Masuk</a>
       <a href="#" class="side-link" data-tab-link="status-satuan"><span class="dot"></span>Status Seluruh Satuan</a>
     </nav>
@@ -235,6 +257,45 @@
           </div>
         </div>
 
+        <div class="panel chart-box">
+          <div class="chart-box-head-row">
+            <div><h3 style="font-family:var(--display);font-size:17px;font-weight:700;">Analitik Pengawasan Organisasi</h3><p style="font-size:12px;color:var(--text-muted);margin-top:2px;">Distribusi status satuan, beban laporan berdasarkan prioritas, dan satuan paling aktif melapor.</p></div>
+            <div class="chart-filter-group">
+              <select class="chart-type-select" id="chartTypeFilterGlobal">
+                <option value="bar" selected>Grafik Batang</option>
+                <option value="line">Grafik Garis</option>
+                <option value="radar">Grafik Radar</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="chart-box-grid" id="chartBoxGrid">
+
+            <div class="chart-mini">
+              <div class="chart-mini-head">
+                <h4>Status Seluruh Satuan</h4><p>Normal, Siaga, atau Ada Insiden.</p>
+              </div>
+              <div class="chart-wrap"><canvas id="chartStatusSatuan"></canvas></div>
+            </div>
+
+            <div class="chart-mini">
+              <div class="chart-mini-head">
+                <h4>Laporan per Prioritas</h4><p>Beban laporan masuk saat ini.</p>
+              </div>
+              <div class="chart-wrap"><canvas id="chartLaporanPrioritas"></canvas></div>
+            </div>
+
+            <div class="chart-mini">
+              <div class="chart-mini-head">
+                <h4>Satuan Paling Aktif Melapor</h4><p>Jumlah laporan per satuan.</p>
+              </div>
+              <div class="chart-wrap"><canvas id="chartLaporanPerSatuan"></canvas></div>
+            </div>
+
+          </div>
+          <p class="chart-legend-note">Merah = butuh perhatian segera (insiden aktif / prioritas tinggi). Ganti jenis grafik lewat dropdown di kanan atas — pilihan selain "Batang" akan otomatis memisah tiap grafik menjadi tampilan yang lebih besar.</p>
+        </div>
+
         <div class="panel">
           <div class="panel-head">
             <div>
@@ -271,10 +332,11 @@
           <div class="tbl-wrap">
             <table class="dtbl">
               <thead><tr><th>Asal Satuan</th><th>Perihal</th><th>Diteruskan Oleh</th><th>Tanggal</th><th>Prioritas</th><th>Status</th>
+              <th>Lampiran</th>
               <th>Aksi</th>
               </tr></thead>
               <tbody>
-                @foreach($laporanMasuk as $i => $l)
+                @forelse($laporanMasuk as $i => $l)
                 <tr id="rowLaporan{{ $i }}">
                   <td>{{ $l['satuan'] }}</td>
                   <td>{{ $l['perihal'] }}</td>
@@ -282,6 +344,16 @@
                   <td>{{ $l['tanggal'] }}</td>
                   <td><span class="status-dot {{ $l['prioritas_class'] }}">{{ $l['prioritas'] }}</span></td>
                   <td id="statusLaporan{{ $i }}"><span class="badge {{ $l['status_class'] }}">{{ $l['status'] }}</span></td>
+                  <td>
+                    @if(!empty($l['lampiran_url']))
+                      <div class="btn-row">
+                        <a href="{{ $l['lampiran_url'] }}" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">Lihat PDF</a>
+                        <a href="{{ $l['lampiran_url'] }}" download class="btn btn-ghost btn-sm">Unduh</a>
+                      </div>
+                    @else
+                      <span style="font-size:11.5px;color:var(--text-dim);">Tidak ada lampiran</span>
+                    @endif
+                  </td>
                   <td id="aksiLaporan{{ $i }}">
                     <div class="btn-row">
                       <button class="btn btn-primary btn-sm" type="button" onclick="bukaKonfirmasiLaporan({{ $i }}, 'setuju', '{{ addslashes($l['satuan']) }}', '{{ addslashes($l['perihal']) }}')">Setujui</button>
@@ -289,7 +361,11 @@
                     </div>
                   </td>
                 </tr>
-                @endforeach
+                @empty
+                <tr>
+                  <td colspan="8" style="text-align:center;color:var(--text-muted);padding:20px;">Belum ada laporan masuk.</td>
+                </tr>
+                @endforelse
               </tbody>
             </table>
           </div>
@@ -800,6 +876,182 @@
   confirmBtn.addEventListener('click', function () {
     if (pendingForm) pendingForm.submit();
   });
+})();
+</script>
+
+{{-- ===== ANALITIK PENGAWASAN ORGANISASI (RINGKASAN) ===== --}}
+<script>
+(function () {
+  var canvasCheck = document.getElementById('chartStatusSatuan');
+  if (!canvasCheck || typeof Chart === 'undefined') return;
+
+  var css = getComputedStyle(document.documentElement);
+  var cGold = css.getPropertyValue('--gold-bright').trim() || '#f2c14e';
+  var cGreen = css.getPropertyValue('--green').trim() || '#3ddc84';
+  var cAmber = css.getPropertyValue('--amber').trim() || '#f2a93b';
+  var cRed = css.getPropertyValue('--red').trim() || '#e5484d';
+  var cMuted = css.getPropertyValue('--text-dim').trim() || '#7d8f87';
+  var cText = css.getPropertyValue('--text').trim() || '#e8efe9';
+  var cBorder = css.getPropertyValue('--border-soft').trim() || '#22302a';
+
+  var statusSatuan = @json($statusDistribusi ?? []);
+  var laporanPrioritas = @json($laporanPerPrioritas ?? []);
+  var laporanPerSatuan = @json($laporanPerSatuanChart ?? []);
+
+  var registry = {};
+
+  function wrapLabel(text, maxCharsPerLine) {
+    maxCharsPerLine = maxCharsPerLine || 14;
+    var words = String(text).split(' ');
+    var lines = [];
+    var current = '';
+    words.forEach(function (w) {
+      var test = current ? current + ' ' + w : w;
+      if (test.length > maxCharsPerLine && current) {
+        lines.push(current);
+        current = w;
+      } else {
+        current = test;
+      }
+    });
+    if (current) lines.push(current);
+    return lines;
+  }
+
+  function buildOptions(type, opts) {
+    opts = opts || {};
+    if (type === 'radar') {
+      return {
+        responsive: true,
+        maintainAspectRatio: false,
+        layout: { padding: 0 },
+        plugins: { legend: { display: false, position: 'bottom', labels: { color: cText, boxWidth: 9, padding: 10 } } },
+        scales: {
+          r: {
+            min: 0, max: opts.max || 100,
+            grid: { color: cBorder }, angleLines: { color: cBorder },
+            pointLabels: { color: cMuted, font: { size: 10 } },
+            ticks: { display: false, backdropColor: 'transparent' }
+          }
+        }
+      };
+    }
+    if (type === 'doughnut') {
+      return {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '62%',
+        plugins: { legend: { position: 'bottom', labels: { color: cText, boxWidth: 10, padding: 12 } } }
+      };
+    }
+    return {
+      indexAxis: opts.horizontal ? 'y' : 'x',
+      responsive: true,
+      maintainAspectRatio: false,
+      layout: { padding: { left: 4, right: 12, top: 8, bottom: 0 } },
+      plugins: { legend: { display: false } },
+      scales: {
+        x: opts.horizontal
+          ? { min: 0, grid: { color: cBorder }, ticks: { precision: 0 } }
+          : { offset: false, grid: { display: false }, ticks: { maxRotation: 0, minRotation: 0, autoSkip: false, font: { size: 10 } } },
+        y: opts.horizontal
+          ? { offset: false, grid: { display: false }, ticks: { autoSkip: false } }
+          : { min: 0, grid: { color: cBorder }, ticks: { precision: 0 } }
+      }
+    };
+  }
+
+  function renderChart(canvasId, type, rawLabels, values, colors, opts) {
+    var el = document.getElementById(canvasId);
+    if (!el) return;
+    if (registry[canvasId]) registry[canvasId].destroy();
+
+    var labels = (type !== 'doughnut' && !opts.horizontal)
+      ? rawLabels.map(function (l) { return wrapLabel(l, 14); })
+      : rawLabels;
+
+    var isFillType = (type === 'doughnut' || type === 'radar');
+    var fillColor = (type === 'radar') ? hexToRgba(opts.lineColor || cGold, 0.28) : colors;
+
+    var dataset = {
+      label: opts.label || '',
+      data: values,
+      backgroundColor: isFillType ? fillColor : colors,
+      borderColor: type === 'line' ? (opts.lineColor || cGold) : (type === 'radar' ? (opts.lineColor || cGold) : 'transparent'),
+      borderWidth: (type === 'line' || type === 'radar') ? 2 : 0,
+      borderRadius: (type === 'bar') ? 4 : 0,
+      maxBarThickness: opts.horizontal ? 34 : 44,
+      fill: type === 'radar' ? true : (type === 'line' ? false : undefined),
+      tension: 0,
+      pointBackgroundColor: (type === 'line' || type === 'radar') ? (opts.lineColor || cGold) : undefined,
+      pointRadius: type === 'line' ? 3 : undefined,
+    };
+
+    registry[canvasId] = new Chart(el, {
+      type: type,
+      data: { labels: labels, datasets: [dataset] },
+      options: buildOptions(type, opts)
+    });
+  }
+
+  function hexToRgba(hex, alpha) {
+    hex = (hex || '').replace('#', '');
+    if (hex.length === 3) hex = hex.split('').map(function (c) { return c + c; }).join('');
+    var r = parseInt(hex.substring(0, 2), 16) || 0;
+    var g = parseInt(hex.substring(2, 4), 16) || 0;
+    var b = parseInt(hex.substring(4, 6), 16) || 0;
+    return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
+  }
+
+  // ===== Grafik 1: Status seluruh satuan =====
+  function drawStatusSatuan(type) {
+    var t = type === 'bar' ? 'doughnut' : type; // status komposisi tetap lingkaran di mode default
+    renderChart(
+      'chartStatusSatuan', t,
+      statusSatuan.map(function (s) { return s.label; }),
+      statusSatuan.map(function (s) { return s.jumlah; }),
+      [cGreen, cAmber, cRed],
+      { label: 'Jumlah Satuan' }
+    );
+  }
+
+  // ===== Grafik 2: Laporan per prioritas =====
+  function drawLaporanPrioritas(type) {
+    renderChart(
+      'chartLaporanPrioritas', type,
+      laporanPrioritas.map(function (p) { return p.label; }),
+      laporanPrioritas.map(function (p) { return p.jumlah; }),
+      type === 'line' || type === 'radar' ? cGold : [cRed, cAmber, cMuted],
+      { label: 'Jumlah Laporan', lineColor: cGold }
+    );
+  }
+
+  // ===== Grafik 3: Satuan paling aktif melapor =====
+  function drawLaporanPerSatuan(type) {
+    renderChart(
+      'chartLaporanPerSatuan', type,
+      laporanPerSatuan.map(function (s) { return s.satuan; }),
+      laporanPerSatuan.map(function (s) { return s.jumlah; }),
+      type === 'line' || type === 'radar' ? cGold : cGold,
+      { horizontal: type === 'bar', label: 'Jumlah Laporan', lineColor: cGold }
+    );
+  }
+
+  var typeFilterEl = document.getElementById('chartTypeFilterGlobal');
+  var gridEl = document.getElementById('chartBoxGrid');
+
+  function redrawAll() {
+    var type = typeFilterEl ? typeFilterEl.value : 'bar';
+    if (gridEl) gridEl.classList.toggle('split-mode', type !== 'bar');
+
+    drawStatusSatuan(type);
+    drawLaporanPrioritas(type);
+    drawLaporanPerSatuan(type);
+  }
+
+  redrawAll();
+
+  if (typeFilterEl) typeFilterEl.addEventListener('change', redrawAll);
 })();
 </script>
 

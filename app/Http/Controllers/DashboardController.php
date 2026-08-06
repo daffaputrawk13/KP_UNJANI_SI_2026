@@ -141,12 +141,14 @@ class DashboardController extends Controller
         ];
 
         // Laporan asli yang dikirim langsung ke DANPUS (mis. dari Satlok Duktek/
-        // Bangtek) — ditaruh di atas daftar dummy WADAN supaya kelihatan paling baru.
-        $laporanMasukReal = Laporan::with('satuan')
+        // Bangtek). Tidak ada lagi data dummy — semua baris di tabel "Laporan
+        // Masuk" sekarang murni berasal dari database.
+        $laporanMasukFinal = Laporan::with('satuan')
             ->where('tujuan_satuan_id', $satuan->id)
             ->latest()
             ->get()
             ->map(fn (Laporan $l) => [
+                'id' => $l->id,
                 'satuan' => $l->satuan->nama,
                 'perihal' => $l->perihal,
                 'diteruskan_oleh' => $l->satuan->nama, // dikirim langsung, bukan lewat WADAN
@@ -163,12 +165,39 @@ class DashboardController extends Controller
                     'Ditolak DANPUS' => 'bad',
                     default => 'amber',
                 },
+                // URL lampiran PDF (kalau ada) — dipakai tombol "Lihat/Unduh PDF" di tabel.
+                // Butuh `php artisan storage:link` supaya folder storage/app/public bisa diakses lewat /storage/...
+                'lampiran_url' => $l->lampiran_path ? asset('storage/'.$l->lampiran_path) : null,
             ])
             ->toArray();
 
         // Notifikasi laporan baru untuk DANPUS yang sedang login — ditampilkan
         // di lonceng notifikasi pada topbar.
         $notifikasi = $user->unreadNotifications;
+
+        // ===== Grafik 1: Distribusi status seluruh satuan (Normal / Siaga / Ada Insiden) =====
+        $jumlahPerStatusClass = collect($statusSatuan)->groupBy('class')->map->count();
+        $statusDistribusi = [
+            ['label' => 'Normal', 'jumlah' => $jumlahPerStatusClass->get('ok', 0)],
+            ['label' => 'Siaga', 'jumlah' => $jumlahPerStatusClass->get('warn', 0)],
+            ['label' => 'Ada Insiden', 'jumlah' => $jumlahPerStatusClass->get('bad', 0)],
+        ];
+
+        // ===== Grafik 2: Jumlah laporan masuk per tingkat prioritas =====
+        $jumlahPerPrioritas = collect($laporanMasukFinal)->groupBy('prioritas')->map->count();
+        $laporanPerPrioritas = [
+            ['label' => 'Tinggi', 'jumlah' => $jumlahPerPrioritas->get('Tinggi', 0)],
+            ['label' => 'Sedang', 'jumlah' => $jumlahPerPrioritas->get('Sedang', 0)],
+            ['label' => 'Rendah', 'jumlah' => $jumlahPerPrioritas->get('Rendah', 0)],
+        ];
+
+        // ===== Grafik 3: Satuan paling aktif melapor (jumlah laporan per satuan) =====
+        $laporanPerSatuanChart = collect($laporanMasukFinal)
+            ->groupBy('satuan')
+            ->map(fn ($grup, $nama) => ['satuan' => $nama, 'jumlah' => $grup->count()])
+            ->sortByDesc('jumlah')
+            ->values()
+            ->toArray();
 
         return view('siberad.dashboards.danpus', [
             'notifikasi' => $notifikasi,
@@ -179,7 +208,7 @@ class DashboardController extends Controller
             'stats' => [
                 'total_satuan' => $semuaSatuan->count(),
                 'insiden_aktif' => 1,
-                'laporan_pending' => 3,
+                'laporan_pending' => collect($laporanMasukFinal)->where('status', 'Menunggu')->count(),
                 'siaga_hijau' => $semuaSatuan->count() - 2,
             ],
             'laporanPrioritas' => [
@@ -187,11 +216,10 @@ class DashboardController extends Controller
                 ['satuan' => 'Satlak Sibersos', 'perihal' => 'Hoaks rekrutmen mengatasnamakan TNI AD', 'prioritas' => 'Sedang', 'prioritas_class' => 'warn', 'tanggal' => '01 Agu 2026', 'status' => 'Menunggu DANPUS', 'status_class' => 'amber'],
                 ['satuan' => 'Satlak Penindakan', 'perihal' => 'Indikasi ransomware pada server unit', 'prioritas' => 'Tinggi', 'prioritas_class' => 'bad', 'tanggal' => '31 Jul 2026', 'status' => 'Disetujui', 'status_class' => 'green'],
             ],
-            'laporanMasuk' => array_merge($laporanMasukReal, [
-                ['satuan' => 'Satlakal (Penangkalan)', 'perihal' => 'Serangan DDoS pada portal utama', 'diteruskan_oleh' => 'WADAN', 'tanggal' => '02 Agu 2026', 'prioritas' => 'Tinggi', 'prioritas_class' => 'bad', 'status' => 'Menunggu', 'status_class' => 'amber'],
-                ['satuan' => 'Satlak Sibersos', 'perihal' => 'Hoaks rekrutmen mengatasnamakan TNI AD', 'diteruskan_oleh' => 'WADAN', 'tanggal' => '01 Agu 2026', 'prioritas' => 'Sedang', 'prioritas_class' => 'warn', 'status' => 'Menunggu', 'status_class' => 'amber'],
-                ['satuan' => 'Binmat', 'perihal' => 'Pengadaan perangkat pemantauan baru', 'diteruskan_oleh' => 'WADAN', 'tanggal' => '29 Jul 2026', 'prioritas' => 'Rendah', 'prioritas_class' => 'ok', 'status' => 'Disetujui', 'status_class' => 'green'],
-            ]),
+            'laporanMasuk' => $laporanMasukFinal,
+            'statusDistribusi' => $statusDistribusi,
+            'laporanPerPrioritas' => $laporanPerPrioritas,
+            'laporanPerSatuanChart' => $laporanPerSatuanChart,
         ]);
     }
 
