@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Notifications\LaporanBaruDiterima;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class LaporanController extends Controller
 {
@@ -56,5 +57,27 @@ class LaporanController extends Controller
         }
 
         return back()->with('status', 'Laporan berhasil dikirim ke DANPUS.');
+    }
+
+    /**
+     * Hapus laporan dari riwayat (dipakai tab "Riwayat Laporan" di dashboard
+     * DANPUS). Hanya user dari satuan tujuan laporan tersebut yang boleh
+     * menghapusnya — mencegah satuan lain menghapus laporan yang bukan
+     * ditujukan kepada mereka.
+     */
+    public function destroy(Request $request, Laporan $laporan): RedirectResponse
+    {
+        $user = $request->user()->load('satuan');
+        $satuan = $user->satuan;
+
+        abort_unless($satuan && $laporan->tujuan_satuan_id === $satuan->id, 403);
+
+        if ($laporan->lampiran_path) {
+            Storage::disk('public')->delete($laporan->lampiran_path);
+        }
+
+        $laporan->delete();
+
+        return back()->with('status', 'Laporan berhasil dihapus dari riwayat.');
     }
 }

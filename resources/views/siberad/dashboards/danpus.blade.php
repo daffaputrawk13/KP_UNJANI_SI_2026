@@ -111,6 +111,7 @@
       <div class="side-nav-label">Menu</div>
       <a href="#" class="side-link active" data-tab-link="ringkasan"><span class="dot"></span>Dashboard</a>
       <a href="#" class="side-link" data-tab-link="laporan"><span class="dot"></span>Laporan Masuk</a>
+      <a href="#" class="side-link" data-tab-link="riwayat"><span class="dot"></span>Riwayat Laporan</a>
       <a href="#" class="side-link" data-tab-link="status-satuan"><span class="dot"></span>Status Seluruh Satuan</a>
     </nav>
 
@@ -360,6 +361,50 @@
               </tbody>
             </table>
           </div>
+        </div>
+      </section>
+
+      {{-- ===== RIWAYAT LAPORAN ===== --}}
+      <section class="tab-panel" data-tab-panel="riwayat">
+        <div class="section-head">
+          <h2>Riwayat Laporan</h2>
+          <p>Seluruh riwayat laporan yang pernah masuk ke DANPUS, lengkap dengan status akhirnya.</p>
+        </div>
+        <div class="panel">
+          <div class="chart-box-head-row" style="margin-bottom:16px;">
+            <div><h3 style="font-family:var(--display);font-size:15px;font-weight:700;">Filter Tanggal</h3><p style="font-size:12px;color:var(--text-muted);margin-top:2px;">Tampilkan laporan pada rentang tanggal tertentu.</p></div>
+            <div class="chart-filter-group" style="align-items:center;">
+              <input type="date" id="riwayatDariTanggal" class="chart-type-select" style="cursor:text;">
+              <span style="font-size:11px;color:var(--text-dim);align-self:center;">s/d</span>
+              <input type="date" id="riwayatSampaiTanggal" class="chart-type-select" style="cursor:text;">
+              <button type="button" class="btn btn-ghost btn-sm" id="riwayatResetFilter">Reset</button>
+            </div>
+          </div>
+
+          <div class="tbl-wrap">
+            <table class="dtbl" id="tabelRiwayatLaporan">
+              <thead><tr><th>Asal Satuan</th><th>Perihal</th><th>Tanggal</th><th>Prioritas</th><th>Status</th><th>Aksi</th></tr></thead>
+              <tbody>
+                @forelse($laporanMasuk as $l)
+                <tr data-tanggal="{{ $l['tanggal_iso'] }}">
+                  <td>{{ $l['satuan'] }}</td>
+                  <td>{{ $l['perihal'] }}</td>
+                  <td>{{ $l['tanggal'] }}</td>
+                  <td><span class="status-dot {{ $l['prioritas_class'] }}">{{ $l['prioritas'] }}</span></td>
+                  <td><span class="badge {{ $l['status_class'] }}">{{ $l['status'] }}</span></td>
+                  <td>
+                    <button type="button" class="btn btn-ghost-red btn-sm" onclick="bukaHapusRiwayat({{ $l['id'] }}, '{{ addslashes($l['satuan']) }}', '{{ addslashes($l['perihal']) }}')">Hapus</button>
+                  </td>
+                </tr>
+                @empty
+                <tr>
+                  <td colspan="6" style="text-align:center;color:var(--text-muted);padding:20px;">Belum ada riwayat laporan.</td>
+                </tr>
+                @endforelse
+              </tbody>
+            </table>
+          </div>
+          <p id="riwayatKosongFilter" style="display:none;text-align:center;color:var(--text-muted);padding:16px 0 4px;font-size:12.5px;">Tidak ada laporan pada rentang tanggal yang dipilih.</p>
         </div>
       </section>
 
@@ -739,6 +784,86 @@
     document.getElementById('modalKonfirmasiLaporan').addEventListener('click', function(e){
       if(e.target === this) tutupKonfirmasiLaporan();
     });
+  </script>
+
+  {{-- ===== MODAL KONFIRMASI HAPUS RIWAYAT LAPORAN ===== --}}
+  <div class="modal-overlay" id="modalHapusRiwayat">
+    <div class="modal-box" style="max-width:420px;">
+      <div class="modal-head">
+        <div>
+          <h3>Hapus Laporan</h3>
+          <p id="hapusRiwayatSub" style="margin:2px 0 0;font-size:12.5px;color:var(--text-muted);">-</p>
+        </div>
+        <button type="button" class="modal-close" onclick="tutupHapusRiwayat()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">Laporan yang dihapus tidak dapat dikembalikan. Yakin ingin menghapus laporan ini dari riwayat?</p>
+        <form id="formHapusRiwayat" method="POST" action="">
+          @csrf
+          @method('DELETE')
+          <div class="btn-row" style="justify-content:flex-end;">
+            <button type="button" class="btn" onclick="tutupHapusRiwayat()">Batal</button>
+            <button type="submit" class="btn btn-ghost-red">Ya, Hapus</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function bukaHapusRiwayat(id, satuan, perihal){
+      document.getElementById('hapusRiwayatSub').textContent = satuan + ' \u2014 ' + perihal;
+      document.getElementById('formHapusRiwayat').action = '/laporan/' + id;
+      document.getElementById('modalHapusRiwayat').classList.add('open');
+    }
+
+    function tutupHapusRiwayat(){
+      document.getElementById('modalHapusRiwayat').classList.remove('open');
+    }
+
+    document.getElementById('modalHapusRiwayat').addEventListener('click', function(e){
+      if(e.target === this) tutupHapusRiwayat();
+    });
+  </script>
+
+  {{-- ===== FILTER TANGGAL RIWAYAT LAPORAN ===== --}}
+  <script>
+  (function(){
+    var dari = document.getElementById('riwayatDariTanggal');
+    var sampai = document.getElementById('riwayatSampaiTanggal');
+    var resetBtn = document.getElementById('riwayatResetFilter');
+    var tbody = document.querySelector('#tabelRiwayatLaporan tbody');
+    var emptyMsg = document.getElementById('riwayatKosongFilter');
+    if(!dari || !sampai || !tbody) return;
+
+    function applyFilter(){
+      var dariVal = dari.value;
+      var sampaiVal = sampai.value;
+      var rows = tbody.querySelectorAll('tr[data-tanggal]');
+      var visibleCount = 0;
+
+      rows.forEach(function(row){
+        var tgl = row.getAttribute('data-tanggal');
+        var show = true;
+        if(dariVal && tgl < dariVal) show = false;
+        if(sampaiVal && tgl > sampaiVal) show = false;
+        row.style.display = show ? '' : 'none';
+        if(show) visibleCount++;
+      });
+
+      emptyMsg.style.display = (rows.length > 0 && visibleCount === 0) ? 'block' : 'none';
+    }
+
+    dari.addEventListener('change', applyFilter);
+    sampai.addEventListener('change', applyFilter);
+    if(resetBtn){
+      resetBtn.addEventListener('click', function(){
+        dari.value = '';
+        sampai.value = '';
+        applyFilter();
+      });
+    }
+  })();
   </script>
 
   {{-- ===== MODAL DETAIL LAPORAN MASUK ===== --}}

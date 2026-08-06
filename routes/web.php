@@ -34,6 +34,12 @@ Route::post('/laporan', [LaporanController::class, 'store'])
     ->middleware('auth')
     ->name('laporan.store');
 
+// Hapus laporan dari riwayat — hanya satuan tujuan (mis. DANPUS) yang boleh
+// menghapus laporan yang ditujukan kepadanya (dicek di controller).
+Route::delete('/laporan/{laporan}', [LaporanController::class, 'destroy'])
+    ->middleware('auth')
+    ->name('laporan.destroy');
+
 Route::post('/notifikasi/baca-semua', [NotifikasiController::class, 'bacaSemua'])
     ->middleware('auth')
     ->name('notifikasi.baca-semua');

@@ -153,6 +153,9 @@ class DashboardController extends Controller
                 'perihal' => $l->perihal,
                 'diteruskan_oleh' => $l->satuan->nama, // dikirim langsung, bukan lewat WADAN
                 'tanggal' => $l->created_at->translatedFormat('d M Y'),
+                // Format ISO (YYYY-MM-DD) dipakai khusus untuk filter rentang
+                // tanggal di tab "Riwayat Laporan" — tidak ditampilkan langsung.
+                'tanggal_iso' => $l->created_at->format('Y-m-d'),
                 'prioritas' => $l->prioritas,
                 'prioritas_class' => match ($l->prioritas) {
                     'Tinggi' => 'bad',
@@ -228,6 +231,41 @@ class DashboardController extends Controller
      */
     private function wadan($user, $satuan): View
     {
+        $laporanMasuk = [
+            ['satuan' => 'Satlakal (Penangkalan)', 'perihal' => 'Serangan DDoS pada portal utama', 'tanggal' => '02 Agu 2026', 'prioritas' => 'Tinggi', 'prioritas_class' => 'bad', 'status' => 'Menunggu', 'status_class' => 'amber'],
+            ['satuan' => 'Satlak Sibersos', 'perihal' => 'Hoaks rekrutmen mengatasnamakan TNI AD', 'tanggal' => '01 Agu 2026', 'prioritas' => 'Sedang', 'prioritas_class' => 'warn', 'status' => 'Menunggu', 'status_class' => 'amber'],
+            ['satuan' => 'Satlak Penindakan', 'perihal' => 'Indikasi ransomware pada server unit', 'tanggal' => '31 Jul 2026', 'prioritas' => 'Tinggi', 'prioritas_class' => 'bad', 'status' => 'Menunggu', 'status_class' => 'amber'],
+            ['satuan' => 'Binfung', 'perihal' => 'Laporan penempatan 3 personel baru', 'tanggal' => '29 Jul 2026', 'prioritas' => 'Rendah', 'prioritas_class' => 'ok', 'status' => 'Diteruskan', 'status_class' => 'green'],
+        ];
+
+        $koordinasi = [
+            ['satuan' => 'Satlok Duktek (Dukungan Teknologi)', 'perihal' => 'Permintaan pengiriman 2 personel untuk riset AI', 'diminta_oleh' => 'SDIR', 'tanggal' => '30 Jul 2026', 'status' => 'Menunggu', 'status_class' => 'amber'],
+            ['satuan' => 'Diklat', 'perihal' => 'Koordinasi jadwal latihan gabungan', 'diminta_oleh' => 'SDIR', 'tanggal' => '28 Jul 2026', 'status' => 'Selesai', 'status_class' => 'green'],
+        ];
+
+        // ===== Grafik 1: Jumlah laporan masuk per tingkat prioritas =====
+        $jumlahPerPrioritas = collect($laporanMasuk)->groupBy('prioritas')->map->count();
+        $laporanPerPrioritas = [
+            ['label' => 'Tinggi', 'jumlah' => $jumlahPerPrioritas->get('Tinggi', 0)],
+            ['label' => 'Sedang', 'jumlah' => $jumlahPerPrioritas->get('Sedang', 0)],
+            ['label' => 'Rendah', 'jumlah' => $jumlahPerPrioritas->get('Rendah', 0)],
+        ];
+
+        // ===== Grafik 2: Satuan paling aktif melapor (jumlah laporan per satuan) =====
+        $laporanPerSatuanChart = collect($laporanMasuk)
+            ->groupBy('satuan')
+            ->map(fn ($grup, $nama) => ['satuan' => $nama, 'jumlah' => $grup->count()])
+            ->sortByDesc('jumlah')
+            ->values()
+            ->toArray();
+
+        // ===== Grafik 3: Status permintaan koordinasi (Menunggu vs Selesai) =====
+        $jumlahPerStatusKoordinasi = collect($koordinasi)->groupBy('status')->map->count();
+        $statusKoordinasi = [
+            ['label' => 'Menunggu', 'jumlah' => $jumlahPerStatusKoordinasi->get('Menunggu', 0)],
+            ['label' => 'Selesai', 'jumlah' => $jumlahPerStatusKoordinasi->get('Selesai', 0)],
+        ];
+
         return view('siberad.dashboards.wadan', [
             'user' => $user,
             'satuan' => $satuan,
@@ -242,16 +280,11 @@ class DashboardController extends Controller
                 ['satuan' => 'Satlak Sibersos', 'perihal' => 'Hoaks rekrutmen mengatasnamakan TNI AD', 'tanggal' => '01 Agu 2026', 'status' => 'Menunggu Verifikasi', 'status_class' => 'amber'],
                 ['satuan' => 'SDIR', 'perihal' => 'Permintaan personel tambahan Satlok Duktek (Dukungan Teknologi)', 'tanggal' => '31 Jul 2026', 'status' => 'Diteruskan', 'status_class' => 'green'],
             ],
-            'laporanMasuk' => [
-                ['satuan' => 'Satlakal (Penangkalan)', 'perihal' => 'Serangan DDoS pada portal utama', 'tanggal' => '02 Agu 2026', 'prioritas' => 'Tinggi', 'prioritas_class' => 'bad', 'status' => 'Menunggu', 'status_class' => 'amber'],
-                ['satuan' => 'Satlak Sibersos', 'perihal' => 'Hoaks rekrutmen mengatasnamakan TNI AD', 'tanggal' => '01 Agu 2026', 'prioritas' => 'Sedang', 'prioritas_class' => 'warn', 'status' => 'Menunggu', 'status_class' => 'amber'],
-                ['satuan' => 'Satlak Penindakan', 'perihal' => 'Indikasi ransomware pada server unit', 'tanggal' => '31 Jul 2026', 'prioritas' => 'Tinggi', 'prioritas_class' => 'bad', 'status' => 'Menunggu', 'status_class' => 'amber'],
-                ['satuan' => 'Binfung', 'perihal' => 'Laporan penempatan 3 personel baru', 'tanggal' => '29 Jul 2026', 'prioritas' => 'Rendah', 'prioritas_class' => 'ok', 'status' => 'Diteruskan', 'status_class' => 'green'],
-            ],
-            'koordinasi' => [
-                ['satuan' => 'Satlok Duktek (Dukungan Teknologi)', 'perihal' => 'Permintaan pengiriman 2 personel untuk riset AI', 'diminta_oleh' => 'SDIR', 'tanggal' => '30 Jul 2026', 'status' => 'Menunggu', 'status_class' => 'amber'],
-                ['satuan' => 'Diklat', 'perihal' => 'Koordinasi jadwal latihan gabungan', 'diminta_oleh' => 'SDIR', 'tanggal' => '28 Jul 2026', 'status' => 'Selesai', 'status_class' => 'green'],
-            ],
+            'laporanMasuk' => $laporanMasuk,
+            'koordinasi' => $koordinasi,
+            'laporanPerPrioritas' => $laporanPerPrioritas,
+            'laporanPerSatuanChart' => $laporanPerSatuanChart,
+            'statusKoordinasi' => $statusKoordinasi,
             'riwayatDiteruskan' => [
                 ['satuan' => 'Satlak Penindakan', 'perihal' => 'Indikasi ransomware pada server unit', 'tanggal' => '31 Jul 2026', 'status' => 'Disetujui DANPUS', 'status_class' => 'green'],
                 ['satuan' => 'Binmat', 'perihal' => 'Pengadaan perangkat pemantauan baru', 'tanggal' => '29 Jul 2026', 'status' => 'Disetujui DANPUS', 'status_class' => 'green'],
