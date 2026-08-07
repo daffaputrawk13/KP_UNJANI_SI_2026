@@ -1,5 +1,11 @@
 <?php
 
+use App\Http\Controllers\Admin\BackupController;
+use App\Http\Controllers\Admin\PermissionController;
+use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\SatuanController;
+use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\AkunMedsosController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\DashboardController;
@@ -35,7 +41,7 @@ Route::get('/dashboard', DashboardController::class)
     ->middleware('auth')
     ->name('dashboard');
 
-// Kirim laporan dari satuan pengirim (mis. Satlok Duktek/Bangtek) ke DANPUS,
+// Kirim laporan dari satuan pengirim (mis. satlak Duktek/Bangtek) ke DANPUS,
 // sekaligus memicu notifikasi database ke seluruh akun DANPUS.
 Route::post('/laporan', [LaporanController::class, 'store'])
     ->middleware('auth')
@@ -145,3 +151,37 @@ Route::post('/personel-dokumen', [PersonelDokumenController::class, 'store'])
 Route::delete('/personel-dokumen/{dokumen}', [PersonelDokumenController::class, 'destroy'])
     ->middleware('auth')
     ->name('personel-dokumen.destroy');
+
+// ===== Kelola Sistem (Admin) =====
+// Seluruh route di sini khusus untuk akun bersatuan ADMIN, ditegakkan oleh
+// middleware 'admin'. Mencakup CRUD Pengguna, CRUD Satlak, Role & Hak
+// Akses, Pengaturan Sistem, Backup Database, dan Laporan Pengguna &
+// Aktivitas (Export PDF/Excel) — fitur-fitur pada Dashboard Admin.
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    // Manajemen Pengguna (CRUD User)
+    Route::post('/users', [AdminUserController::class, 'store'])->name('users.store');
+    Route::patch('/users/{user}', [AdminUserController::class, 'update'])->name('users.update');
+    Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
+    Route::post('/users/{user}/reset-password', [AdminUserController::class, 'resetPassword'])->name('users.reset-password');
+
+    // Manajemen Satlak
+    Route::post('/satuan', [SatuanController::class, 'store'])->name('satuan.store');
+    Route::patch('/satuan/{satuan}', [SatuanController::class, 'update'])->name('satuan.update');
+    Route::delete('/satuan/{satuan}', [SatuanController::class, 'destroy'])->name('satuan.destroy');
+
+    // Manajemen Role & Hak Akses
+    Route::patch('/satuan/{satuan}/permissions', [PermissionController::class, 'update'])->name('satuan.permissions');
+
+    // Pengaturan Sistem (Profil Instansi, Logo, dll.)
+    Route::patch('/pengaturan', [SettingController::class, 'update'])->name('pengaturan.update');
+
+    // Backup Database (opsional)
+    Route::post('/backup', [BackupController::class, 'store'])->name('backup.store');
+    Route::get('/backup/{filename}/download', [BackupController::class, 'download'])->name('backup.download');
+
+    // Laporan Pengguna & Aktivitas + Export PDF/Excel
+    Route::get('/laporan', [ReportController::class, 'index'])->name('laporan.index');
+    Route::get('/laporan/cetak', [ReportController::class, 'printView'])->name('laporan.cetak');
+    Route::get('/laporan/export/pengguna', [ReportController::class, 'exportUsersExcel'])->name('laporan.export-pengguna');
+    Route::get('/laporan/export/aktivitas', [ReportController::class, 'exportActivityExcel'])->name('laporan.export-aktivitas');
+});

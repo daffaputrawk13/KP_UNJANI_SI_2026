@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Storage;
 class LaporanController extends Controller
 {
     /**
-     * Simpan laporan baru dari satuan pengirim (mis. Satlok Duktek/Bangtek)
+     * Simpan laporan baru dari satuan pengirim (mis. satlak Duktek/Bangtek)
      * dan kirim notifikasi database ke seluruh user yang terdaftar di DANPUS.
      */
     public function store(Request $request): RedirectResponse

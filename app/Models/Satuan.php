@@ -15,7 +15,25 @@ class Satuan extends Model
         'nama',
         'kategori',
         'deskripsi',
+        'permissions',
         'urutan',
+    ];
+
+    protected $casts = [
+        'permissions' => 'array',
+    ];
+
+    /**
+     * Modul dashboard yang bisa diatur hak aksesnya lewat "Manajemen Role &
+     * Hak Akses" (Admin). Kunci dipakai sebagai nilai checkbox, label untuk
+     * ditampilkan di UI.
+     */
+    public const MODUL_HAK_AKSES = [
+        'laporan' => 'Kirim & Kelola Laporan',
+        'medsos' => 'Manajemen Media Sosial',
+        'personel' => 'Administrasi Personel',
+        'monitoring' => 'Monitoring Aset/Sistem',
+        'notifikasi' => 'Notifikasi',
     ];
 
     /**
@@ -32,7 +50,7 @@ class Satuan extends Model
     }
 
     /**
-     * Laporan yang dikirim oleh satuan ini (mis. laporan dari Satlok Duktek).
+     * Laporan yang dikirim oleh satuan ini (mis. laporan dari satlak Duktek).
      */
     public function laporanTerkirim(): HasMany
     {

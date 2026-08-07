@@ -505,7 +505,7 @@
                   <td><span class="status-dot warn">Diteruskan ke DANPUS</span></td>
                 </tr>
                 <tr>
-                  <td>Gateway Email Satlok Duktek (Dukungan Teknologi)</td>
+                  <td>Gateway Email satlak Duktek (Dukungan Teknologi)</td>
                   <td>Phishing campaign berhasil diblokir</td>
                   <td>02 Agu 2026</td>
                   <td><span class="status-dot green">Disetujui DANPUS</span></td>

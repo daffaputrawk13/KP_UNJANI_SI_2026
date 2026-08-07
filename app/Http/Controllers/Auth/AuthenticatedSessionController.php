@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\Satuan;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -33,6 +34,8 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        ActivityLog::catat('login', 'Berhasil login ke SIBERAD.', $request->user());
+
         return redirect()->intended(route('dashboard'));
     }
 
@@ -41,6 +44,8 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        ActivityLog::catat('logout', 'Logout dari SIBERAD.', $request->user());
+
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();

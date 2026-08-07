@@ -134,6 +134,12 @@
           <svg class="side-dropdown-arrow" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg>
         </button>
         <div class="side-dropdown-menu" id="sistemSubmenu">
+          <a href="#" class="side-link side-sublink" data-tab-link="satlak">Manajemen Satlak</a>
+          <a href="#" class="side-link side-sublink" data-tab-link="role-akses">Role &amp; Hak Akses</a>
+          <a href="#" class="side-link side-sublink" data-tab-link="data-master">Data Master</a>
+          <a href="#" class="side-link side-sublink" data-tab-link="log-aktivitas">Log Aktivitas</a>
+          <a href="#" class="side-link side-sublink" data-tab-link="backup">Backup Database</a>
+          <a href="#" class="side-link side-sublink" data-tab-link="laporan-admin">Laporan &amp; Export</a>
           <a href="#" class="side-link side-sublink" data-tab-link="pengaturan-umum">Pengaturan Umum</a>
         </div>
       </div>
@@ -345,10 +351,58 @@
           <h2>Kelola Pengguna</h2>
           <p>Seluruh akun yang terdaftar, satu akun per satuan.</p>
         </div>
+
+        @if (session('status'))
+          <div class="notice">{{ session('status') }}</div>
+        @endif
+        @if (session('error'))
+          <div class="notice" style="border-color:var(--red);">{{ session('error') }}</div>
+        @endif
+        @if ($errors->any())
+          <div class="notice" style="border-color:var(--red);">{{ $errors->first() }}</div>
+        @endif
+
         <div class="panel">
-          <div class="panel-head">
-            <button type="button" class="btn btn-primary btn-sm" style="margin-left:auto;" onclick="alert('Prototype — form tambah pengguna belum tersambung ke database.')">+ Tambah Pengguna</button>
-          </div>
+          <div class="panel-head"><div><h3>Tambah Pengguna</h3><p>Buat akun baru untuk satu satuan.</p></div></div>
+          <form class="form-grid" method="POST" action="{{ route('admin.users.store') }}" style="padding:22px;">
+            @csrf
+            <div class="form-field">
+              <label for="uNama">Nama Lengkap</label>
+              <input id="uNama" name="name" type="text" required>
+            </div>
+            <div class="form-field">
+              <label for="uUsername">Username / NRP</label>
+              <input id="uUsername" name="username" type="text" required>
+            </div>
+            <div class="form-field">
+              <label for="uEmail">Email (opsional)</label>
+              <input id="uEmail" name="email" type="email">
+            </div>
+            <div class="form-field">
+              <label for="uJabatan">Jabatan (opsional)</label>
+              <input id="uJabatan" name="jabatan" type="text">
+            </div>
+            <div class="form-field">
+              <label for="uSatuan">Satuan</label>
+              <select id="uSatuan" name="satuan_id" required>
+                <option value="">— Pilih satuan —</option>
+                @foreach($semuaSatuan as $s)
+                <option value="{{ $s->id }}">{{ $s->nama }} ({{ $s->kode }})</option>
+                @endforeach
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="uPassword">Password Awal</label>
+              <input id="uPassword" name="password" type="password" minlength="8" required placeholder="Minimal 8 karakter">
+            </div>
+            <div class="form-field full">
+              <button class="btn btn-primary" type="submit">Simpan Pengguna</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><div><h3>Daftar Pengguna</h3><p>Klik "Ubah" untuk mengedit satuan/jabatan/password.</p></div></div>
           <div class="table-toolbar">
             <div class="table-search-wrap">
               <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
@@ -361,7 +415,7 @@
               @endforeach
             </select>
           </div>
-          <div class="tbl-wrap" data-row-limit="5">
+          <div class="tbl-wrap" data-row-limit="8">
             <table class="dtbl" id="tblPengguna">
               <thead><tr><th>Nama</th><th>Username</th><th>Email</th><th>Satuan</th><th>Aksi</th></tr></thead>
               <tbody>
@@ -373,13 +427,287 @@
                   <td>{{ $p->satuan->nama ?? '-' }}</td>
                   <td>
                     <div class="btn-row">
-                      <button class="btn btn-sm" type="button" onclick="alert('Prototype — reset password untuk &quot;{{ $p->name }}&quot; belum tersambung ke database.')">Reset Password</button>
+                      <button class="btn btn-sm" type="button" onclick="toggleEditPengguna({{ $p->id }})">Ubah</button>
+                      <form method="POST" action="{{ route('admin.users.reset-password', $p) }}" onsubmit="return confirm('Reset password akun {{ $p->name }}?');" style="display:inline;">
+                        @csrf
+                        <button class="btn btn-sm" type="submit">Reset Password</button>
+                      </form>
+                      @if($p->id !== $user->id)
+                      <form method="POST" action="{{ route('admin.users.destroy', $p) }}" onsubmit="return confirm('Hapus akun {{ $p->name }}?');" style="display:inline;">
+                        @csrf @method('DELETE')
+                        <button class="btn btn-sm btn-ghost-red" type="submit">Hapus</button>
+                      </form>
+                      @endif
                     </div>
+                  </td>
+                </tr>
+                <tr id="editRow{{ $p->id }}" style="display:none;">
+                  <td colspan="5" style="background:var(--panel-alt);">
+                    <form class="form-grid" method="POST" action="{{ route('admin.users.update', $p) }}" style="padding:16px;">
+                      @csrf @method('PATCH')
+                      <div class="form-field"><label>Nama</label><input name="name" type="text" value="{{ $p->name }}" required></div>
+                      <div class="form-field"><label>Username</label><input name="username" type="text" value="{{ $p->username }}" required></div>
+                      <div class="form-field"><label>Email</label><input name="email" type="email" value="{{ $p->email }}"></div>
+                      <div class="form-field"><label>Jabatan</label><input name="jabatan" type="text" value="{{ $p->jabatan }}"></div>
+                      <div class="form-field">
+                        <label>Satuan</label>
+                        <select name="satuan_id" required>
+                          @foreach($semuaSatuan as $s)
+                          <option value="{{ $s->id }}" @selected($p->satuan_id === $s->id)>{{ $s->nama }}</option>
+                          @endforeach
+                        </select>
+                      </div>
+                      <div class="form-field"><label>Password Baru (opsional)</label><input name="password" type="password" minlength="8" placeholder="Kosongkan jika tidak diubah"></div>
+                      <div class="form-field full"><button class="btn btn-primary btn-sm" type="submit">Simpan Perubahan</button></div>
+                    </form>
                   </td>
                 </tr>
                 @endforeach
               </tbody>
             </table>
+          </div>
+        </div>
+      </section>
+      <script>
+        function toggleEditPengguna(id) {
+          var row = document.getElementById('editRow' + id);
+          if (row) row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
+        }
+      </script>
+
+      {{-- ===== MANAJEMEN SATLAK ===== --}}
+      <section class="tab-panel" data-tab-panel="satlak">
+        <div class="section-head">
+          <h2>Manajemen Satlak</h2>
+          <p>Kelola daftar satuan/Satlak yang terdaftar di SIBERAD.</p>
+        </div>
+
+        @if (session('status'))
+          <div class="notice">{{ session('status') }}</div>
+        @endif
+        @if (session('error'))
+          <div class="notice" style="border-color:var(--red);">{{ session('error') }}</div>
+        @endif
+
+        <div class="panel">
+          <div class="panel-head"><div><h3>Tambah Satuan</h3><p>Kode dipakai sebagai identitas login/role.</p></div></div>
+          <form class="form-grid" method="POST" action="{{ route('admin.satuan.store') }}" style="padding:22px;">
+            @csrf
+            <div class="form-field"><label for="sKode">Kode</label><input id="sKode" name="kode" type="text" placeholder="Contoh: BINLOG" required style="text-transform:uppercase;"></div>
+            <div class="form-field"><label for="sNama">Nama Satuan</label><input id="sNama" name="nama" type="text" required></div>
+            <div class="form-field">
+              <label for="sKategori">Kategori</label>
+              <select id="sKategori" name="kategori" required>
+                <option value="{{ \App\Models\Satuan::KATEGORI_SATLAK }}">Satlak</option>
+                <option value="{{ \App\Models\Satuan::KATEGORI_DIREKTORAT }}">Direktorat</option>
+                <option value="{{ \App\Models\Satuan::KATEGORI_PIMPINAN }}">Pimpinan</option>
+                <option value="{{ \App\Models\Satuan::KATEGORI_ADMIN }}">Admin</option>
+              </select>
+            </div>
+            <div class="form-field"><label for="sUrutan">Urutan</label><input id="sUrutan" name="urutan" type="number" min="0" placeholder="0"></div>
+            <div class="form-field full"><label for="sDeskripsi">Deskripsi (opsional)</label><textarea id="sDeskripsi" name="deskripsi" rows="2"></textarea></div>
+            <div class="form-field full"><button class="btn btn-primary" type="submit">Simpan Satuan</button></div>
+          </form>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><div><h3>Daftar Satuan</h3><p>Satuan yang masih punya pengguna tidak bisa dihapus.</p></div></div>
+          <div class="tbl-wrap" data-row-limit="8">
+            <table class="dtbl">
+              <thead><tr><th>Kode</th><th>Nama</th><th>Kategori</th><th>Jumlah Pengguna</th><th>Aksi</th></tr></thead>
+              <tbody>
+                @forelse($semuaSatuan as $s)
+                <tr>
+                  <td><span class="badge">{{ $s->kode }}</span></td>
+                  <td>{{ $s->nama }}</td>
+                  <td style="color:var(--text-muted);text-transform:capitalize;">{{ $s->kategori }}</td>
+                  <td>{{ $s->users_count }}</td>
+                  <td>
+                    <div class="btn-row">
+                      <button class="btn btn-sm" type="button" onclick="toggleEditSatuan({{ $s->id }})">Ubah</button>
+                      <form method="POST" action="{{ route('admin.satuan.destroy', $s) }}" onsubmit="return confirm('Hapus satuan {{ $s->nama }}?');" style="display:inline;">
+                        @csrf @method('DELETE')
+                        <button class="btn btn-sm btn-ghost-red" type="submit">Hapus</button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+                <tr id="editSatuan{{ $s->id }}" style="display:none;">
+                  <td colspan="5" style="background:var(--panel-alt);">
+                    <form class="form-grid" method="POST" action="{{ route('admin.satuan.update', $s) }}" style="padding:16px;">
+                      @csrf @method('PATCH')
+                      <div class="form-field"><label>Kode</label><input name="kode" type="text" value="{{ $s->kode }}" required></div>
+                      <div class="form-field"><label>Nama</label><input name="nama" type="text" value="{{ $s->nama }}" required></div>
+                      <div class="form-field">
+                        <label>Kategori</label>
+                        <select name="kategori" required>
+                          @foreach([\App\Models\Satuan::KATEGORI_SATLAK,\App\Models\Satuan::KATEGORI_DIREKTORAT,\App\Models\Satuan::KATEGORI_PIMPINAN,\App\Models\Satuan::KATEGORI_ADMIN] as $k)
+                          <option value="{{ $k }}" @selected($s->kategori === $k)>{{ ucfirst($k) }}</option>
+                          @endforeach
+                        </select>
+                      </div>
+                      <div class="form-field"><label>Urutan</label><input name="urutan" type="number" min="0" value="{{ $s->urutan }}"></div>
+                      <div class="form-field full"><label>Deskripsi</label><textarea name="deskripsi" rows="2">{{ $s->deskripsi }}</textarea></div>
+                      <div class="form-field full"><button class="btn btn-primary btn-sm" type="submit">Simpan Perubahan</button></div>
+                    </form>
+                  </td>
+                </tr>
+                @empty
+                <tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:24px;">Belum ada data satuan.</td></tr>
+                @endforelse
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+      <script>
+        function toggleEditSatuan(id) {
+          var row = document.getElementById('editSatuan' + id);
+          if (row) row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
+        }
+      </script>
+
+      {{-- ===== ROLE & HAK AKSES ===== --}}
+      <section class="tab-panel" data-tab-panel="role-akses">
+        <div class="section-head">
+          <h2>Role &amp; Hak Akses</h2>
+          <p>Setiap satuan berperan sebagai role login. Atur modul apa saja yang boleh diakses tiap satuan.</p>
+        </div>
+
+        @if (session('status'))
+          <div class="notice">{{ session('status') }}</div>
+        @endif
+
+        @foreach($semuaSatuan as $s)
+        <div class="panel">
+          <div class="panel-head"><div><h3>{{ $s->nama }} <span class="badge">{{ $s->kode }}</span></h3><p>{{ $s->deskripsi ?: 'Tidak ada deskripsi.' }}</p></div></div>
+          <form method="POST" action="{{ route('admin.satuan.permissions', $s) }}" style="padding:18px 22px;">
+            @csrf @method('PATCH')
+            <div style="display:flex;flex-wrap:wrap;gap:14px;margin-bottom:14px;">
+              @foreach($modulHakAkses as $key => $label)
+              <label style="display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--text-muted);">
+                <input type="checkbox" name="permissions[]" value="{{ $key }}" @checked(in_array($key, $s->permissions ?? []))>
+                {{ $label }}
+              </label>
+              @endforeach
+            </div>
+            <button class="btn btn-primary btn-sm" type="submit">Simpan Hak Akses {{ $s->kode }}</button>
+          </form>
+        </div>
+        @endforeach
+      </section>
+
+      {{-- ===== DATA MASTER ===== --}}
+      <section class="tab-panel" data-tab-panel="data-master">
+        <div class="section-head">
+          <h2>Manajemen Data Master</h2>
+          <p>Referensi data pangkat &amp; jabatan yang dipakai seluruh modul Administrasi Personel.</p>
+        </div>
+        <div class="panel">
+          <div style="padding:20px;text-align:center;">
+            <p style="margin:0 0 12px;font-size:12.5px;line-height:1.6;color:var(--text-muted);">
+              Data master Pangkat dan Jabatan dikelola bersama dari dashboard Binfung (Pembinaan Fungsi) supaya satu sumber data untuk seluruh satuan.
+            </p>
+            <span class="badge">{{ \App\Models\Pangkat::count() }} Pangkat</span>
+            &nbsp;
+            <span class="badge">{{ \App\Models\Jabatan::count() }} Jabatan</span>
+            &nbsp;
+            <span class="badge">{{ $semuaSatuan->count() }} Satuan</span>
+          </div>
+        </div>
+      </section>
+
+      {{-- ===== LOG AKTIVITAS ===== --}}
+      <section class="tab-panel" data-tab-panel="log-aktivitas">
+        <div class="section-head">
+          <h2>Monitoring Aktivitas Sistem</h2>
+          <p>Rekam jejak login, logout, dan seluruh aksi kelola sistem oleh Admin.</p>
+        </div>
+        <div class="panel">
+          <div class="table-toolbar">
+            <div class="table-search-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
+              <input type="text" class="table-search" data-table-search="tblLogAktivitas" placeholder="Cari pengguna atau aksi...">
+            </div>
+          </div>
+          <div class="tbl-wrap" data-row-limit="10">
+            <table class="dtbl" id="tblLogAktivitas">
+              <thead><tr><th>Waktu</th><th>Pengguna</th><th>Aksi</th><th>Deskripsi</th><th>IP</th></tr></thead>
+              <tbody>
+                @forelse($logAktivitas as $l)
+                <tr>
+                  <td style="white-space:nowrap;">{{ $l->created_at?->translatedFormat('d M Y H:i') }}</td>
+                  <td>{{ $l->nama_pengguna ?? '-' }}</td>
+                  <td><span class="badge">{{ $l->aksi }}</span></td>
+                  <td style="color:var(--text-muted);">{{ $l->deskripsi }}</td>
+                  <td style="color:var(--text-dim);">{{ $l->ip_address }}</td>
+                </tr>
+                @empty
+                <tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:24px;">Belum ada aktivitas tercatat.</td></tr>
+                @endforelse
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      {{-- ===== BACKUP DATABASE ===== --}}
+      <section class="tab-panel" data-tab-panel="backup">
+        <div class="section-head">
+          <h2>Backup Database</h2>
+          <p>Buat salinan database sewaktu-waktu dan unduh untuk disimpan di luar server.</p>
+        </div>
+
+        @if (session('status'))
+          <div class="notice">{{ session('status') }}</div>
+        @endif
+        @if (session('error'))
+          <div class="notice" style="border-color:var(--red);">{{ session('error') }}</div>
+        @endif
+
+        <div class="panel">
+          <div class="panel-head"><div><h3>Buat Backup Baru</h3><p>Untuk koneksi SQLite: salin file database. Untuk MySQL: jalankan mysqldump.</p></div></div>
+          <form method="POST" action="{{ route('admin.backup.store') }}" style="padding:18px 22px;">
+            @csrf
+            <button class="btn btn-primary" type="submit">+ Buat Backup Sekarang</button>
+          </form>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><div><h3>Riwayat Backup</h3></div></div>
+          <div class="tbl-wrap" data-row-limit="8">
+            <table class="dtbl">
+              <thead><tr><th>Nama File</th><th>Ukuran</th><th>Tanggal</th><th>Aksi</th></tr></thead>
+              <tbody>
+                @forelse($daftarBackup as $b)
+                <tr>
+                  <td>{{ $b['nama'] }}</td>
+                  <td>{{ $b['ukuran'] }}</td>
+                  <td>{{ $b['tanggal'] }}</td>
+                  <td><a class="btn btn-sm" href="{{ route('admin.backup.download', $b['nama']) }}">Unduh</a></td>
+                </tr>
+                @empty
+                <tr><td colspan="4" style="text-align:center;color:var(--text-dim);padding:24px;">Belum ada backup dibuat.</td></tr>
+                @endforelse
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      {{-- ===== LAPORAN & EXPORT ===== --}}
+      <section class="tab-panel" data-tab-panel="laporan-admin">
+        <div class="section-head">
+          <h2>Laporan Pengguna &amp; Aktivitas</h2>
+          <p>Rekap data pengguna dan aktivitas sistem, siap diekspor.</p>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div><h3>Export</h3><p>Unduh dalam format CSV (bisa dibuka Excel) atau cetak sebagai PDF.</p></div></div>
+          <div class="btn-row" style="padding:18px 22px;flex-wrap:wrap;">
+            <a class="btn btn-primary btn-sm" href="{{ route('admin.laporan.export-pengguna') }}">Export Pengguna (Excel/CSV)</a>
+            <a class="btn btn-primary btn-sm" href="{{ route('admin.laporan.export-aktivitas') }}">Export Aktivitas (Excel/CSV)</a>
+            <a class="btn btn-sm" href="{{ route('admin.laporan.cetak') }}" target="_blank">Cetak / Simpan sebagai PDF</a>
+            <a class="btn btn-sm" href="{{ route('admin.laporan.index') }}" target="_blank">Buka Halaman Laporan Lengkap</a>
           </div>
         </div>
       </section>
@@ -390,11 +718,46 @@
           <h2>Pengaturan Umum</h2>
           <p>Konfigurasi umum aplikasi SIBERAD.</p>
         </div>
+
+        @if (session('status'))
+          <div class="notice">{{ session('status') }}</div>
+        @endif
+
         <div class="panel">
-          <div class="panel-head"><div><h3>Identitas Aplikasi</h3><p>Nama, logo, dan informasi dasar sistem.</p></div></div>
-          <div style="padding:24px;text-align:center;">
-            <p style="margin:0;font-size:12.5px;line-height:1.6;color:var(--text-muted);">Prototype — pengaturan umum belum tersambung ke database.<br>Nantinya menu ini dipakai untuk mengatur nama instansi, logo, dan preferensi sistem lainnya.</p>
-          </div>
+          <div class="panel-head"><div><h3>Identitas Aplikasi</h3><p>Nama instansi, logo, dan informasi kontak.</p></div></div>
+          <form class="form-grid" method="POST" action="{{ route('admin.pengaturan.update') }}" enctype="multipart/form-data" style="padding:22px;">
+            @csrf @method('PATCH')
+            <div class="form-field">
+              <label for="pgNama">Nama Instansi</label>
+              <input id="pgNama" name="nama_instansi" type="text" value="{{ $pengaturan->nama_instansi }}" required>
+            </div>
+            <div class="form-field">
+              <label for="pgSingkatan">Singkatan</label>
+              <input id="pgSingkatan" name="singkatan" type="text" value="{{ $pengaturan->singkatan }}">
+            </div>
+            <div class="form-field">
+              <label for="pgEmail">Email Kontak</label>
+              <input id="pgEmail" name="email_kontak" type="email" value="{{ $pengaturan->email_kontak }}">
+            </div>
+            <div class="form-field">
+              <label for="pgTelepon">Telepon Kontak</label>
+              <input id="pgTelepon" name="telepon_kontak" type="text" value="{{ $pengaturan->telepon_kontak }}">
+            </div>
+            <div class="form-field full">
+              <label for="pgAlamat">Alamat</label>
+              <textarea id="pgAlamat" name="alamat" rows="2">{{ $pengaturan->alamat }}</textarea>
+            </div>
+            <div class="form-field">
+              <label for="pgLogo">Logo (opsional, PNG/JPG)</label>
+              <input id="pgLogo" name="logo" type="file" accept="image/*">
+              @if($pengaturan->logo_path)
+                <img src="{{ asset('storage/'.$pengaturan->logo_path) }}" alt="Logo saat ini" style="height:40px;margin-top:8px;border-radius:6px;">
+              @endif
+            </div>
+            <div class="form-field full">
+              <button class="btn btn-primary" type="submit">Simpan Pengaturan</button>
+            </div>
+          </form>
         </div>
       </section>
 

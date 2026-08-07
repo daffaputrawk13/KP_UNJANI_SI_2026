@@ -23,7 +23,7 @@ class Laporan extends Model
     ];
 
     /**
-     * Satuan asal pengirim laporan (mis. Satlok Duktek/Bangtek).
+     * Satuan asal pengirim laporan (mis. satlak Duktek/Bangtek).
      */
     public function satuan(): BelongsTo
     {

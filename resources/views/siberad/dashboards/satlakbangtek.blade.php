@@ -258,7 +258,7 @@
 
         <div class="panel chart-box">
           <div class="chart-box-head-row">
-            <div><h3 style="font-family:var(--display);font-size:17px;font-weight:700;">Analitik Riset & Perbandingan Satlak</h3><p style="font-size:12px;color:var(--text-muted);margin-top:2px;">Progres proyek, komposisi kategori, dan posisi Satlok Duktek (Dukungan Teknologi) dibanding tiga Satlak lainnya.</p></div>
+            <div><h3 style="font-family:var(--display);font-size:17px;font-weight:700;">Analitik Riset & Perbandingan Satlak</h3><p style="font-size:12px;color:var(--text-muted);margin-top:2px;">Progres proyek, komposisi kategori, dan posisi satlak Duktek (Dukungan Teknologi) dibanding tiga Satlak lainnya.</p></div>
             <div class="chart-filter-group">
               <select class="chart-type-select" id="chartDateFilterGlobal">
                 <option value="7d">7 Hari Terakhir</option>
@@ -298,7 +298,7 @@
             </div>
 
           </div>
-          <p class="chart-legend-note">Emas = Satlok Duktek (Dukungan Teknologi), disorot sebagai Satlak yang paling krusial pada riset & pengembangan teknologi. Ganti jenis grafik lewat dropdown di kanan atas — pilihan selain "Batang" akan otomatis memisah tiap grafik menjadi tampilan yang lebih besar. Filter tanggal masih simulasi proporsional karena histori progres per tanggal belum tersambung ke database.</p>
+          <p class="chart-legend-note">Emas = satlak Duktek (Dukungan Teknologi), disorot sebagai Satlak yang paling krusial pada riset & pengembangan teknologi. Ganti jenis grafik lewat dropdown di kanan atas — pilihan selain "Batang" akan otomatis memisah tiap grafik menjadi tampilan yang lebih besar. Filter tanggal masih simulasi proporsional karena histori progres per tanggal belum tersambung ke database.</p>
         </div>
 
         <div class="panel">
