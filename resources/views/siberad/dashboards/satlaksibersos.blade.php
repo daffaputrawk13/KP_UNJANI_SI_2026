@@ -510,20 +510,7 @@
       </style>
 
       <script>
-        const laporanPublikasiData = @json($semuaLaporanPublikasi->keyBy('id')->map(function ($l) {
-            return [
-                'judul' => $l->judul,
-                'platform' => $l->platform ?? '—',
-                'status' => $l->status,
-                'tanggal' => $l->tanggal_kirim?->translatedFormat('d M Y H:i') ?? '—',
-                'link' => $l->link_publikasi,
-                'deskripsi' => $l->deskripsi,
-                'dokumentasi' => $l->dokumentasi->map(fn ($d) => [
-                    'nama' => $d->nama_file,
-                    'url' => asset('storage/'.$d->path),
-                ]),
-            ];
-        }));
+        const laporanPublikasiData = @json($laporanPublikasiData);
 
         function bukaDetailLaporanPublikasi(id) {
           const l = laporanPublikasiData[id];

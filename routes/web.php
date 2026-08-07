@@ -11,6 +11,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\JabatanController;
 use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\LaporanPublikasiController;
 use App\Http\Controllers\NotifikasiController;
 use App\Http\Controllers\PangkatController;
 use App\Http\Controllers\PersonelController;
@@ -56,6 +57,33 @@ Route::post('/laporan', [LaporanController::class, 'store'])
 Route::delete('/laporan/{laporan}', [LaporanController::class, 'destroy'])
     ->middleware('auth')
     ->name('laporan.destroy');
+
+// ===== Laporan Publikasi ke DANPUS (Satlak Sibersos) =====
+// Dipakai fitur Buat Laporan Publikasi, Draft, Kirim ke DANPUS, Upload
+// Dokumentasi, dan Hapus Draft pada dashboard Satlak Sibersos.
+Route::post('/laporan-publikasi', [LaporanPublikasiController::class, 'store'])
+    ->middleware('auth')
+    ->name('laporan-publikasi.store');
+
+Route::patch('/laporan-publikasi/{laporanPublikasi}', [LaporanPublikasiController::class, 'update'])
+    ->middleware('auth')
+    ->name('laporan-publikasi.update');
+
+Route::post('/laporan-publikasi/{laporanPublikasi}/kirim', [LaporanPublikasiController::class, 'kirim'])
+    ->middleware('auth')
+    ->name('laporan-publikasi.kirim');
+
+Route::post('/laporan-publikasi/{laporanPublikasi}/dokumentasi', [LaporanPublikasiController::class, 'uploadDokumentasi'])
+    ->middleware('auth')
+    ->name('laporan-publikasi.upload-dokumentasi');
+
+Route::delete('/laporan-publikasi-dokumen/{dokumen}', [LaporanPublikasiController::class, 'destroyDokumentasi'])
+    ->middleware('auth')
+    ->name('laporan-publikasi-dokumen.destroy');
+
+Route::delete('/laporan-publikasi/{laporanPublikasi}', [LaporanPublikasiController::class, 'destroy'])
+    ->middleware('auth')
+    ->name('laporan-publikasi.destroy');
 
 Route::post('/notifikasi/baca-semua', [NotifikasiController::class, 'bacaSemua'])
     ->middleware('auth')

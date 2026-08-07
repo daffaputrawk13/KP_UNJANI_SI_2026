@@ -422,6 +422,25 @@ class DashboardController extends Controller
         $draftLaporanPublikasi = $semuaLaporanPublikasi->where('status', 'Draft')->values();
         $statusLaporanPublikasi = $semuaLaporanPublikasi->where('status', '!=', 'Draft')->values();
 
+        // Dibangun di sini (bukan langsung di dalam @json() pada Blade) karena
+        // Blade meng-explode isi @json(...) berdasarkan koma untuk mencari
+        // parameter options/depth. Array kompleks dengan banyak koma di dalam
+        // @json() akan membuat hasil kompilasinya rusak (ParseError).
+        $laporanPublikasiData = $semuaLaporanPublikasi->keyBy('id')->map(function ($l) {
+            return [
+                'judul' => $l->judul,
+                'platform' => $l->platform ?? '—',
+                'status' => $l->status,
+                'tanggal' => $l->tanggal_kirim?->translatedFormat('d M Y H:i') ?? '—',
+                'link' => $l->link_publikasi,
+                'deskripsi' => $l->deskripsi,
+                'dokumentasi' => $l->dokumentasi->map(fn ($d) => [
+                    'nama' => $d->nama_file,
+                    'url' => asset('storage/'.$d->path),
+                ]),
+            ];
+        });
+
         return view('siberad.dashboards.satlaksibersos', [
             'user' => $user,
             'satuan' => $satuan,
@@ -436,6 +455,7 @@ class DashboardController extends Controller
             'semuaLaporanPublikasi' => $semuaLaporanPublikasi,
             'draftLaporanPublikasi' => $draftLaporanPublikasi,
             'statusLaporanPublikasi' => $statusLaporanPublikasi,
+            'laporanPublikasiData' => $laporanPublikasiData,
         ]);
     }
 
