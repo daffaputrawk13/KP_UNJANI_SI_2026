@@ -251,6 +251,14 @@
 
       {{-- ===== RINGKASAN ===== --}}
       <section class="tab-panel active" data-tab-panel="dashboard">
+        <div class="dash-hero">
+          <div>
+            <div class="dash-hero-eyebrow">SIBERAD // {{ $satuan->kode ?? 'SISTEM' }}</div>
+            <h2>Selamat datang, {{ $satuan->nama ?? $user->name }}</h2>
+            <p>{{ now()->translatedFormat('l, d F Y') }}</p>
+          </div>
+        </div>
+
         <div class="section-head">
           <h2>Ringkasan Penempatan Personel</h2>
           <p>Status penempatan personel yang ditangani Binfung bulan ini.</p>

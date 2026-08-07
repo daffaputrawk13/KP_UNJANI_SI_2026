@@ -277,8 +277,8 @@
 
         <div class="dash-hero">
           <div>
-            <div class="dash-hero-eyebrow">SIBERAD // Panel Admin</div>
-            <h2>Selamat datang, {{ explode(' ', $user->name)[0] }}</h2>
+            <div class="dash-hero-eyebrow">SIBERAD // {{ $satuan->kode ?? 'SISTEM' }}</div>
+            <h2>Selamat datang, {{ $satuan->nama ?? $user->name }}</h2>
             <p>{{ now()->translatedFormat('l, d F Y') }}</p>
           </div>
         </div>
@@ -367,14 +367,6 @@
         </div>
 
         <style>
-          .dash-hero{
-            display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:18px;
-            margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--border-soft);
-          }
-          .dash-hero-eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-bright);margin-bottom:8px;}
-          .dash-hero h2{font-family:var(--display);font-size:26px;font-weight:700;margin-bottom:6px;}
-          .dash-hero p{font-size:13px;color:var(--text-muted);}
-
           .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:26px;}
           @media(max-width:980px){.kpi-grid{grid-template-columns:repeat(2,1fr);}}
           .kpi-card{padding-top:52px;}

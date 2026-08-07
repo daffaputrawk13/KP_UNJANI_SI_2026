@@ -331,6 +331,15 @@
   .section-head h2{font-family:var(--display);font-size:22px;font-weight:700;margin-bottom:5px;letter-spacing:.01em;}
   .section-head p{font-size:13px;color:var(--text-muted);}
 
+  /* ===== dashboard hero greeting ===== */
+  .dash-hero{
+    display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:18px;
+    margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--border-soft);
+  }
+  .dash-hero-eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-bright);margin-bottom:8px;}
+  .dash-hero h2{font-family:var(--display);font-size:26px;font-weight:700;margin-bottom:6px;}
+  .dash-hero p{font-size:13px;color:var(--text-muted);}
+
   /* ===== stat cards ===== */
   .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:26px;}
   .stat-card{
