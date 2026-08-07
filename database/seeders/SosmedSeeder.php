@@ -18,7 +18,7 @@ class SosmedSeeder extends Seeder
      */
     public function run(): void
     {
-        $satuan = Satuan::where('kode', 'SATLAKSIBERSOS')->first();
+        $satuan = Satuan::where('kode', 'SATLAKSISOS')->first();
         if (! $satuan) {
             return; // Jalankan SatuanSeeder dulu.
         }

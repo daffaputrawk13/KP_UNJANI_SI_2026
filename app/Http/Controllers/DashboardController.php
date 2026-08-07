@@ -3,16 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\ActivityLog;
+use App\Models\DukunganTeknisLog;
 use App\Models\Jabatan;
 use App\Models\Laporan;
 use App\Models\LaporanMonitoring;
 use App\Models\LaporanPublikasi;
+use App\Models\LogUjiPengembangan;
 use App\Models\Pangkat;
 use App\Models\Pengaturan;
 use App\Models\Pengumuman;
 use App\Models\Personel;
 use App\Models\PersonelDokumen;
 use App\Models\PersonelMutasi;
+use App\Models\ProyekRiset;
 use App\Models\Satuan;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -45,9 +48,9 @@ class DashboardController extends Controller
             'ADMIN' => $this->admin($user, $satuan),
             'DANPUS' => $this->danpus($user, $satuan),
             'WADAN' => $this->wadan($user, $satuan),
-            'SATLAKAL' => $this->satlakAlmon($user, $satuan),
-            'SATLAKSIBERSOS' => $this->satlakSibersos($user, $satuan),
-            'SATLAKRINDAK' => $this->satlakRindak($user, $satuan),
+            'SATLAKKAL' => $this->satlakAlmon($user, $satuan),
+            'SATLAKSISOS' => $this->satlakSibersos($user, $satuan),
+            'SATLAKDAK' => $this->satlakRindak($user, $satuan),
             'SATLAKDUKTEK' => $this->satlakDuktek($user, $satuan),
             'BINFUNG' => $this->binfung($user, $satuan),
             'BINUM' => $this->binum($user, $satuan),
@@ -182,9 +185,9 @@ class DashboardController extends Controller
         $semuaSatuan = Satuan::where('kode', '!=', 'ADMIN')->orderBy('urutan')->get();
 
         $statusSatuan = [
-            'SATLAKAL' => ['label' => 'Ada Insiden', 'class' => 'bad', 'update' => '10 menit lalu'],
-            'SATLAKSIBERSOS' => ['label' => 'Siaga', 'class' => 'warn', 'update' => '35 menit lalu'],
-            'SATLAKRINDAK' => ['label' => 'Normal', 'class' => 'ok', 'update' => '1 jam lalu'],
+            'SATLAKKAL' => ['label' => 'Ada Insiden', 'class' => 'bad', 'update' => '10 menit lalu'],
+            'SATLAKSISOS' => ['label' => 'Siaga', 'class' => 'warn', 'update' => '35 menit lalu'],
+            'SATLAKDAK' => ['label' => 'Normal', 'class' => 'ok', 'update' => '1 jam lalu'],
             'SATLAKDUKTEK' => ['label' => 'Normal', 'class' => 'ok', 'update' => '2 jam lalu'],
             'BINFUNG' => ['label' => 'Normal', 'class' => 'ok', 'update' => 'Hari ini'],
             'BINUM' => ['label' => 'Normal', 'class' => 'ok', 'update' => 'Hari ini'],
@@ -564,10 +567,35 @@ class DashboardController extends Controller
             ['nama' => 'Jaringan Internal SDIR', 'jenis' => 'Percobaan brute force', 'tingkat' => 'Rendah', 'tingkat_class' => 'ok', 'terdeteksi' => '3 jam lalu'],
         ];
 
+        $logPenanganan = [
+            ['aset' => 'Server File Sharing Ditjen', 'jenis' => 'Ransomware (Lockbit variant)', 'waktu' => '02 Agu 2026, 09:32', 'tindakan' => 'Isolasi jaringan, forensik disk, siapkan restore dari backup', 'status' => 'Berlangsung', 'status_class' => 'amber'],
+            ['aset' => 'Endpoint Staf Binmat #14', 'jenis' => 'Malware (Trojan)', 'waktu' => '02 Agu 2026, 09:00', 'tindakan' => 'Karantina endpoint, scan menyeluruh, reset kredensial', 'status' => 'Dalam Penanganan', 'status_class' => 'amber'],
+            ['aset' => 'Gateway Email satlak Duktek (Dukungan Teknologi)', 'jenis' => 'Phishing campaign', 'waktu' => '02 Agu 2026, 08:20', 'tindakan' => 'Blokir domain pengirim, edukasi pengguna terdampak', 'status' => 'Selesai', 'status_class' => 'green'],
+            ['aset' => 'Portal Data Kodim', 'jenis' => 'Defacement (rujukan Satlakal (Penangkalan))', 'waktu' => '28 Jul 2026, 15:10', 'tindakan' => 'Analisis malware yang disisipkan, patch celah upload', 'status' => 'Selesai', 'status_class' => 'green'],
+        ];
+
+        // Data komposisi untuk 3 grafik mini di dashboard — diturunkan dari
+        // daftar ancaman & log penanganan yang sama, bukan angka acak baru.
+        $ancamanPerTingkat = collect($ancamanTerdeteksi)
+            ->groupBy('tingkat')
+            ->map(fn ($g, $tingkat) => ['tingkat' => $tingkat, 'jumlah' => $g->count()])
+            ->values();
+        $jenisAncamanChart = collect($ancamanTerdeteksi)
+            ->groupBy('jenis')
+            ->map(fn ($g, $jenis) => ['jenis' => $jenis, 'jumlah' => $g->count()])
+            ->values();
+        $statusPenangananChart = collect($logPenanganan)
+            ->groupBy('status')
+            ->map(fn ($g, $status) => ['status' => $status, 'jumlah' => $g->count()])
+            ->values();
+
         return view('siberad.dashboards.satlakrindak', [
             'user' => $user,
             'satuan' => $satuan,
             'ancamanTerdeteksi' => $ancamanTerdeteksi,
+            'ancamanPerTingkat' => $ancamanPerTingkat,
+            'jenisAncamanChart' => $jenisAncamanChart,
+            'statusPenangananChart' => $statusPenangananChart,
             'stats' => [
                 'ancaman_aktif' => 2,
                 'ransomware' => 1,
@@ -578,15 +606,28 @@ class DashboardController extends Controller
                 ['aset' => 'Server File Sharing Ditjen', 'jenis' => 'Ransomware (Lockbit variant)', 'waktu' => '8 menit lalu', 'status' => 'Isolasi Jaringan', 'status_class' => 'bad'],
                 ['aset' => 'Endpoint Staf Binmat #14', 'jenis' => 'Malware (Trojan)', 'waktu' => '40 menit lalu', 'status' => 'Dikarantina', 'status_class' => 'warn'],
             ],
-            'logPenanganan' => [
-                ['aset' => 'Server File Sharing Ditjen', 'jenis' => 'Ransomware (Lockbit variant)', 'waktu' => '02 Agu 2026, 09:32', 'tindakan' => 'Isolasi jaringan, forensik disk, siapkan restore dari backup', 'status' => 'Berlangsung', 'status_class' => 'amber'],
-                ['aset' => 'Endpoint Staf Binmat #14', 'jenis' => 'Malware (Trojan)', 'waktu' => '02 Agu 2026, 09:00', 'tindakan' => 'Karantina endpoint, scan menyeluruh, reset kredensial', 'status' => 'Dalam Penanganan', 'status_class' => 'amber'],
-                ['aset' => 'Gateway Email satlak Duktek (Dukungan Teknologi)', 'jenis' => 'Phishing campaign', 'waktu' => '02 Agu 2026, 08:20', 'tindakan' => 'Blokir domain pengirim, edukasi pengguna terdampak', 'status' => 'Selesai', 'status_class' => 'green'],
-                ['aset' => 'Portal Data Kodim', 'jenis' => 'Defacement (rujukan Satlakal (Penangkalan))', 'waktu' => '28 Jul 2026, 15:10', 'tindakan' => 'Analisis malware yang disisipkan, patch celah upload', 'status' => 'Selesai', 'status_class' => 'green'],
-            ],
+            'logPenanganan' => $logPenanganan,
             'laporanPiket' => [
                 ['aset' => 'Server File Sharing Ditjen', 'perihal' => 'Indikasi ransomware mengenkripsi file bersama', 'pelapor' => 'Piket Satlak Penindakan', 'tanggal' => '02 Agu 2026', 'prioritas' => 'Tinggi', 'prioritas_class' => 'bad'],
                 ['aset' => 'Endpoint Staf Binmat #14', 'perihal' => 'Trojan terdeteksi via antivirus terpusat', 'pelapor' => 'Piket Satlak Penindakan', 'tanggal' => '02 Agu 2026', 'prioritas' => 'Sedang', 'prioritas_class' => 'warn'],
+            ],
+            'investigasi' => [
+                ['kasus' => 'INV-2026-014', 'aset' => 'Server File Sharing Ditjen', 'jenis' => 'Ransomware (Lockbit variant)', 'investigator' => 'Serma Ridho Pratama', 'mulai' => '02 Agu 2026', 'progres' => 65, 'status' => 'Berlangsung', 'status_class' => 'amber'],
+                ['kasus' => 'INV-2026-013', 'aset' => 'Endpoint Staf Binmat #14', 'jenis' => 'Malware (Trojan)', 'investigator' => 'Sertu Dimas Aditya', 'mulai' => '02 Agu 2026', 'progres' => 40, 'status' => 'Berlangsung', 'status_class' => 'amber'],
+                ['kasus' => 'INV-2026-012', 'aset' => 'Gateway Email satlak Duktek (Dukungan Teknologi)', 'jenis' => 'Phishing campaign', 'investigator' => 'Serma Ridho Pratama', 'mulai' => '02 Agu 2026', 'progres' => 100, 'status' => 'Selesai', 'status_class' => 'green'],
+                ['kasus' => 'INV-2026-009', 'aset' => 'Portal Data Kodim', 'jenis' => 'Defacement', 'investigator' => 'Sertu Dimas Aditya', 'mulai' => '28 Jul 2026', 'progres' => 100, 'status' => 'Selesai', 'status_class' => 'green'],
+            ],
+            'timelinePenanganan' => [
+                ['waktu' => '02 Agu 2026, 09:32', 'judul' => 'Insiden Terdeteksi', 'deskripsi' => 'Sistem monitoring mendeteksi aktivitas enkripsi massal pada Server File Sharing Ditjen.', 'state' => 'done'],
+                ['waktu' => '02 Agu 2026, 09:40', 'judul' => 'Isolasi Jaringan', 'deskripsi' => 'Server diisolasi dari jaringan untuk mencegah penyebaran ransomware ke sistem lain.', 'state' => 'done'],
+                ['waktu' => '02 Agu 2026, 10:15', 'judul' => 'Forensik & Analisis', 'deskripsi' => 'Tim investigasi melakukan analisis disk image untuk identifikasi varian ransomware.', 'state' => 'active'],
+                ['waktu' => 'Menyusul', 'judul' => 'Pemulihan dari Backup', 'deskripsi' => 'Restorasi data dari backup terakhir setelah sistem dipastikan bersih.', 'state' => 'pending'],
+                ['waktu' => 'Menyusul', 'judul' => 'Laporan Akhir & Penutupan Kasus', 'deskripsi' => 'Penyusunan laporan investigasi lengkap dan rekomendasi mitigasi jangka panjang.', 'state' => 'pending'],
+            ],
+            'mitigasi' => [
+                ['aset' => 'Server File Sharing Ditjen', 'ancaman' => 'Ransomware (Lockbit variant)', 'tindakan' => 'Perkuat segmentasi jaringan & aktifkan backup terenkripsi harian', 'penanggung_jawab' => 'Serma Ridho Pratama', 'tenggat' => '10 Agu 2026', 'status' => 'Berjalan', 'status_class' => 'amber'],
+                ['aset' => 'Endpoint Staf Binmat #14', 'ancaman' => 'Malware (Trojan)', 'tindakan' => 'Update signature antivirus terpusat & audit endpoint lain', 'penanggung_jawab' => 'Sertu Dimas Aditya', 'tenggat' => '08 Agu 2026', 'status' => 'Berjalan', 'status_class' => 'amber'],
+                ['aset' => 'Gateway Email satlak Duktek (Dukungan Teknologi)', 'ancaman' => 'Phishing campaign', 'tindakan' => 'Blokir domain pengirim & edukasi pengguna terdampak', 'penanggung_jawab' => 'Serma Ridho Pratama', 'tenggat' => '05 Agu 2026', 'status' => 'Selesai', 'status_class' => 'green'],
             ],
         ]);
     }
@@ -596,24 +637,23 @@ class DashboardController extends Controller
      */
     private function satlakDuktek($user, $satuan): View
     {
-        $proyekRiset = [
-            ['nama' => 'Deteksi Anomali Jaringan berbasis AI', 'kategori' => 'AI / Machine Learning', 'progres' => 72, 'status' => 'Berjalan', 'status_class' => 'warn', 'target' => 'Sep 2026'],
-            ['nama' => 'Drone Pemantau Perbatasan Gen-2', 'kategori' => 'Drone / UAV', 'progres' => 45, 'status' => 'Berjalan', 'status_class' => 'warn', 'target' => 'Nov 2026'],
-            ['nama' => 'Chatbot Internal Layanan Personel', 'kategori' => 'AI / NLP', 'progres' => 100, 'status' => 'Selesai', 'status_class' => 'ok', 'target' => 'Jul 2026'],
-            ['nama' => 'Sistem Enkripsi Komunikasi Lapangan', 'kategori' => 'Keamanan Siber', 'progres' => 20, 'status' => 'Riset Awal', 'status_class' => 'ok', 'target' => 'Feb 2027'],
-        ];
+        // Proyek riset & pengembangan (AI, drone, keamanan siber, dll) — dulunya
+        // data dummy, sekarang CRUD nyata lewat tab "Riset & Pengembangan".
+        $proyekRiset = ProyekRiset::where('satuan_id', $satuan->id)
+            ->orderByDesc('created_at')
+            ->get();
 
-        // Distribusi kategori proyek — untuk grafik komposisi riset satlak Duktek (Dukungan Teknologi).
-        $kategoriDistribusi = [
-            ['kategori' => 'AI / Machine Learning', 'jumlah' => 2],
-            ['kategori' => 'Drone / UAV', 'jumlah' => 1],
-            ['kategori' => 'Keamanan Siber', 'jumlah' => 1],
-        ];
+        // Distribusi kategori proyek — untuk grafik komposisi riset.
+        $kategoriDistribusi = $proyekRiset
+            ->groupBy('kategori')
+            ->map(fn ($group, $kategori) => ['kategori' => $kategori, 'jumlah' => $group->count()])
+            ->values();
 
-        // Perbandingan progres aktivitas antar Satlak — satlak Duktek (Dukungan Teknologi)
-        // menjadi tumpuan riset & pengembangan seluruh Satlak, sehingga disorot sebagai pembanding utama.
+        // Perbandingan progres antar Satlak — punya Duktek dihitung dari rata-rata
+        // progres proyek riset asli; 3 satlak lain tetap perbandingan simulasi
+        // karena metrik progres mereka bukan bagian dari modul ini.
         $perbandinganSatlak = [
-            ['nama' => 'Duktek (Bangtek)', 'singkatan' => 'Bangtek', 'progres' => round(collect($proyekRiset)->avg('progres')), 'highlight' => true],
+            ['nama' => 'Duktek (Bangtek)', 'singkatan' => 'Bangtek', 'progres' => $proyekRiset->isNotEmpty() ? round($proyekRiset->avg('progres')) : 0, 'highlight' => true],
             ['nama' => 'Penangkalan (Almon)', 'singkatan' => 'Almon', 'progres' => 60, 'highlight' => false],
             ['nama' => 'Sosial Media (Sibersos)', 'singkatan' => 'Sibersos', 'progres' => 67, 'highlight' => false],
             ['nama' => 'Penindakan (Rindak)', 'singkatan' => 'Rindak', 'progres' => 50, 'highlight' => false],
@@ -625,6 +665,21 @@ class DashboardController extends Controller
             ->latest()
             ->get();
 
+        // Log uji & pengembangan — riwayat pengujian prototipe per proyek riset.
+        $logUji = LogUjiPengembangan::with('proyekRiset')
+            ->where('satuan_id', $satuan->id)
+            ->latest('waktu_uji')
+            ->get();
+
+        // Log dukungan teknis ke 3 Satlak operasional lain (Satlakal, Sibersos, Rindak).
+        $satuanTujuanDukungan = Satuan::whereIn('kode', ['SATLAKKAL', 'SATLAKSISOS', 'SATLAKDAK'])
+            ->orderBy('urutan')
+            ->get();
+        $dukunganTeknis = DukunganTeknisLog::with('satuanTujuan')
+            ->where('satuan_id', $satuan->id)
+            ->latest()
+            ->get();
+
         return view('siberad.dashboards.satlakduktek', [
             'user' => $user,
             'satuan' => $satuan,
@@ -633,23 +688,21 @@ class DashboardController extends Controller
             'kategoriDistribusi' => $kategoriDistribusi,
             'perbandinganSatlak' => $perbandinganSatlak,
             'stats' => [
-                'proyek_aktif' => 3,
-                'proyek_ai' => 2,
-                'unit_drone_uji' => 4,
-                'prototipe_selesai' => 1,
+                'proyek_aktif' => $proyekRiset->where('status', '!=', 'Selesai')->count(),
+                'proyek_ai' => $proyekRiset->filter(fn ($p) => str_contains(strtolower($p->kategori), 'ai'))->count(),
+                'unit_drone_uji' => $logUji->count(),
+                'prototipe_selesai' => $proyekRiset->where('status', 'Selesai')->count(),
             ],
-            'aktivitasTerbaru' => [
-                ['proyek' => 'Deteksi Anomali Jaringan berbasis AI', 'kegiatan' => 'Pelatihan ulang model dengan data insiden terbaru', 'waktu' => '1 jam lalu', 'status' => 'Berjalan', 'status_class' => 'warn'],
-                ['proyek' => 'Drone Pemantau Perbatasan Gen-2', 'kegiatan' => 'Uji terbang prototipe di lapangan Cimahi', 'waktu' => 'Kemarin', 'status' => 'Berjalan', 'status_class' => 'warn'],
-            ],
-            'logUji' => [
-                ['proyek' => 'Drone Pemantau Perbatasan Gen-2', 'kegiatan' => 'Uji terbang prototipe #3 — jangkauan & stabilitas kamera', 'waktu' => '01 Agu 2026, 14:00', 'hasil' => 'Jangkauan tercapai, perlu perbaikan gimbal kamera', 'status' => 'Selesai', 'status_class' => 'green'],
-                ['proyek' => 'Deteksi Anomali Jaringan berbasis AI', 'kegiatan' => 'Validasi model terhadap dataset serangan Satlak Penindakan', 'waktu' => '30 Jul 2026, 10:30', 'hasil' => 'Akurasi 91%, false positive masih tinggi', 'status' => 'Perlu Tindak Lanjut', 'status_class' => 'amber'],
-                ['proyek' => 'Chatbot Internal Layanan Personel', 'kegiatan' => 'Uji terima pengguna (UAT) bersama Binfung', 'waktu' => '25 Jul 2026, 09:00', 'hasil' => 'Disetujui untuk dipakai satuan', 'status' => 'Selesai', 'status_class' => 'green'],
-            ],
-            'laporanPiket' => [
-                ['proyek' => 'Drone Pemantau Perbatasan Gen-2', 'perihal' => 'Pengajuan anggaran komponen gimbal kamera baru', 'pelapor' => 'Piket satlak Duktek (Dukungan Teknologi)', 'tanggal' => '02 Agu 2026', 'prioritas' => 'Sedang', 'prioritas_class' => 'warn'],
-            ],
+            'aktivitasTerbaru' => $logUji->take(2)->map(fn ($l) => [
+                'proyek' => $l->proyekRiset->nama ?? '-',
+                'kegiatan' => $l->kegiatan,
+                'waktu' => $l->waktu_uji?->diffForHumans() ?? '-',
+                'status' => $l->status,
+                'status_class' => $l->status === 'Selesai' ? 'ok' : 'warn',
+            ]),
+            'logUji' => $logUji,
+            'satuanTujuanDukungan' => $satuanTujuanDukungan,
+            'dukunganTeknis' => $dukunganTeknis,
         ]);
     }
 

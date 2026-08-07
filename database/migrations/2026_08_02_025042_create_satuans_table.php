@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('satuans', function (Blueprint $table) {
             $table->id();
-            $table->string('kode')->unique();      // mis. SATLAKAL, BINFUNG, DANPUS
+            $table->string('kode')->unique();      // mis. SATLAKKAL, BINFUNG, DANPUS
             $table->string('nama');                // nama lengkap satuan
             $table->string('kategori');            // satlak | direktorat | pimpinan
             $table->string('deskripsi')->nullable();

@@ -12,16 +12,19 @@ use App\Http\Controllers\AkunMedsosController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\DanpusLaporanMonitoringController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DukunganTeknisController;
 use App\Http\Controllers\JabatanController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\LaporanMonitoringController;
 use App\Http\Controllers\LaporanPublikasiController;
+use App\Http\Controllers\LogUjiPengembanganController;
 use App\Http\Controllers\NotifikasiController;
 use App\Http\Controllers\PangkatController;
 use App\Http\Controllers\PersonelController;
 use App\Http\Controllers\PersonelDokumenController;
 use App\Http\Controllers\PersonelMutasiController;
 use App\Http\Controllers\PostinganController;
+use App\Http\Controllers\ProyekRisetController;
 use App\Models\Pengaturan;
 use App\Models\Satuan;
 use Illuminate\Support\Facades\Route;
@@ -159,6 +162,37 @@ Route::patch('/posting/{posting}/engagement', [PostinganController::class, 'upda
 Route::delete('/posting/{posting}', [PostinganController::class, 'destroy'])
     ->middleware('auth')
     ->name('posting.destroy');
+
+// ===== satlak Duktek (Dukungan Teknologi) =====
+// Mencakup fitur "Riset & Pengembangan" (CRUD proyek riset), "Log Uji &
+// Pengembangan", dan "Log Dukungan Teknis" ke Satlakal/Sibersos/Rindak.
+Route::post('/proyek-riset', [ProyekRisetController::class, 'store'])
+    ->middleware('auth')
+    ->name('proyek-riset.store');
+
+Route::patch('/proyek-riset/{proyekRiset}', [ProyekRisetController::class, 'update'])
+    ->middleware('auth')
+    ->name('proyek-riset.update');
+
+Route::delete('/proyek-riset/{proyekRiset}', [ProyekRisetController::class, 'destroy'])
+    ->middleware('auth')
+    ->name('proyek-riset.destroy');
+
+Route::post('/log-uji', [LogUjiPengembanganController::class, 'store'])
+    ->middleware('auth')
+    ->name('log-uji.store');
+
+Route::delete('/log-uji/{logUjiPengembangan}', [LogUjiPengembanganController::class, 'destroy'])
+    ->middleware('auth')
+    ->name('log-uji.destroy');
+
+Route::post('/dukungan-teknis', [DukunganTeknisController::class, 'store'])
+    ->middleware('auth')
+    ->name('dukungan-teknis.store');
+
+Route::delete('/dukungan-teknis/{dukunganTeknisLog}', [DukunganTeknisController::class, 'destroy'])
+    ->middleware('auth')
+    ->name('dukungan-teknis.destroy');
 
 // ===== Administrasi Personel (Binfung) =====
 // Mencakup fitur "Data Personel", "Tambah/Edit Personel", "Mutasi",

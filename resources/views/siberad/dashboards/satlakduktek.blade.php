@@ -106,6 +106,9 @@
     <nav class="side-nav">
       <div class="side-nav-label">Menu</div>
       <a href="#" class="side-link active" data-tab-link="dashboard"><span class="dot"></span>Dashboard</a>
+      <a href="#" class="side-link" data-tab-link="proyek"><span class="dot"></span>Riset & Pengembangan</a>
+      <a href="#" class="side-link" data-tab-link="uji"><span class="dot"></span>Log Uji & Pengembangan</a>
+      <a href="#" class="side-link" data-tab-link="dukungan-teknis"><span class="dot"></span>Log Dukungan Teknis</a>
 
       <div class="side-dropdown" id="laporanDropdown">
         <button type="button" class="side-link side-dropdown-toggle" id="laporanToggle" aria-expanded="false" aria-controls="laporanSubmenu">
@@ -328,20 +331,67 @@
           <h2>Proyek Riset & Pengembangan</h2>
           <p>Daftar proyek teknologi beserta progres dan target penyelesaian.</p>
         </div>
+
+        @if (session('status'))
+          <div class="notice">{{ session('status') }}</div>
+        @endif
+
         <div class="panel">
+          <div class="panel-head"><div><h3>Tambah Proyek Baru</h3></div></div>
+          <form class="form-grid" method="POST" action="{{ route('proyek-riset.store') }}" style="padding:22px;">
+            @csrf
+            <div class="form-field full">
+              <label for="prNama">Nama Proyek</label>
+              <input id="prNama" name="nama" type="text" maxlength="255" required>
+            </div>
+            <div class="form-field">
+              <label for="prKategori">Kategori</label>
+              <input id="prKategori" name="kategori" type="text" maxlength="100" required placeholder="mis. AI / Machine Learning">
+            </div>
+            <div class="form-field">
+              <label for="prProgres">Progres (%)</label>
+              <input id="prProgres" name="progres" type="number" min="0" max="100" value="0" required>
+            </div>
+            <div class="form-field">
+              <label for="prStatus">Status</label>
+              <select id="prStatus" name="status" required>
+                <option value="Riset Awal">Riset Awal</option>
+                <option value="Berjalan">Berjalan</option>
+                <option value="Selesai">Selesai</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="prTarget">Target Selesai</label>
+              <input id="prTarget" name="target_selesai" type="text" maxlength="50" placeholder="mis. Sep 2026">
+            </div>
+            <div class="form-field full">
+              <button class="btn btn-primary" type="submit">Simpan Proyek</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="panel" style="margin-top:22px;">
           <div class="tbl-wrap">
             <table class="dtbl">
-              <thead><tr><th>Nama Proyek</th><th>Kategori</th><th>Progres</th><th>Status</th><th>Target</th></tr></thead>
+              <thead><tr><th>Nama Proyek</th><th>Kategori</th><th>Progres</th><th>Status</th><th>Target</th><th>Aksi</th></tr></thead>
               <tbody>
-                @foreach($proyekRiset as $p)
+                @forelse($proyekRiset as $p)
                 <tr>
                   <td>{{ $p['nama'] }}</td>
                   <td style="color:var(--text-muted);">{{ $p['kategori'] }}</td>
                   <td style="font-family:var(--mono);">{{ $p['progres'] }}%</td>
                   <td><span class="status-dot {{ $p['status_class'] }}">{{ $p['status'] }}</span></td>
-                  <td>{{ $p['target'] }}</td>
+                  <td>{{ $p['target_selesai'] ?? '-' }}</td>
+                  <td>
+                    <form method="POST" action="{{ route('proyek-riset.destroy', $p) }}" onsubmit="return confirm('Hapus proyek ini? Log uji terkait juga akan ikut terlepas.');">
+                      @csrf @method('DELETE')
+                      <button class="btn btn-ghost-red btn-sm" type="submit">Hapus</button>
+                    </form>
+                  </td>
                 </tr>
-                @endforeach
+                @empty
+                <tr class="table-empty-row"><td colspan="6">Belum ada proyek riset.</td></tr>
+                @endforelse
               </tbody>
             </table>
           </div>
@@ -354,20 +404,132 @@
           <h2>Log Uji & Pengembangan</h2>
           <p>Riwayat pengujian prototipe dan hasil yang didapat.</p>
         </div>
+
+        @if (session('status'))
+          <div class="notice">{{ session('status') }}</div>
+        @endif
+
         <div class="panel">
+          <div class="panel-head"><div><h3>Catat Uji Baru</h3></div></div>
+          <form class="form-grid" method="POST" action="{{ route('log-uji.store') }}" style="padding:22px;">
+            @csrf
+            <div class="form-field">
+              <label for="ljProyek">Proyek Terkait (opsional)</label>
+              <select id="ljProyek" name="proyek_riset_id">
+                <option value="">— Tidak terkait proyek tertentu —</option>
+                @foreach($proyekRiset as $p)
+                  <option value="{{ $p->id }}">{{ $p->nama }}</option>
+                @endforeach
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="ljStatus">Status</label>
+              <select id="ljStatus" name="status" required>
+                <option value="Selesai">Selesai</option>
+                <option value="Perlu Tindak Lanjut">Perlu Tindak Lanjut</option>
+              </select>
+            </div>
+            <div class="form-field full">
+              <label for="ljKegiatan">Kegiatan Uji</label>
+              <input id="ljKegiatan" name="kegiatan" type="text" maxlength="255" required>
+            </div>
+            <div class="form-field full">
+              <label for="ljHasil">Hasil</label>
+              <textarea id="ljHasil" name="hasil" rows="2"></textarea>
+            </div>
+            <div class="form-field full">
+              <button class="btn btn-primary" type="submit">Simpan Log Uji</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="panel" style="margin-top:22px;">
           <div class="tbl-wrap">
             <table class="dtbl">
-              <thead><tr><th>Proyek</th><th>Kegiatan Uji</th><th>Waktu</th><th>Hasil</th><th>Status</th></tr></thead>
+              <thead><tr><th>Proyek</th><th>Kegiatan Uji</th><th>Waktu</th><th>Hasil</th><th>Status</th><th>Aksi</th></tr></thead>
               <tbody>
-                @foreach($logUji as $l)
+                @forelse($logUji as $l)
                 <tr>
-                  <td>{{ $l['proyek'] }}</td>
-                  <td>{{ $l['kegiatan'] }}</td>
-                  <td>{{ $l['waktu'] }}</td>
-                  <td>{{ $l['hasil'] }}</td>
-                  <td><span class="badge {{ $l['status_class'] }}">{{ $l['status'] }}</span></td>
+                  <td>{{ $l->proyekRiset->nama ?? '-' }}</td>
+                  <td>{{ $l->kegiatan }}</td>
+                  <td>{{ $l->waktu_uji?->format('d M Y, H:i') ?? '-' }}</td>
+                  <td style="color:var(--text-muted);">{{ $l->hasil }}</td>
+                  <td><span class="badge {{ $l->status_class }}">{{ $l->status }}</span></td>
+                  <td>
+                    <form method="POST" action="{{ route('log-uji.destroy', $l) }}" onsubmit="return confirm('Hapus log ini?');">
+                      @csrf @method('DELETE')
+                      <button class="btn btn-ghost-red btn-sm" type="submit">Hapus</button>
+                    </form>
+                  </td>
                 </tr>
+                @empty
+                <tr class="table-empty-row"><td colspan="6">Belum ada log uji & pengembangan.</td></tr>
+                @endforelse
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      {{-- ===== LOG DUKUNGAN TEKNIS ===== --}}
+      <section class="tab-panel" data-tab-panel="dukungan-teknis">
+        <div class="section-head">
+          <h2>Log Dukungan Teknis</h2>
+          <p>Catatan bantuan teknis yang diberikan ke Satlakal, Satlak Sibersos, dan Satlak Rindak.</p>
+        </div>
+
+        @if (session('status'))
+          <div class="notice">{{ session('status') }}</div>
+        @endif
+
+        <div class="panel">
+          <div class="panel-head"><div><h3>Catat Dukungan Baru</h3></div></div>
+          <form class="form-grid" method="POST" action="{{ route('dukungan-teknis.store') }}" style="padding:22px;">
+            @csrf
+            <div class="form-field">
+              <label for="dtSatuan">Satlak Penerima</label>
+              <select id="dtSatuan" name="satuan_tujuan_id" required>
+                <option value="">Pilih satuan...</option>
+                @foreach($satuanTujuanDukungan as $s)
+                  <option value="{{ $s->id }}">{{ $s->nama }} ({{ $s->kode }})</option>
                 @endforeach
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="dtJenis">Jenis Bantuan</label>
+              <input id="dtJenis" name="jenis_bantuan" type="text" maxlength="150" required placeholder="mis. Setup tools monitoring">
+            </div>
+            <div class="form-field full">
+              <label for="dtKeterangan">Keterangan</label>
+              <textarea id="dtKeterangan" name="keterangan" rows="3"></textarea>
+            </div>
+            <div class="form-field full">
+              <button class="btn btn-primary" type="submit">Simpan Log Dukungan</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="panel" style="margin-top:22px;">
+          <div class="tbl-wrap">
+            <table class="dtbl">
+              <thead><tr><th>Satlak Penerima</th><th>Jenis Bantuan</th><th>Keterangan</th><th>Tanggal</th><th>Aksi</th></tr></thead>
+              <tbody>
+                @forelse($dukunganTeknis as $d)
+                <tr>
+                  <td>{{ $d->satuanTujuan->nama ?? '-' }} <span class="badge">{{ $d->satuanTujuan->kode ?? '' }}</span></td>
+                  <td>{{ $d->jenis_bantuan }}</td>
+                  <td style="color:var(--text-muted);">{{ $d->keterangan }}</td>
+                  <td>{{ $d->created_at->format('d M Y') }}</td>
+                  <td>
+                    <form method="POST" action="{{ route('dukungan-teknis.destroy', $d) }}" onsubmit="return confirm('Hapus log ini?');">
+                      @csrf @method('DELETE')
+                      <button class="btn btn-ghost-red btn-sm" type="submit">Hapus</button>
+                    </form>
+                  </td>
+                </tr>
+                @empty
+                <tr class="table-empty-row"><td colspan="5">Belum ada log dukungan teknis.</td></tr>
+                @endforelse
               </tbody>
             </table>
           </div>

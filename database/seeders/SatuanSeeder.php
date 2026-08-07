@@ -22,16 +22,16 @@ class SatuanSeeder extends Seeder
             ['kode' => 'ADMIN', 'username' => 'admin', 'nama' => 'Administrator Sistem', 'kategori' => Satuan::KATEGORI_ADMIN, 'deskripsi' => 'Kelola akun pengguna, satuan, dan permintaan reset password.', 'urutan' => 0],
 
             // --- SATLAK (Satuan Pelaksana) ---
-            ['kode' => 'SATLAKAL',       'username' => 'satlakkal',   'nama' => 'Satlakal (Penangkalan)',                  'kategori' => Satuan::KATEGORI_SATLAK,      'deskripsi' => 'Pemantauan & pemulihan (mis. website yang diserang).',   'urutan' => 10],
-            ['kode' => 'SATLAKSIBERSOS', 'username' => 'satlaksibersos', 'nama' => 'Satlak Sibersos',               'kategori' => Satuan::KATEGORI_SATLAK,      'deskripsi' => 'Pengelolaan media sosial di daerah.',                    'urutan' => 20],
-            ['kode' => 'SATLAKRINDAK',   'username' => 'satlakdak',   'nama' => 'Satlak Penindakan',             'kategori' => Satuan::KATEGORI_SATLAK,      'deskripsi' => 'Penanganan aksi cyber: malware, ransomware, serangan.', 'urutan' => 30],
-            ['kode' => 'SATLAKDUKTEK',  'username' => 'satlakduktek', 'nama' => 'satlak Duktek (Dukungan Teknologi)', 'kategori' => Satuan::KATEGORI_SATLAK,      'deskripsi' => 'Riset & pengembangan teknologi terkini (AI, drone, dll).', 'urutan' => 40],
+            ['kode' => 'SATLAKKAL',      'username' => 'satlakkal',   'nama' => 'Satuan Pelaksanaan Penangkalan',        'kategori' => Satuan::KATEGORI_SATLAK,      'deskripsi' => 'Pemantauan & pemulihan (mis. website yang diserang).',   'urutan' => 10],
+            ['kode' => 'SATLAKSISOS',    'username' => 'satlaksibersos', 'nama' => 'Satuan Pelaksanaan Siber Sosial',   'kategori' => Satuan::KATEGORI_SATLAK,      'deskripsi' => 'Pengelolaan media sosial di daerah.',                    'urutan' => 20],
+            ['kode' => 'SATLAKDAK',      'username' => 'satlakdak',   'nama' => 'Satuan Pelaksanaan Penindakan',         'kategori' => Satuan::KATEGORI_SATLAK,      'deskripsi' => 'Penanganan aksi cyber: malware, ransomware, serangan.', 'urutan' => 30],
+            ['kode' => 'SATLAKDUKTEK',  'username' => 'satlakduktek', 'nama' => 'Satuan Pelaksanaan Dukungan Teknologi', 'kategori' => Satuan::KATEGORI_SATLAK,      'deskripsi' => 'Riset & pengembangan teknologi terkini (AI, drone, dll).', 'urutan' => 40],
 
             // --- DIR (Direktorat) ---
             ['kode' => 'BINFUNG', 'username' => 'binfung', 'nama' => 'Binfung (Pembinaan Fungsi)',    'kategori' => Satuan::KATEGORI_DIREKTORAT, 'deskripsi' => 'Penempatan personel yang masuk.',                  'urutan' => 50],
             ['kode' => 'BINUM',  'username' => 'binum',  'nama' => 'Binum (Pembinaan Umum)',      'kategori' => Satuan::KATEGORI_DIREKTORAT, 'deskripsi' => 'Pengawasan satuan, lomba internal, personel baru.', 'urutan' => 60],
             ['kode' => 'DIKLAT',  'username' => 'diklat', 'nama' => 'Diklat (Pendidikan & Latihan)', 'kategori' => Satuan::KATEGORI_DIREKTORAT, 'deskripsi' => 'Pendidikan dan latihan satuan.',                   'urutan' => 70],
-            ['kode' => 'BINMAT',  'username' => 'binmat', 'nama' => 'Binmat (Pembinaan Materiil)',  'kategori' => Satuan::KATEGORI_DIREKTORAT, 'deskripsi' => 'Pengurusan material/perlengkapan satuan.',         'urutan' => 80],
+            ['kode' => 'BINMAT',  'username' => 'binmat', 'nama' => 'Pembinaan Materil',  'kategori' => Satuan::KATEGORI_DIREKTORAT, 'deskripsi' => 'Pengurusan material/perlengkapan satuan.',         'urutan' => 80],
 
             // --- Koordinasi / Pimpinan ---
             ['kode' => 'SDIR',   'username' => 'sdir',   'nama' => 'SDIR (Sekretaris Direktorat)',  'kategori' => Satuan::KATEGORI_PIMPINAN, 'deskripsi' => 'Koordinasi antar Satlak, pelaporan ke DANPUS.', 'urutan' => 90],

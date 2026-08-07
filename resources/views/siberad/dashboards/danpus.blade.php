@@ -366,7 +366,7 @@
         </div>
       </section>
 
-      {{-- ===== LAPORAN MONITORING & RECOVERY (SATLAKAL) ===== --}}
+      {{-- ===== LAPORAN MONITORING & RECOVERY (SATLAKKAL) ===== --}}
       <section class="tab-panel" data-tab-panel="laporan-monitoring">
         <div class="section-head">
           <h2>Laporan Monitoring &amp; Recovery</h2>
