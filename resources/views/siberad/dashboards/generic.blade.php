@@ -31,6 +31,7 @@
   </header>
 
   <main>
+    @include('siberad.dashboards.partials.pengumuman-banner')
     <div class="card hud-panel">
       <div class="eyebrow">SIBERAD // DASHBOARD</div>
       <h1 style="margin-top:14px;">Selamat datang, {{ $user->name }}</h1>

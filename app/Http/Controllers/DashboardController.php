@@ -9,12 +9,14 @@ use App\Models\LaporanMonitoring;
 use App\Models\LaporanPublikasi;
 use App\Models\Pangkat;
 use App\Models\Pengaturan;
+use App\Models\Pengumuman;
 use App\Models\Personel;
 use App\Models\PersonelDokumen;
 use App\Models\PersonelMutasi;
 use App\Models\Satuan;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
@@ -112,6 +114,34 @@ class DashboardController extends Controller
         // Daftar backup database yang sudah pernah dibuat.
         $daftarBackup = app(\App\Http\Controllers\Admin\BackupController::class)->index();
 
+        // Pengumuman — dikelola admin, tampil sebagai banner di seluruh dashboard satuan.
+        $daftarPengumuman = Pengumuman::with('pembuat')->latest()->get();
+
+        // Sesi login aktif (SESSION_DRIVER=database) — dipakai tab "Sesi Aktif"
+        // untuk memantau siapa saja yang sedang login dan bisa paksa logout.
+        $sesiAktif = DB::table('sessions')
+            ->leftJoin('users', 'sessions.user_id', '=', 'users.id')
+            ->orderByDesc('sessions.last_activity')
+            ->get([
+                'sessions.id',
+                'sessions.ip_address',
+                'sessions.user_agent',
+                'sessions.last_activity',
+                'users.name as user_name',
+            ]);
+
+        // Rekap laporan lintas Satlak — ringkasan jumlah laporan & statusnya
+        // per satuan pelaksana, dipakai tab "Rekap Laporan".
+        $rekapLaporanSatuan = Satuan::where('kategori', Satuan::KATEGORI_SATLAK)
+            ->withCount([
+                'laporanTerkirim as total_laporan',
+                'laporanTerkirim as laporan_menunggu' => fn ($q) => $q->where('status', 'Menunggu'),
+                'laporanTerkirim as laporan_disetujui' => fn ($q) => $q->where('status', 'Disetujui DANPUS'),
+                'laporanTerkirim as laporan_ditolak' => fn ($q) => $q->where('status', 'Ditolak DANPUS'),
+            ])
+            ->orderBy('urutan')
+            ->get();
+
         return view('siberad.dashboards.admin', [
             'user' => $user,
             'satuan' => $satuan,
@@ -128,6 +158,10 @@ class DashboardController extends Controller
             'pengaturan' => Pengaturan::current(),
             'logAktivitas' => $logAktivitas,
             'daftarBackup' => $daftarBackup,
+            'daftarPengumuman' => $daftarPengumuman,
+            'sesiAktif' => $sesiAktif,
+            'sesiSayaId' => session()->getId(),
+            'rekapLaporanSatuan' => $rekapLaporanSatuan,
             'modulHakAkses' => Satuan::MODUL_HAK_AKSES,
             'stats' => [
                 'total_pengguna' => $semuaPengguna->count(),
