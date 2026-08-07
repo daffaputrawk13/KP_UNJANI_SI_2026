@@ -48,9 +48,9 @@ class DashboardController extends Controller
             'ADMIN' => $this->admin($user, $satuan),
             'DANPUS' => $this->danpus($user, $satuan),
             'WADAN' => $this->wadan($user, $satuan),
-            'SATLAKKAL' => $this->satlakKal($user, $satuan),
-            'SATLAKSISOS' => $this->satlakSisos($user, $satuan),
-            'SATLAKDAK' => $this->satlakDak($user, $satuan),
+            'SATLAKAL' => $this->satlakKal($user, $satuan),
+            'SATLAKSIBERSOS' => $this->satlakSisos($user, $satuan),
+            'SATLAKRINDAK' => $this->satlakDak($user, $satuan),
             'SATLAKDUKTEK' => $this->satlakDuktek($user, $satuan),
             'BINFUNG' => $this->binfung($user, $satuan),
             'BINUM' => $this->binum($user, $satuan),
@@ -185,9 +185,9 @@ class DashboardController extends Controller
         $semuaSatuan = Satuan::where('kode', '!=', 'ADMIN')->orderBy('urutan')->get();
 
         $statusSatuan = [
-            'SATLAKKAL' => ['label' => 'Ada Insiden', 'class' => 'bad', 'update' => '10 menit lalu'],
-            'SATLAKSISOS' => ['label' => 'Siaga', 'class' => 'warn', 'update' => '35 menit lalu'],
-            'SATLAKDAK' => ['label' => 'Normal', 'class' => 'ok', 'update' => '1 jam lalu'],
+            'SATLAKAL' => ['label' => 'Ada Insiden', 'class' => 'bad', 'update' => '10 menit lalu'],
+            'SATLAKSIBERSOS' => ['label' => 'Siaga', 'class' => 'warn', 'update' => '35 menit lalu'],
+            'SATLAKRINDAK' => ['label' => 'Normal', 'class' => 'ok', 'update' => '1 jam lalu'],
             'SATLAKDUKTEK' => ['label' => 'Normal', 'class' => 'ok', 'update' => '2 jam lalu'],
             'BINFUNG' => ['label' => 'Normal', 'class' => 'ok', 'update' => 'Hari ini'],
             'BINUM' => ['label' => 'Normal', 'class' => 'ok', 'update' => 'Hari ini'],
@@ -673,7 +673,7 @@ class DashboardController extends Controller
 
         // Log dukungan teknis ke 3 Satlak operasional lain (Satuan Pelaksanaan
         // Penangkalan, Siber Sosial, Penindakan).
-        $satuanTujuanDukungan = Satuan::whereIn('kode', ['SATLAKKAL', 'SATLAKSISOS', 'SATLAKDAK'])
+        $satuanTujuanDukungan = Satuan::whereIn('kode', ['SATLAKAL', 'SATLAKSIBERSOS', 'SATLAKRINDAK'])
             ->orderBy('urutan')
             ->get();
         $dukunganTeknis = DukunganTeknisLog::with('satuanTujuan')
