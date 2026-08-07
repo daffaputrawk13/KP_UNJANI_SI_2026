@@ -7,8 +7,32 @@
 <link rel="icon" type="image/jpeg" href="{{ asset('images/logo-pussiberad.jpg') }}">
 @include('siberad.dashboards.partials.dash-styles')
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+{{-- Library untuk fitur "Export Laporan" pada tab Riwayat Laporan. --}}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <style>
   .chart-box{margin-bottom:26px;}
+  .progress-track{background:var(--panel-alt);border:1px solid var(--border-soft);border-radius:20px;height:8px;width:100%;overflow:hidden;}
+  .progress-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--gold),var(--gold-bright));}
+  .progress-row{display:flex;align-items:center;gap:10px;min-width:140px;}
+  .progress-row span{font-family:var(--mono);font-size:11px;color:var(--text-muted);flex-shrink:0;width:34px;text-align:right;}
+  .timeline{position:relative;padding:6px 4px 6px 6px;}
+  .timeline-item{position:relative;display:flex;gap:16px;padding-bottom:26px;}
+  .timeline-item:last-child{padding-bottom:0;}
+  .timeline-marker{position:relative;display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:16px;}
+  .timeline-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--border);background:var(--panel-alt);flex-shrink:0;z-index:1;}
+  .timeline-item.done .timeline-dot{background:var(--green-bright);border-color:var(--green-bright);box-shadow:0 0 0 3px var(--green-dim);}
+  .timeline-item.active .timeline-dot{background:var(--gold-bright);border-color:var(--gold-bright);box-shadow:0 0 0 3px var(--gold-dim);}
+  .timeline-item.pending .timeline-dot{background:var(--panel-alt);border-color:var(--border);}
+  .timeline-line{position:absolute;top:16px;bottom:-26px;width:2px;background:var(--border-soft);}
+  .timeline-item:last-child .timeline-line{display:none;}
+  .timeline-item.done .timeline-line{background:var(--green-dim);}
+  .timeline-content{flex:1;padding-top:-1px;}
+  .timeline-time{font-family:var(--mono);font-size:10.5px;color:var(--text-dim);letter-spacing:.04em;text-transform:uppercase;}
+  .timeline-title{font-family:var(--display);font-size:14px;font-weight:700;margin:3px 0 4px;}
+  .timeline-item.active .timeline-title{color:var(--gold-bright);}
+  .timeline-desc{font-size:12.5px;color:var(--text-muted);line-height:1.55;}
   .chart-box-head-row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:16px;}
   .chart-filter-group{display:flex;gap:8px;flex-wrap:wrap;flex-shrink:0;}
   .chart-type-select{background:var(--panel);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:11px;border-radius:6px;padding:5px 8px;cursor:pointer;flex-shrink:0;}
@@ -103,6 +127,8 @@
     <nav class="side-nav">
       <div class="side-nav-label">Menu</div>
       <a href="#" class="side-link active" data-tab-link="dashboard"><span class="dot"></span>Dashboard</a>
+      <a href="#" class="side-link" data-tab-link="ancaman"><span class="dot"></span>Deteksi Ancaman</a>
+      <a href="#" class="side-link" data-tab-link="penanganan"><span class="dot"></span>Log Penanganan</a>
 
       <div class="side-dropdown" id="laporanDropdown">
         <button type="button" class="side-link side-dropdown-toggle" id="laporanToggle" aria-expanded="false" aria-controls="laporanSubmenu">
@@ -116,6 +142,19 @@
           <a href="#" class="side-link side-sublink" data-tab-link="riwayat-laporan">Riwayat Laporan</a>
         </div>
       </div>
+
+      <div class="side-dropdown" id="insidenDropdown">
+        <button type="button" class="side-link side-dropdown-toggle" id="insidenToggle" aria-expanded="false" aria-controls="insidenSubmenu">
+          <span class="dot"></span>
+          <span class="side-link-label">Manajemen Insiden</span>
+          <svg class="side-dropdown-arrow" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg>
+        </button>
+        <div class="side-dropdown-menu" id="insidenSubmenu">
+          <a href="#" class="side-link side-sublink" data-tab-link="investigasi">Investigasi</a>
+          <a href="#" class="side-link side-sublink" data-tab-link="timeline-penanganan">Timeline Penanganan</a>
+          <a href="#" class="side-link side-sublink" data-tab-link="mitigasi">Mitigasi</a>
+        </div>
+      </div>
     </nav>
     <div class="side-foot">
       <form class="logout logout-form" method="POST" action="{{ route('logout') }}">
@@ -127,17 +166,23 @@
 
   <script>
   (function () {
-    var dropdown = document.getElementById('laporanDropdown');
-    var toggle = document.getElementById('laporanToggle');
-    if (!dropdown || !toggle) return;
+    var pairs = [
+      { dropdown: document.getElementById('laporanDropdown'), toggle: document.getElementById('laporanToggle') },
+      { dropdown: document.getElementById('insidenDropdown'), toggle: document.getElementById('insidenToggle') }
+    ];
 
-    var subActive = dropdown.querySelector('.side-sublink.active');
-    if (subActive) dropdown.classList.add('open');
+    pairs.forEach(function (pair) {
+      var dropdown = pair.dropdown, toggle = pair.toggle;
+      if (!dropdown || !toggle) return;
 
-    toggle.addEventListener('click', function (e) {
-      e.preventDefault();
-      var isOpen = dropdown.classList.toggle('open');
-      toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      var subActive = dropdown.querySelector('.side-sublink.active');
+      if (subActive) dropdown.classList.add('open');
+
+      toggle.addEventListener('click', function (e) {
+        e.preventDefault();
+        var isOpen = dropdown.classList.toggle('open');
+        toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      });
     });
   })();
   </script>
@@ -401,6 +446,22 @@
               </select>
             </div>
             <div class="form-field full">
+              <label for="jenisSeranganTambahLaporan">Klasifikasi Jenis Serangan</label>
+              <select id="jenisSeranganTambahLaporan" required>
+                <option value="">— Pilih klasifikasi —</option>
+                <option>Ransomware</option>
+                <option>Malware / Trojan</option>
+                <option>Phishing</option>
+                <option>DDoS (Distributed Denial of Service)</option>
+                <option>Brute Force</option>
+                <option>SQL Injection</option>
+                <option>Defacement</option>
+                <option>Social Engineering</option>
+                <option>Lainnya</option>
+              </select>
+              <span class="form-hint">Menentukan alur investigasi & mitigasi yang dipakai.</span>
+            </div>
+            <div class="form-field full">
               <label for="perihalTambahLaporan">Perihal</label>
               <input id="perihalTambahLaporan" type="text" placeholder="Contoh: Indikasi ransomware mengenkripsi file bersama" required>
             </div>
@@ -409,9 +470,9 @@
               <textarea id="deskripsiTambahLaporan" rows="4" placeholder="Jelaskan kronologi dan dampak insiden..." required></textarea>
             </div>
             <div class="form-field full">
-              <label for="lampiranTambahLaporan">Lampiran (bukti / dokumentasi)</label>
-              <input id="lampiranTambahLaporan" type="file" accept="application/pdf,.pdf">
-              <span class="form-hint">Format PDF, maksimal 20 MB.</span>
+              <label for="lampiranTambahLaporan">Upload Bukti Digital</label>
+              <input id="lampiranTambahLaporan" type="file" accept="application/pdf,.pdf,image/png,image/jpeg,.png,.jpg,.jpeg,.zip,.log" multiple>
+              <span class="form-hint">Format PDF, gambar (PNG/JPG), file log, atau ZIP bukti forensik — maksimal 20 MB per file.</span>
             </div>
             <div class="form-field full">
               <button class="btn btn-primary" type="button" onclick="alert('Prototype — form Tambah Laporan belum tersambung ke database.')">Simpan Laporan</button>
@@ -462,8 +523,18 @@
           <p>Log lengkap ancaman dan tindak lanjut yang pernah ditangani Satlak Penindakan.</p>
         </div>
         <div class="panel">
+          <div class="btn-row" style="margin-bottom:18px;">
+            <button type="button" class="btn btn-sm" id="btnExportPdfRiwayat">
+              <svg viewBox="0 0 24 24" width="14" height="14" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path></svg>
+              Export PDF
+            </button>
+            <button type="button" class="btn btn-sm" id="btnExportExcelRiwayat">
+              <svg viewBox="0 0 24 24" width="14" height="14" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M8 8l8 8M16 8l-8 8"></path></svg>
+              Export Excel
+            </button>
+          </div>
           <div class="tbl-wrap">
-            <table class="dtbl">
+            <table class="dtbl" id="tabelRiwayatLaporan">
               <thead><tr><th>Aset</th><th>Jenis Ancaman</th><th>Waktu</th><th>Tindakan</th><th>Status</th></tr></thead>
               <tbody>
                 @foreach($logPenanganan as $l)
@@ -473,6 +544,153 @@
                   <td>{{ $l['waktu'] }}</td>
                   <td>{{ $l['tindakan'] }}</td>
                   <td><span class="status-dot {{ $l['status_class'] }}">{{ $l['status'] }}</span></td>
+                </tr>
+                @endforeach
+              </tbody>
+            </table>
+          </div>
+          <p class="form-hint" style="margin-top:12px;">Export mengambil data yang sedang tampil di tabel Riwayat Laporan.</p>
+        </div>
+      </section>
+
+      <script>
+      (function () {
+        var table = document.getElementById('tabelRiwayatLaporan');
+        var HEADER = ['Aset', 'Jenis Ancaman', 'Waktu', 'Tindakan', 'Status'];
+        if (!table) return;
+
+        function ambilBarisRiwayat() {
+          var rows = [];
+          table.querySelectorAll('tbody tr').forEach(function (tr) {
+            var sel = [];
+            tr.querySelectorAll('td').forEach(function (td) { sel.push(td.textContent.trim()); });
+            rows.push(sel);
+          });
+          return rows;
+        }
+
+        var btnExcel = document.getElementById('btnExportExcelRiwayat');
+        if (btnExcel) {
+          btnExcel.addEventListener('click', function () {
+            if (typeof XLSX === 'undefined') {
+              alert('Pustaka export Excel belum termuat (periksa koneksi internet), coba lagi.');
+              return;
+            }
+            var ws = XLSX.utils.aoa_to_sheet([HEADER].concat(ambilBarisRiwayat()));
+            var wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Riwayat Laporan');
+            XLSX.writeFile(wb, 'riwayat-laporan-satlak-penindakan.xlsx');
+          });
+        }
+
+        var btnPdf = document.getElementById('btnExportPdfRiwayat');
+        if (btnPdf) {
+          btnPdf.addEventListener('click', function () {
+            if (typeof window.jspdf === 'undefined') {
+              alert('Pustaka export PDF belum termuat (periksa koneksi internet), coba lagi.');
+              return;
+            }
+            var doc = new window.jspdf.jsPDF();
+            doc.setFontSize(14);
+            doc.text('Riwayat Laporan — Satlak Penindakan', 14, 16);
+            doc.setFontSize(10);
+            doc.text('Dicetak: ' + new Date().toLocaleString('id-ID'), 14, 23);
+            doc.autoTable({
+              startY: 29,
+              head: [HEADER],
+              body: ambilBarisRiwayat(),
+              styles: { fontSize: 8.5 },
+              headStyles: { fillColor: [212, 175, 55], textColor: [36, 26, 5] }
+            });
+            doc.save('riwayat-laporan-satlak-penindakan.pdf');
+          });
+        }
+      })();
+      </script>
+
+      {{-- ===== MANAJEMEN INVESTIGASI ===== --}}
+      <section class="tab-panel" data-tab-panel="investigasi">
+        <div class="section-head">
+          <h2>Manajemen Investigasi</h2>
+          <p>Kasus yang sedang atau sudah diinvestigasi oleh tim Satlak Penindakan.</p>
+        </div>
+        <div class="panel">
+          <div class="tbl-wrap">
+            <table class="dtbl">
+              <thead><tr><th>No. Kasus</th><th>Aset</th><th>Jenis Ancaman</th><th>Investigator</th><th>Mulai</th><th>Progres</th><th>Status</th><th>Aksi</th></tr></thead>
+              <tbody>
+                @foreach($investigasi as $inv)
+                <tr>
+                  <td style="font-family:var(--mono);">{{ $inv['kasus'] }}</td>
+                  <td>{{ $inv['aset'] }}</td>
+                  <td style="color:var(--text-muted);">{{ $inv['jenis'] }}</td>
+                  <td>{{ $inv['investigator'] }}</td>
+                  <td>{{ $inv['mulai'] }}</td>
+                  <td>
+                    <div class="progress-row">
+                      <div class="progress-track"><div class="progress-fill" style="width:{{ $inv['progres'] }}%;"></div></div>
+                      <span>{{ $inv['progres'] }}%</span>
+                    </div>
+                  </td>
+                  <td><span class="badge {{ $inv['status_class'] }}">{{ $inv['status'] }}</span></td>
+                  <td>
+                    <div class="btn-row">
+                      <button class="btn btn-sm" type="button" onclick="alert('Prototype — detail investigasi {{ $inv['kasus'] }} belum tersambung ke database.')">Lihat Detail</button>
+                    </div>
+                  </td>
+                </tr>
+                @endforeach
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      {{-- ===== TIMELINE PENANGANAN ===== --}}
+      <section class="tab-panel" data-tab-panel="timeline-penanganan">
+        <div class="section-head">
+          <h2>Timeline Penanganan</h2>
+          <p>Kronologi penanganan kasus prioritas tertinggi yang sedang berjalan — Server File Sharing Ditjen (INV-2026-014).</p>
+        </div>
+        <div class="panel">
+          <div class="timeline">
+            @foreach($timelinePenanganan as $t)
+            <div class="timeline-item {{ $t['state'] }}">
+              <div class="timeline-marker">
+                <div class="timeline-dot"></div>
+                <div class="timeline-line"></div>
+              </div>
+              <div class="timeline-content">
+                <div class="timeline-time">{{ $t['waktu'] }}</div>
+                <div class="timeline-title">{{ $t['judul'] }}</div>
+                <div class="timeline-desc">{{ $t['deskripsi'] }}</div>
+              </div>
+            </div>
+            @endforeach
+          </div>
+          <p class="form-hint" style="margin-top:16px;">Prototype — timeline masih statis untuk satu kasus contoh. Pemilihan kasus lain lewat dropdown belum tersambung ke database.</p>
+        </div>
+      </section>
+
+      {{-- ===== MANAJEMEN MITIGASI ===== --}}
+      <section class="tab-panel" data-tab-panel="mitigasi">
+        <div class="section-head">
+          <h2>Manajemen Mitigasi</h2>
+          <p>Tindak lanjut mitigasi untuk setiap insiden setelah investigasi awal dilakukan.</p>
+        </div>
+        <div class="panel">
+          <div class="tbl-wrap">
+            <table class="dtbl">
+              <thead><tr><th>Aset</th><th>Ancaman</th><th>Tindakan Mitigasi</th><th>Penanggung Jawab</th><th>Tenggat</th><th>Status</th></tr></thead>
+              <tbody>
+                @foreach($mitigasi as $m)
+                <tr>
+                  <td>{{ $m['aset'] }}</td>
+                  <td style="color:var(--text-muted);">{{ $m['ancaman'] }}</td>
+                  <td>{{ $m['tindakan'] }}</td>
+                  <td>{{ $m['penanggung_jawab'] }}</td>
+                  <td>{{ $m['tenggat'] }}</td>
+                  <td><span class="badge {{ $m['status_class'] }}">{{ $m['status'] }}</span></td>
                 </tr>
                 @endforeach
               </tbody>

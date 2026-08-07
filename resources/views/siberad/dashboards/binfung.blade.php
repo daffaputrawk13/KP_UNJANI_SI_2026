@@ -27,6 +27,23 @@
 
   .chart-legend-note{font-size:11px;color:var(--text-dim);margin-top:14px;line-height:1.5;}
   @media(max-width:980px){.chart-box-grid{grid-template-columns:1fr;}.chart-mini .chart-wrap{height:230px;}}
+
+  /* Dropdown sidebar lebih panjang dari 3 item — dinaikkan biar submenu Manajemen
+     Personel & Manajemen Referensi tidak terpotong. */
+  .side-dropdown.open .side-dropdown-menu{max-height:320px;}
+
+  /* Modal Tambah/Edit Personel & modal umum lainnya di dashboard ini */
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:center;justify-content:center;padding:20px;}
+  .modal-overlay.open{display:flex;}
+  .modal-box{background:var(--panel,#0f1a14);border:1px solid var(--border-strong,#2a3a30);border-radius:12px;max-width:640px;width:100%;max-height:85vh;display:flex;flex-direction:column;}
+  .modal-head{display:flex;align-items:flex-start;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--border-soft,#22302a);}
+  .modal-head h3{margin:0;font-size:16px;}
+  .modal-close{background:none;border:none;color:var(--text-muted,#9fb0a8);font-size:22px;line-height:1;cursor:pointer;}
+  .modal-close:hover{color:var(--gold-bright,#f2c14e);}
+  .modal-body{padding:16px 20px 20px;overflow-y:auto;}
+
+  .mini-stat-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:22px;}
+  @media(max-width:980px){.mini-stat-grid{grid-template-columns:repeat(2,1fr);}}
 </style>
 </head>
 <body>
@@ -119,6 +136,20 @@
           <a href="#" class="side-link side-sublink" data-tab-link="riwayat-laporan">Riwayat Laporan</a>
         </div>
       </div>
+
+      <div class="side-dropdown" id="personelDropdown">
+        <button type="button" class="side-link side-dropdown-toggle" id="personelToggle" aria-expanded="false" aria-controls="personelSubmenu">
+          <span class="dot"></span>
+          <span class="side-link-label">Manajemen Personel</span>
+          <svg class="side-dropdown-arrow" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg>
+        </button>
+        <div class="side-dropdown-menu" id="personelSubmenu">
+          <a href="#" class="side-link side-sublink" data-tab-link="data-personel">Data Personel</a>
+          <a href="#" class="side-link side-sublink" data-tab-link="mutasi-personel">Mutasi Personel</a>
+          <a href="#" class="side-link side-sublink" data-tab-link="riwayat-personel">Riwayat Personel</a>
+          <a href="#" class="side-link side-sublink" data-tab-link="keaktifan-personel">Keaktifan Personel</a>
+        </div>
+      </div>
     </nav>
     <div class="side-foot">
       <form class="logout logout-form" method="POST" action="{{ route('logout') }}">
@@ -130,17 +161,23 @@
 
   <script>
   (function () {
-    var dropdown = document.getElementById('laporanDropdown');
-    var toggle = document.getElementById('laporanToggle');
-    if (!dropdown || !toggle) return;
+    var pairs = [
+      { dropdown: document.getElementById('laporanDropdown'), toggle: document.getElementById('laporanToggle') },
+      { dropdown: document.getElementById('personelDropdown'), toggle: document.getElementById('personelToggle') }
+    ];
 
-    var subActive = dropdown.querySelector('.side-sublink.active');
-    if (subActive) dropdown.classList.add('open');
+    pairs.forEach(function (pair) {
+      var dropdown = pair.dropdown, toggle = pair.toggle;
+      if (!dropdown || !toggle) return;
 
-    toggle.addEventListener('click', function (e) {
-      e.preventDefault();
-      var isOpen = dropdown.classList.toggle('open');
-      toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      var subActive = dropdown.querySelector('.side-sublink.active');
+      if (subActive) dropdown.classList.add('open');
+
+      toggle.addEventListener('click', function (e) {
+        e.preventDefault();
+        var isOpen = dropdown.classList.toggle('open');
+        toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      });
     });
   })();
   </script>
@@ -469,6 +506,231 @@
               </tbody>
             </table>
           </div>
+        </div>
+      </section>
+
+      {{-- ===== DATA PERSONEL (TAMBAH & EDIT) ===== --}}
+      <section class="tab-panel" data-tab-panel="data-personel">
+        <div class="section-head">
+          <h2>Data Personel</h2>
+          <p>Master data personel yang terdata di sistem — tambah personel baru atau edit data yang sudah ada.</p>
+        </div>
+        <div class="panel">
+          <div class="panel-head">
+            <div><h3>Seluruh Personel</h3><p>{{ count($dataPersonel) }} personel tercatat (sampel).</p></div>
+            <button type="button" class="btn btn-primary btn-sm" onclick="bukaModalPersonel('add')">+ Tambah Personel</button>
+          </div>
+          <div class="tbl-wrap">
+            <table class="dtbl">
+              <thead><tr><th>Nama</th><th>NRP</th><th>Pangkat</th><th>Jabatan</th><th>Satuan</th><th>Bergabung</th><th>Keaktifan</th><th>Aksi</th></tr></thead>
+              <tbody>
+                @foreach($dataPersonel as $p)
+                <tr>
+                  <td>{{ $p['nama'] }}</td>
+                  <td style="font-family:var(--mono);">{{ $p['nrp'] }}</td>
+                  <td>{{ $p['pangkat'] }}</td>
+                  <td style="color:var(--text-muted);">{{ $p['jabatan'] }}</td>
+                  <td>{{ $p['satuan'] }}</td>
+                  <td>{{ $p['tanggal_gabung'] }}</td>
+                  <td><span class="badge {{ $p['keaktifan_class'] }}">{{ $p['keaktifan'] }}</span></td>
+                  <td>
+                    <div class="btn-row">
+                      <button class="btn btn-sm" type="button" onclick="bukaModalPersonel('edit', {{ json_encode($p) }})">Edit</button>
+                    </div>
+                  </td>
+                </tr>
+                @endforeach
+              </tbody>
+            </table>
+          </div>
+          <p class="form-hint" style="margin-top:12px;">Prototype — data personel masih statis (sampel), belum tersambung ke database.</p>
+        </div>
+      </section>
+
+      {{-- ===== MODAL TAMBAH / EDIT PERSONEL ===== --}}
+      <div class="modal-overlay" id="modalPersonel">
+        <div class="modal-box" style="max-width:560px;">
+          <div class="modal-head">
+            <div>
+              <h3 id="modalPersonelJudul">Tambah Personel</h3>
+              <p style="margin:2px 0 0;font-size:12.5px;color:var(--text-muted);">Lengkapi data personel di bawah ini.</p>
+            </div>
+            <button type="button" class="modal-close" onclick="tutupModalPersonel()">&times;</button>
+          </div>
+          <div class="modal-body">
+            <form class="form-grid" id="formPersonel" novalidate>
+              <div class="form-field full">
+                <label for="personelNama">Nama Lengkap</label>
+                <input id="personelNama" type="text" placeholder="Contoh: Serka Budi Santoso" required>
+              </div>
+              <div class="form-field">
+                <label for="personelNrp">NRP / NIP</label>
+                <input id="personelNrp" type="text" placeholder="Contoh: 21030112345" required>
+              </div>
+              <div class="form-field">
+                <label for="personelTanggalGabung">Tanggal Bergabung</label>
+                <input id="personelTanggalGabung" type="date" required>
+              </div>
+              <div class="form-field">
+                <label for="personelPangkat">Pangkat</label>
+                <select id="personelPangkat" required>
+                  @foreach($daftarPangkat as $pk)
+                    <option>{{ $pk['nama'] }}</option>
+                  @endforeach
+                </select>
+              </div>
+              <div class="form-field">
+                <label for="personelJabatan">Jabatan</label>
+                <select id="personelJabatan" required>
+                  @foreach($daftarJabatan as $j)
+                    <option>{{ $j['nama'] }}</option>
+                  @endforeach
+                </select>
+              </div>
+              <div class="form-field">
+                <label for="personelSatuan">Satuan</label>
+                <select id="personelSatuan" required>
+                  @foreach($daftarSatuan as $s)
+                    <option>{{ $s['nama'] }}</option>
+                  @endforeach
+                </select>
+              </div>
+              <div class="form-field">
+                <label for="personelKeaktifan">Status Keaktifan</label>
+                <select id="personelKeaktifan" required>
+                  <option>Aktif</option>
+                  <option>Menunggu SK</option>
+                  <option>Cuti</option>
+                  <option>Dinas Luar</option>
+                  <option>Pensiun / Non-Aktif</option>
+                </select>
+              </div>
+              <div class="form-field full" style="margin-top:6px;">
+                <button class="btn btn-primary" type="button" onclick="alert('Prototype — data personel belum tersambung ke database.'); tutupModalPersonel();">Simpan Data Personel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <script>
+      (function () {
+        var overlay = document.getElementById('modalPersonel');
+        if (!overlay) return;
+
+        window.bukaModalPersonel = function (mode, data) {
+          document.getElementById('modalPersonelJudul').textContent = (mode === 'edit') ? 'Edit Personel' : 'Tambah Personel';
+          document.getElementById('personelNama').value = data ? (data.nama || '') : '';
+          document.getElementById('personelNrp').value = data ? (data.nrp || '') : '';
+          document.getElementById('personelTanggalGabung').value = '';
+          if (data && data.pangkat) document.getElementById('personelPangkat').value = data.pangkat;
+          if (data && data.jabatan) document.getElementById('personelJabatan').value = data.jabatan;
+          if (data && data.satuan) document.getElementById('personelSatuan').value = data.satuan;
+          if (data && data.keaktifan) document.getElementById('personelKeaktifan').value = data.keaktifan;
+          overlay.classList.add('open');
+        };
+
+        window.tutupModalPersonel = function () {
+          overlay.classList.remove('open');
+        };
+
+        overlay.addEventListener('click', function (e) {
+          if (e.target === overlay) window.tutupModalPersonel();
+        });
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape' && overlay.classList.contains('open')) window.tutupModalPersonel();
+        });
+      })();
+      </script>
+
+      {{-- ===== MUTASI PERSONEL ===== --}}
+      <section class="tab-panel" data-tab-panel="mutasi-personel">
+        <div class="section-head">
+          <h2>Mutasi Personel</h2>
+          <p>Perpindahan personel dari satu satuan ke satuan lain.</p>
+        </div>
+        <div class="panel">
+          <div class="panel-head">
+            <div><h3>Daftar Mutasi</h3><p>Riwayat dan pengajuan mutasi personel antar satuan.</p></div>
+            <button type="button" class="btn btn-primary btn-sm" onclick="alert('Prototype — form pengajuan mutasi belum tersambung ke database.')">+ Ajukan Mutasi</button>
+          </div>
+          <div class="tbl-wrap">
+            <table class="dtbl">
+              <thead><tr><th>Nama</th><th>Satuan Asal</th><th>Satuan Tujuan</th><th>Jabatan Baru</th><th>Tanggal</th><th>Alasan</th><th>Status</th></tr></thead>
+              <tbody>
+                @foreach($mutasiPersonel as $m)
+                <tr>
+                  <td>{{ $m['nama'] }}</td>
+                  <td style="color:var(--text-muted);">{{ $m['satuan_asal'] }}</td>
+                  <td>{{ $m['satuan_tujuan'] }}</td>
+                  <td>{{ $m['jabatan_baru'] }}</td>
+                  <td>{{ $m['tanggal_mutasi'] }}</td>
+                  <td style="color:var(--text-muted);">{{ $m['alasan'] }}</td>
+                  <td><span class="status-dot {{ $m['status_class'] === 'green' ? 'ok' : 'warn' }}">{{ $m['status'] }}</span></td>
+                </tr>
+                @endforeach
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      {{-- ===== RIWAYAT PERSONEL ===== --}}
+      <section class="tab-panel" data-tab-panel="riwayat-personel">
+        <div class="section-head">
+          <h2>Riwayat Personel</h2>
+          <p>Log lengkap peristiwa karier personel — penempatan, mutasi, kenaikan pangkat, cuti, dan lainnya.</p>
+        </div>
+        <div class="panel">
+          <div class="tbl-wrap">
+            <table class="dtbl">
+              <thead><tr><th>Nama</th><th>Peristiwa</th><th>Keterangan</th><th>Tanggal</th></tr></thead>
+              <tbody>
+                @foreach($riwayatPersonel as $r)
+                <tr>
+                  <td>{{ $r['nama'] }}</td>
+                  <td><span class="badge">{{ $r['peristiwa'] }}</span></td>
+                  <td style="color:var(--text-muted);">{{ $r['keterangan'] }}</td>
+                  <td>{{ $r['tanggal'] }}</td>
+                </tr>
+                @endforeach
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      {{-- ===== DATA KEAKTIFAN PERSONEL ===== --}}
+      <section class="tab-panel" data-tab-panel="keaktifan-personel">
+        <div class="section-head">
+          <h2>Data Keaktifan Personel</h2>
+          <p>Sebaran status keaktifan seluruh personel yang terdata di sistem.</p>
+        </div>
+        <div class="mini-stat-grid">
+          @foreach($keaktifanPersonel as $k)
+          <div class="stat-card">
+            <div class="lbl">{{ $k['label'] }}</div>
+            <div class="val" style="color:var(--{{ $k['class'] }});">{{ $k['jumlah'] }}</div>
+            <div class="sub">Personel</div>
+          </div>
+          @endforeach
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div><h3>Rincian per Status</h3><p>Ringkasan jumlah personel berdasarkan status keaktifan saat ini.</p></div></div>
+          <div class="tbl-wrap">
+            <table class="dtbl">
+              <thead><tr><th>Status Keaktifan</th><th>Jumlah Personel</th></tr></thead>
+              <tbody>
+                @foreach($keaktifanPersonel as $k)
+                <tr>
+                  <td><span class="badge {{ $k['class'] }}">{{ $k['label'] }}</span></td>
+                  <td>{{ $k['jumlah'] }}</td>
+                </tr>
+                @endforeach
+              </tbody>
+            </table>
+          </div>
+          <p class="form-hint" style="margin-top:12px;">Prototype — angka masih sampel, belum dihitung otomatis dari data personel di database.</p>
         </div>
       </section>
 

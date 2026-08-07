@@ -498,6 +498,31 @@ class DashboardController extends Controller
                 ['aset' => 'Server File Sharing Ditjen', 'perihal' => 'Indikasi ransomware mengenkripsi file bersama', 'pelapor' => 'Piket Satlak Penindakan', 'tanggal' => '02 Agu 2026', 'prioritas' => 'Tinggi', 'prioritas_class' => 'bad'],
                 ['aset' => 'Endpoint Staf Binmat #14', 'perihal' => 'Trojan terdeteksi via antivirus terpusat', 'pelapor' => 'Piket Satlak Penindakan', 'tanggal' => '02 Agu 2026', 'prioritas' => 'Sedang', 'prioritas_class' => 'warn'],
             ],
+
+            // Manajemen investigasi — kasus yang sedang/sudah diinvestigasi tim Satlak Penindakan.
+            'investigasi' => [
+                ['kasus' => 'INV-2026-014', 'aset' => 'Server File Sharing Ditjen', 'jenis' => 'Ransomware (Lockbit variant)', 'investigator' => 'Serka Yudha P.', 'mulai' => '02 Agu 2026', 'progres' => 65, 'status' => 'Berjalan', 'status_class' => 'amber'],
+                ['kasus' => 'INV-2026-013', 'aset' => 'Endpoint Staf Binmat #14', 'jenis' => 'Malware (Trojan)', 'investigator' => 'Sertu Dimas A.', 'mulai' => '02 Agu 2026', 'progres' => 40, 'status' => 'Berjalan', 'status_class' => 'amber'],
+                ['kasus' => 'INV-2026-011', 'aset' => 'Gateway Email Satlok Duktek (Dukungan Teknologi)', 'jenis' => 'Phishing campaign', 'investigator' => 'Serka Yudha P.', 'mulai' => '31 Jul 2026', 'progres' => 100, 'status' => 'Selesai', 'status_class' => 'green'],
+                ['kasus' => 'INV-2026-009', 'aset' => 'Portal Data Kodim', 'jenis' => 'Defacement (rujukan Satlakal)', 'investigator' => 'Sertu Dimas A.', 'mulai' => '28 Jul 2026', 'progres' => 100, 'status' => 'Selesai', 'status_class' => 'green'],
+            ],
+
+            // Manajemen mitigasi — tindak lanjut mitigasi per insiden setelah investigasi awal.
+            'mitigasi' => [
+                ['aset' => 'Server File Sharing Ditjen', 'ancaman' => 'Ransomware (Lockbit variant)', 'tindakan' => 'Restore data dari backup terakhir & perkuat segmentasi jaringan', 'penanggung_jawab' => 'Tim Satlak Penindakan', 'tenggat' => '05 Agu 2026', 'status' => 'Berjalan', 'status_class' => 'amber'],
+                ['aset' => 'Endpoint Staf Binmat #14', 'ancaman' => 'Malware (Trojan)', 'tindakan' => 'Update signature antivirus terpusat & reset kredensial pengguna', 'penanggung_jawab' => 'Tim Satlak Penindakan', 'tenggat' => '03 Agu 2026', 'status' => 'Berjalan', 'status_class' => 'amber'],
+                ['aset' => 'Gateway Email Satlok Duktek (Dukungan Teknologi)', 'ancaman' => 'Phishing campaign', 'tindakan' => 'Blokir domain pengirim & aktifkan filter anti-phishing tambahan', 'penanggung_jawab' => 'Tim Satlak Penindakan', 'tenggat' => '02 Agu 2026', 'status' => 'Selesai', 'status_class' => 'green'],
+                ['aset' => 'Jaringan Internal SDIR', 'ancaman' => 'Percobaan brute force', 'tindakan' => 'Terapkan rate-limiting login & aktifkan MFA', 'penanggung_jawab' => 'Tim Satlak Penindakan', 'tenggat' => '06 Agu 2026', 'status' => 'Direncanakan', 'status_class' => ''],
+            ],
+
+            // Timeline penanganan — kronologi kasus prioritas tertinggi yang sedang berjalan.
+            'timelinePenanganan' => [
+                ['waktu' => '02 Agu 2026, 09:24', 'judul' => 'Ancaman Terdeteksi', 'deskripsi' => 'Sistem monitoring mendeteksi aktivitas enkripsi mencurigakan pada Server File Sharing Ditjen (indikasi Lockbit variant).', 'state' => 'done'],
+                ['waktu' => '02 Agu 2026, 09:32', 'judul' => 'Isolasi Jaringan', 'deskripsi' => 'Server diisolasi dari jaringan untuk mencegah penyebaran enkripsi ke aset lain.', 'state' => 'done'],
+                ['waktu' => '02 Agu 2026, 10:15', 'judul' => 'Investigasi Forensik', 'deskripsi' => 'Tim forensik digital menganalisis titik masuk serangan dan cakupan file yang terdampak (INV-2026-014).', 'state' => 'active'],
+                ['waktu' => 'Estimasi 04 Agu 2026', 'judul' => 'Mitigasi & Pemulihan', 'deskripsi' => 'Restore data dari backup terakhir dan penguatan segmentasi jaringan.', 'state' => 'pending'],
+                ['waktu' => 'Estimasi 06 Agu 2026', 'judul' => 'Kasus Ditutup', 'deskripsi' => 'Verifikasi akhir sistem pulih normal dan laporan akhir diserahkan ke DANPUS.', 'state' => 'pending'],
+            ],
         ]);
     }
 
@@ -596,6 +621,72 @@ class DashboardController extends Controller
             ],
             'laporanPiket' => [
                 ['nama' => 'Serda Ahmad Fauzi', 'perihal' => 'Pengajuan penempatan personel baru ke Satlak Penindakan', 'pelapor' => 'Piket Binfung', 'tanggal' => '02 Agu 2026', 'prioritas' => 'Sedang', 'prioritas_class' => 'warn'],
+            ],
+
+            // Data Personel — master data personel terdata di sistem (dipakai di tab
+            // Data Personel untuk Tambah/Edit, serta jadi rujukan Mutasi & Riwayat Personel).
+            'dataPersonel' => [
+                ['id' => 1, 'nama' => 'Serka Budi Santoso', 'nrp' => '21030112345', 'pangkat' => 'Serka', 'jabatan' => 'Staf', 'satuan' => 'Binmat', 'tanggal_gabung' => '29 Jul 2026', 'keaktifan' => 'Aktif', 'keaktifan_class' => 'green'],
+                ['id' => 2, 'nama' => 'Sertu Dewi Anggraini', 'nrp' => '21030156789', 'pangkat' => 'Sertu', 'jabatan' => 'Piket', 'satuan' => 'Satlak Sibersos', 'tanggal_gabung' => '27 Jul 2026', 'keaktifan' => 'Aktif', 'keaktifan_class' => 'green'],
+                ['id' => 3, 'nama' => 'Kopda Yusuf Hidayat', 'nrp' => '21030198765', 'pangkat' => 'Kopda', 'jabatan' => 'Piket', 'satuan' => 'Satlakal (Penangkalan)', 'tanggal_gabung' => '20 Jul 2026', 'keaktifan' => 'Aktif', 'keaktifan_class' => 'green'],
+                ['id' => 4, 'nama' => 'Serda Ahmad Fauzi', 'nrp' => '21030122334', 'pangkat' => 'Serda', 'jabatan' => 'Piket', 'satuan' => 'Satlak Penindakan', 'tanggal_gabung' => '02 Agu 2026', 'keaktifan' => 'Menunggu SK', 'keaktifan_class' => 'amber'],
+                ['id' => 5, 'nama' => 'Sertu Rina Wulandari', 'nrp' => '21030144556', 'pangkat' => 'Sertu', 'jabatan' => 'Staf Riset', 'satuan' => 'Satlok Duktek (Dukungan Teknologi)', 'tanggal_gabung' => '01 Agu 2026', 'keaktifan' => 'Menunggu SK', 'keaktifan_class' => 'amber'],
+                ['id' => 6, 'nama' => 'Serka Yudha Pratama', 'nrp' => '21029987654', 'pangkat' => 'Serka', 'jabatan' => 'Investigator', 'satuan' => 'Satlak Penindakan', 'tanggal_gabung' => '15 Mar 2025', 'keaktifan' => 'Aktif', 'keaktifan_class' => 'green'],
+                ['id' => 7, 'nama' => 'Praka Hendra Saputra', 'nrp' => '21031200112', 'pangkat' => 'Praka', 'jabatan' => 'Staf Logistik', 'satuan' => 'Binmat', 'tanggal_gabung' => '10 Jan 2024', 'keaktifan' => 'Cuti', 'keaktifan_class' => 'amber'],
+                ['id' => 8, 'nama' => 'Sertu Dimas Ariyanto', 'nrp' => '21030233445', 'pangkat' => 'Sertu', 'jabatan' => 'Investigator', 'satuan' => 'Satlak Penindakan', 'tanggal_gabung' => '05 Feb 2024', 'keaktifan' => 'Dinas Luar', 'keaktifan_class' => 'amber'],
+            ],
+
+            // Mutasi Personel — perpindahan personel antar satuan.
+            'mutasiPersonel' => [
+                ['nama' => 'Kopda Yusuf Hidayat', 'satuan_asal' => 'Binmat', 'satuan_tujuan' => 'Satlakal (Penangkalan)', 'jabatan_baru' => 'Piket', 'tanggal_mutasi' => '20 Jul 2026', 'alasan' => 'Kebutuhan penguatan piket Satlakal', 'status' => 'Selesai', 'status_class' => 'green'],
+                ['nama' => 'Praka Hendra Saputra', 'satuan_asal' => 'Satlok Duktek (Dukungan Teknologi)', 'satuan_tujuan' => 'Binmat', 'jabatan_baru' => 'Staf Logistik', 'tanggal_mutasi' => '10 Jan 2024', 'alasan' => 'Rotasi tugas rutin', 'status' => 'Selesai', 'status_class' => 'green'],
+                ['nama' => 'Sertu Dimas Ariyanto', 'satuan_asal' => 'Satlok Duktek (Dukungan Teknologi)', 'satuan_tujuan' => 'Satlak Penindakan', 'jabatan_baru' => 'Investigator', 'tanggal_mutasi' => '05 Agu 2026', 'alasan' => 'Penguatan tim investigasi insiden siber', 'status' => 'Menunggu SK', 'status_class' => 'amber'],
+            ],
+
+            // Riwayat Personel — log lengkap peristiwa karier personel (bukan cuma penempatan awal).
+            'riwayatPersonel' => [
+                ['nama' => 'Serka Yudha Pratama', 'peristiwa' => 'Kenaikan Pangkat', 'keterangan' => 'Naik pangkat dari Sertu menjadi Serka', 'tanggal' => '01 Apr 2026'],
+                ['nama' => 'Sertu Dimas Ariyanto', 'peristiwa' => 'Mutasi Satuan', 'keterangan' => 'Dimutasi dari Satlok Duktek (Dukungan Teknologi) ke Satlak Penindakan', 'tanggal' => '05 Agu 2026'],
+                ['nama' => 'Kopda Yusuf Hidayat', 'peristiwa' => 'Mutasi Satuan', 'keterangan' => 'Dimutasi dari Binmat ke Satlakal (Penangkalan)', 'tanggal' => '20 Jul 2026'],
+                ['nama' => 'Serka Budi Santoso', 'peristiwa' => 'Penempatan Awal', 'keterangan' => 'Ditempatkan sebagai Staf di Binmat', 'tanggal' => '29 Jul 2026'],
+                ['nama' => 'Praka Hendra Saputra', 'peristiwa' => 'Cuti Tahunan', 'keterangan' => 'Mengajukan cuti tahunan 14 hari kerja', 'tanggal' => '22 Jul 2026'],
+            ],
+
+            // Manajemen Jabatan — daftar jabatan beserta kuota per satuan.
+            'daftarJabatan' => [
+                ['nama' => 'Piket', 'satuan' => 'Seluruh Satlak', 'kuota' => 12, 'terisi' => 9],
+                ['nama' => 'Staf', 'satuan' => 'Binmat', 'kuota' => 6, 'terisi' => 5],
+                ['nama' => 'Investigator', 'satuan' => 'Satlak Penindakan', 'kuota' => 4, 'terisi' => 2],
+                ['nama' => 'Staf Riset', 'satuan' => 'Satlok Duktek (Dukungan Teknologi)', 'kuota' => 5, 'terisi' => 4],
+                ['nama' => 'Staf Logistik', 'satuan' => 'Binmat', 'kuota' => 3, 'terisi' => 3],
+            ],
+
+            // Manajemen Pangkat — daftar pangkat beserta jumlah personel per pangkat.
+            'daftarPangkat' => [
+                ['nama' => 'Praka', 'golongan' => 'Tamtama', 'jumlah_personel' => 14],
+                ['nama' => 'Kopda', 'golongan' => 'Tamtama', 'jumlah_personel' => 10],
+                ['nama' => 'Serda', 'golongan' => 'Bintara', 'jumlah_personel' => 18],
+                ['nama' => 'Sertu', 'golongan' => 'Bintara', 'jumlah_personel' => 22],
+                ['nama' => 'Serka', 'golongan' => 'Bintara', 'jumlah_personel' => 16],
+            ],
+
+            // Manajemen Satuan — daftar satuan beserta kapasitas & keterisian personel.
+            'daftarSatuan' => [
+                ['nama' => 'Satlak Penindakan', 'kode' => 'RINDAK', 'kategori' => 'Satlak', 'kapasitas' => 16, 'terisi' => 14],
+                ['nama' => 'Satlak Sibersos', 'kode' => 'SIBERSOS', 'kategori' => 'Satlak', 'kapasitas' => 14, 'terisi' => 12],
+                ['nama' => 'Satlakal (Penangkalan)', 'kode' => 'ALMON', 'kategori' => 'Satlak', 'kapasitas' => 13, 'terisi' => 11],
+                ['nama' => 'Satlok Duktek (Dukungan Teknologi)', 'kode' => 'DUKTEK', 'kategori' => 'Satlok', 'kapasitas' => 10, 'terisi' => 8],
+                ['nama' => 'Binmat', 'kode' => 'BINMAT', 'kategori' => 'Bin', 'kapasitas' => 12, 'terisi' => 11],
+                ['nama' => 'Binum', 'kode' => 'BINUM', 'kategori' => 'Bin', 'kapasitas' => 8, 'terisi' => 7],
+            ],
+
+            // Data Keaktifan Personel — sebaran status keaktifan personel (sampel).
+            'keaktifanPersonel' => [
+                ['label' => 'Aktif', 'jumlah' => 62, 'class' => 'green'],
+                ['label' => 'Menunggu SK', 'jumlah' => 2, 'class' => 'amber'],
+                ['label' => 'Cuti', 'jumlah' => 5, 'class' => 'amber'],
+                ['label' => 'Dinas Luar', 'jumlah' => 4, 'class' => 'amber'],
+                ['label' => 'Pensiun / Non-Aktif', 'jumlah' => 3, 'class' => 'red'],
             ],
         ]);
     }
