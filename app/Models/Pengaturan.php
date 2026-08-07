@@ -13,6 +13,23 @@ class Pengaturan extends Model
         'alamat',
         'email_kontak',
         'telepon_kontak',
+        'hero_eyebrow',
+        'hero_judul_awal',
+        'hero_judul_aksen',
+        'hero_subjudul',
+        'hero_deskripsi',
+        'hero_image_path',
+        'fitur',
+        'tentang_deskripsi',
+        'tentang_moto_judul',
+        'tentang_moto_deskripsi',
+        'website',
+        'sosial_media',
+    ];
+
+    protected $casts = [
+        'fitur' => 'array',
+        'sosial_media' => 'array',
     ];
 
     /**

@@ -17,6 +17,7 @@ use App\Http\Controllers\PersonelController;
 use App\Http\Controllers\PersonelDokumenController;
 use App\Http\Controllers\PersonelMutasiController;
 use App\Http\Controllers\PostinganController;
+use App\Models\Pengaturan;
 use App\Models\Satuan;
 use Illuminate\Support\Facades\Route;
 
@@ -24,7 +25,10 @@ Route::get('/', function () {
     // Satuan dikelompokkan per kategori untuk ditampilkan di dropdown login.
     $satuans = Satuan::orderBy('urutan')->get()->groupBy('kategori');
 
-    return view('siberad.landing.welcome', ['satuans' => $satuans]);
+    return view('siberad.landing.welcome', [
+        'satuans' => $satuans,
+        'pengaturan' => Pengaturan::current(),
+    ]);
 });
 
 // Form login berada di landing page (modal), bukan halaman tersendiri.
@@ -172,8 +176,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Manajemen Role & Hak Akses
     Route::patch('/satuan/{satuan}/permissions', [PermissionController::class, 'update'])->name('satuan.permissions');
 
-    // Pengaturan Sistem (Profil Instansi, Logo, dll.)
-    Route::patch('/pengaturan', [SettingController::class, 'update'])->name('pengaturan.update');
+    // Pengaturan Konten Landing Page (Beranda, Fitur, Tentang, Kontak)
+    Route::patch('/pengaturan/landing', [SettingController::class, 'updateLanding'])->name('pengaturan.landing.update');
 
     // Backup Database (opsional)
     Route::post('/backup', [BackupController::class, 'store'])->name('backup.store');

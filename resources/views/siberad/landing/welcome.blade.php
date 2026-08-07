@@ -361,7 +361,7 @@
     background-image:
       linear-gradient(115deg, var(--hero-ov-1) 0%, var(--hero-ov-2) 32%, var(--hero-ov-3) 58%, var(--hero-ov-4) 100%),
       linear-gradient(to top, var(--hero-ov-top) 0%, var(--hero-ov-top-fade) 26%),
-      url('{{ asset('images/hero-lapangan-mabesad.jpg') }}');
+      url('{{ $pengaturan->hero_image_path ? asset('storage/'.$pengaturan->hero_image_path) : asset('images/hero-lapangan-mabesad.jpg') }}');
     background-size:cover;
     background-position:center 58%;
     background-repeat:no-repeat;
@@ -735,10 +735,10 @@
     <section class="hero" id="tentang">
       <div class="wrap hero-inner">
         <div data-reveal>
-          <div class="eyebrow">PUSSIBERAD // SISTEM PENDUKUNG OPERASIONAL</div>
-          <h1>SIBER<em>AD</em></h1>
-          <h2>Sistem Informasi Berbasis Elektronik Angkatan Darat</h2>
-          <p>Mendigitalisasi alur pelaporan kegiatan seluruh Satuan Pelaksana Pusat Siber Angkatan Darat — dari input laporan di lapangan, verifikasi berjenjang, hingga visualisasi real-time bagi pengambil keputusan.</p>
+          <div class="eyebrow">{{ $pengaturan->hero_eyebrow }}</div>
+          <h1>{{ $pengaturan->hero_judul_awal }}<em>{{ $pengaturan->hero_judul_aksen }}</em></h1>
+          <h2>{{ $pengaturan->hero_subjudul }}</h2>
+          <p>{{ $pengaturan->hero_deskripsi }}</p>
           <div class="hero-actions">
             <a class="btn btn-primary" href="#fitur">Selengkapnya</a>
           </div>
@@ -796,39 +796,23 @@
           <h3>Kenapa Memakai Sistem Ini</h3>
           <p>Dirancang untuk menyederhanakan alur pelaporan harian, dari input di lapangan hingga pengambilan keputusan.</p>
         </div>
+        @php
+          $fiturIcons = [
+            '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>',
+            '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>',
+            '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h8l-1 8 10-12h-8l1-8z"/></svg>',
+            '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 3v6c0 5-3.4 8.4-8 11-4.6-2.6-8-6-8-11V5l8-3z"/><path d="m9 12 2 2 4-4"/></svg>',
+          ];
+        @endphp
         <div class="feature-grid" data-reveal>
-          <div class="feature-card hud-panel">
-            <div class="feature-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>
+          @foreach (($pengaturan->fitur ?? []) as $i => $fitur)
+            <div class="feature-card hud-panel">
+              <div class="feature-icon">{!! $fiturIcons[$i] ?? $fiturIcons[0] !!}</div>
+              <div class="feature-code">KEUNGGULAN / {{ str_pad($i + 1, 2, '0', STR_PAD_LEFT) }}</div>
+              <h4>{{ $fitur['judul'] }}</h4>
+              <p>{{ $fitur['deskripsi'] }}</p>
             </div>
-            <div class="feature-code">KEUNGGULAN / 01</div>
-            <h4>Real-time</h4>
-            <p>Laporan dan status pekerjaan dapat dipantau secara langsung tanpa menunggu rekap manual.</p>
-          </div>
-          <div class="feature-card hud-panel">
-            <div class="feature-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>
-            </div>
-            <div class="feature-code">KEUNGGULAN / 02</div>
-            <h4>Terpusat</h4>
-            <p>Seluruh data laporan dan dokumen pendukung tersimpan dalam satu sistem yang mudah diakses.</p>
-          </div>
-          <div class="feature-card hud-panel">
-            <div class="feature-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h8l-1 8 10-12h-8l1-8z"/></svg>
-            </div>
-            <div class="feature-code">KEUNGGULAN / 03</div>
-            <h4>Efisien</h4>
-            <p>Alur persetujuan berjenjang menjadi lebih cepat dan mengurangi proses administrasi berulang.</p>
-          </div>
-          <div class="feature-card hud-panel">
-            <div class="feature-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 3v6c0 5-3.4 8.4-8 11-4.6-2.6-8-6-8-11V5l8-3z"/><path d="m9 12 2 2 4-4"/></svg>
-            </div>
-            <div class="feature-code">KEUNGGULAN / 04</div>
-            <h4>Aman &amp; Terkontrol</h4>
-            <p>Data terjaga dengan sistem cadangan dan hak akses yang diatur sesuai kebutuhan pengguna.</p>
-          </div>
+          @endforeach
         </div>
       </div>
     </section>
@@ -844,14 +828,9 @@
           <div>
             <div class="eyebrow">Tentang</div>
             <h3 style="font-family:var(--display);font-size:clamp(28px,3.4vw,38px);font-weight:700;margin:14px 0 14px;text-transform:uppercase;">Pussiberad</h3>
-            <p style="color:var(--text-muted);line-height:1.8;font-size:15px;">
-              Pussiberad bukan sebuah perusahaan komersial, melainkan satuan resmi di bawah TNI Angkatan Darat yang dibentuk untuk menyelenggarakan pembinaan personel serta fungsi sandi dan siber dalam rangka membantu tugas TNI-AD. Satuan ini bernama
-              <a href="https://id.wikipedia.org/wiki/Pusat_Sandi_dan_Siber_Angkatan_Darat" target="_blank" rel="noopener noreferrer" style="color:var(--gold-bright);text-decoration:underline;text-underline-offset:2px;">Pusat Siber Angkatan Darat</a>
-              (Pussiberad), sebelumnya bernama Pusat Sandi dan Siber TNI Angkatan Darat (Pussansiad).
-            </p>
-            <p style="color:var(--text-muted);line-height:1.8;font-size:15px;margin-top:14px;">
-              Pembentukan satuan ini merupakan hasil pengembangan Organisasi dan Tugas (Orgas) baru di lingkungan TNI-AD, sesuai Peraturan KASAD Nomor 26 Tahun 2019 tanggal 26 Desember 2019 tentang Organisasi dan Tugas Markas Besar TNI Angkatan Darat, Bab IV Tugas dan Tanggung Jawab, Pasal 35 Pussansiad.
-            </p>
+            @foreach (explode("\n\n", $pengaturan->tentang_deskripsi ?? '') as $paragraf)
+              <p style="color:var(--text-muted);line-height:1.8;font-size:15px;margin-top:14px;">{{ trim($paragraf) }}</p>
+            @endforeach
           </div>
         </div>
 
@@ -872,9 +851,9 @@
 
         <div style="margin-top:56px;" data-reveal>
           <div class="eyebrow">Moto</div>
-          <h3 style="font-family:var(--display);font-size:clamp(26px,3vw,34px);font-weight:700;margin:14px 0 14px;text-transform:uppercase;letter-spacing:.04em;">Satria Yudha Waskita</h3>
+          <h3 style="font-family:var(--display);font-size:clamp(26px,3vw,34px);font-weight:700;margin:14px 0 14px;text-transform:uppercase;letter-spacing:.04em;">{{ $pengaturan->tentang_moto_judul }}</h3>
           <p style="color:var(--text-muted);line-height:1.8;font-size:15px;max-width:820px;">
-            Semboyan resmi Pussansiad/Pussiberad ini diambil dari bahasa Sanskerta/Jawa Kuno, yang secara harfiah berarti "prajurit perang yang ahli, bijaksana, dan waspada" — menggambarkan identitas serta tugas utama prajurit siber TNI AD sebagai garda terdepan pertahanan digital bangsa.
+            {{ $pengaturan->tentang_moto_deskripsi }}
           </p>
         </div>
 
@@ -919,24 +898,33 @@
             <li><a href="#tentang-pussiberad">Tentang Pussiberad</a></li>
           </ul>
         </div>
+        @php
+          $sosialIcons = [
+            'instagram' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r="1"/></svg>',
+            'tiktok' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16.6 3h-3.1v12.4a2.7 2.7 0 1 1-1.9-2.6V9.6a5.8 5.8 0 1 0 5 5.7V9.4a7.9 7.9 0 0 0 4.4 1.3V7.6c-2.2-.2-4-1.9-4.4-4.1z"/></svg>',
+            'youtube' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M22.5 7.2c-.3-1.1-1.1-1.9-2.1-2.2C18.6 4.5 12 4.5 12 4.5s-6.6 0-8.4.5c-1 .3-1.8 1.1-2.1 2.2C1 9 1 12 1 12s0 3 .5 4.8c.3 1.1 1.1 1.9 2.1 2.2 1.8.5 8.4.5 8.4.5s6.6 0 8.4-.5c1-.3 1.8-1.1 2.1-2.2.5-1.8.5-4.8.5-4.8s0-3-.5-4.8zM9.8 15.3V8.7l6 3.3-6 3.3z"/></svg>',
+            'x' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.9 3H22l-7.5 8.6L23 21h-6.6l-5.2-6.6L5.2 21H2l8.1-9.3L2 3h6.7l4.7 6 5.5-6z"/></svg>',
+            'facebook' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 21v-8h2.7l.4-3.1h-3.1V8c0-.9.3-1.5 1.6-1.5h1.7V3.7C16.5 3.6 15.6 3.5 14.6 3.5c-2.4 0-4 1.5-4 4.1v2.3H7.9V13h2.7v8h2.9z"/></svg>',
+            'wikipedia' => '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 3.8 5.7 3.8 9s-1.3 6.5-3.8 9c-2.5-2.5-3.8-5.7-3.8-9s1.3-6.5 3.8-9z"/></svg>',
+          ];
+        @endphp
         <div>
           <div class="footer-col-title">Terhubung</div>
           <ul class="footer-links">
-            <li><a href="https://www.instagram.com/pussiberad?igsh=MTA1N2tuMHRobzE5OQ==" target="_blank" rel="noopener noreferrer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r="1"/></svg>Instagram @pussiberad</a></li>
-            <li><a href="https://www.tiktok.com/@pusat.siber_ad?_r=1&_t=ZS-98XYV7h9dfs" target="_blank" rel="noopener noreferrer"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16.6 3h-3.1v12.4a2.7 2.7 0 1 1-1.9-2.6V9.6a5.8 5.8 0 1 0 5 5.7V9.4a7.9 7.9 0 0 0 4.4 1.3V7.6c-2.2-.2-4-1.9-4.4-4.1z"/></svg>TikTok @pusat.siber_ad</a></li>
-            <li><a href="https://youtube.com/@tniangkatandarat?si=N5Es72T6bSpuLscG" target="_blank" rel="noopener noreferrer"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M22.5 7.2c-.3-1.1-1.1-1.9-2.1-2.2C18.6 4.5 12 4.5 12 4.5s-6.6 0-8.4.5c-1 .3-1.8 1.1-2.1 2.2C1 9 1 12 1 12s0 3 .5 4.8c.3 1.1 1.1 1.9 2.1 2.2 1.8.5 8.4.5 8.4.5s6.6 0 8.4-.5c1-.3 1.8-1.1 2.1-2.2.5-1.8.5-4.8.5-4.8s0-3-.5-4.8zM9.8 15.3V8.7l6 3.3-6 3.3z"/></svg>YouTube TNI Angkatan Darat</a></li>
-            <li><a href="https://x.com/tni_ad" target="_blank" rel="noopener noreferrer"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.9 3H22l-7.5 8.6L23 21h-6.6l-5.2-6.6L5.2 21H2l8.1-9.3L2 3h6.7l4.7 6 5.5-6z"/></svg>X (Twitter) @tni_ad</a></li>
-            <li><a href="https://web.facebook.com/TNIAngkatanDarat" target="_blank" rel="noopener noreferrer"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 21v-8h2.7l.4-3.1h-3.1V8c0-.9.3-1.5 1.6-1.5h1.7V3.7C16.5 3.6 15.6 3.5 14.6 3.5c-2.4 0-4 1.5-4 4.1v2.3H7.9V13h2.7v8h2.9z"/></svg>Facebook TNI Angkatan Darat</a></li>
-            <li><a href="https://id.wikipedia.org/wiki/Pusat_Sandi_dan_Siber_Angkatan_Darat" target="_blank" rel="noopener noreferrer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 3.8 5.7 3.8 9s-1.3 6.5-3.8 9c-2.5-2.5-3.8-5.7-3.8-9s1.3-6.5 3.8-9z"/></svg>Profil Resmi</a></li>
+            @foreach (($pengaturan->sosial_media ?? []) as $sosial)
+              @if (!empty($sosial['url']))
+                <li><a href="{{ $sosial['url'] }}" target="_blank" rel="noopener noreferrer">{!! $sosialIcons[$sosial['platform']] ?? '' !!}{{ $sosial['label'] }}</a></li>
+              @endif
+            @endforeach
           </ul>
         </div>
         <div>
           <div class="footer-col-title">Mabesad</div>
           <p class="footer-desc" style="margin-bottom:14px;">Markas Besar TNI Angkatan Darat — pusat kendali dan pimpinan utama TNI AD, dipimpin oleh Kepala Staf Angkatan Darat (Kasad).</p>
           <ul class="footer-links">
-            <li>Jl. Veteran No. 5, Gambir, Jakarta Pusat, DKI Jakarta 10110</li>
-            <li>(021) 3849192</li>
-            <li><a href="https://tni-ad.mil.id/" target="_blank" rel="noopener noreferrer">tni-ad.mil.id</a></li>
+            @if ($pengaturan->alamat)<li>{{ $pengaturan->alamat }}</li>@endif
+            @if ($pengaturan->telepon_kontak)<li>{{ $pengaturan->telepon_kontak }}</li>@endif
+            @if ($pengaturan->website)<li><a href="{{ $pengaturan->website }}" target="_blank" rel="noopener noreferrer">{{ preg_replace('#^https?://#', '', rtrim($pengaturan->website, '/')) }}</a></li>@endif
           </ul>
         </div>
       </div>
