@@ -7,18 +7,18 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Laporan Monitoring & Recovery — dipakai khusus fitur Satlakal
+     * Laporan Monitoring & Recovery — dipakai khusus fitur Satuan Pelaksanaan Penangkalan
      * (Penangkalan) untuk melaporkan insiden/pemulihan aset digital ke
      * DANPUS. Alurnya: Draft -> Dikirim -> Direvisi/Disetujui/Ditolak.
      * "Direvisi" memungkinkan DANPUS meminta perbaikan tanpa langsung
      * menolak laporan; laporan yang direvisi bisa diedit & dikirim ulang
-     * oleh Satlakal (statusnya kembali ke "Dikirim").
+     * oleh Satuan Pelaksanaan Penangkalan (statusnya kembali ke "Dikirim").
      */
     public function up(): void
     {
         Schema::create('laporan_monitorings', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('satuan_id')->constrained('satuans')->cascadeOnDelete(); // satuan asal (Satlakal)
+            $table->foreignId('satuan_id')->constrained('satuans')->cascadeOnDelete(); // satuan asal (Satuan Pelaksanaan Penangkalan)
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();     // pembuat laporan
             $table->foreignId('tujuan_satuan_id')->constrained('satuans')->cascadeOnDelete(); // satuan tujuan (DANPUS)
             $table->string('aset')->nullable();       // aset/sistem terdampak, mis. "Portal Utama Pussiberad"

@@ -621,7 +621,7 @@
         <div class="panel">
           <div style="padding:20px;text-align:center;">
             <p style="margin:0 0 12px;font-size:12.5px;line-height:1.6;color:var(--text-muted);">
-              Data master Pangkat dan Jabatan dikelola bersama dari dashboard Binfung (Pembinaan Fungsi) supaya satu sumber data untuk seluruh satuan.
+              Data master Pangkat dan Jabatan dikelola bersama dari dashboard Pembinaan Fungsi supaya satu sumber data untuk seluruh satuan.
             </p>
             <span class="badge">{{ \App\Models\Pangkat::count() }} Pangkat</span>
             &nbsp;

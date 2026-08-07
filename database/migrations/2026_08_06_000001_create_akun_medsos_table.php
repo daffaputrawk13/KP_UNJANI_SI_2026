@@ -8,7 +8,7 @@ return new class extends Migration
 {
     /**
      * Akun media sosial RESMI yang dikelola langsung oleh satuan (mis. akun
-     * Instagram/TikTok resmi Satlak Sibersos) — berbeda dari "akun yang
+     * Instagram/TikTok resmi Satuan Pelaksanaan Siber Sosial) — berbeda dari "akun yang
      * dipantau" (target monitoring isu/hoaks) yang sudah ada sebelumnya.
      * Tabel ini jadi induk untuk fitur pembuatan & penjadwalan posting.
      */
@@ -17,9 +17,9 @@ return new class extends Migration
         Schema::create('akun_medsos', function (Blueprint $table) {
             $table->id();
             $table->foreignId('satuan_id')->constrained('satuans')->cascadeOnDelete();
-            $table->string('nama_akun');                 // mis. "Instagram Resmi Satlak Sibersos"
+            $table->string('nama_akun');                 // mis. "Instagram Resmi Satuan Pelaksanaan Siber Sosial"
             $table->string('platform');                   // Instagram | Facebook | X (Twitter) | TikTok | YouTube
-            $table->string('username_platform');          // mis. @satlaksibersos
+            $table->string('username_platform');          // mis. @satlaksisos
             $table->string('url_profil')->nullable();
             $table->string('foto_profil_path')->nullable();
             $table->string('status')->default('Aktif');   // Aktif | Nonaktif

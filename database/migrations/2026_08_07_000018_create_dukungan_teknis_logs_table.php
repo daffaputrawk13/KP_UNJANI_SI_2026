@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('dukungan_teknis_logs', function (Blueprint $table) {
             $table->id();
-            // satuan_id = satlak Duktek yang memberi dukungan (selalu sama,
+            // satuan_id = Satuan Pelaksanaan Dukungan Teknologi yang memberi dukungan (selalu sama,
             // tapi tetap disimpan supaya query & relasi konsisten dengan
             // tabel log lain di aplikasi ini).
             $table->foreignId('satuan_id')->constrained('satuans')->cascadeOnDelete();

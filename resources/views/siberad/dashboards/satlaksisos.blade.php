@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Satlak Sibersos — SIBERAD</title>
+<title>Satuan Pelaksanaan Siber Sosial — SIBERAD</title>
 <link rel="icon" type="image/jpeg" href="{{ asset('images/logo-pussiberad.jpg') }}">
 @include('siberad.dashboards.partials.dash-styles')
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
@@ -233,7 +233,7 @@
       <section class="tab-panel active" data-tab-panel="dashboard">
         <div class="section-head">
           <h2>Ringkasan Laporan Publikasi</h2>
-          <p>Rekap laporan publikasi Satlak Sibersos ke DANPUS.</p>
+          <p>Rekap laporan publikasi Satuan Pelaksanaan Siber Sosial ke DANPUS.</p>
         </div>
         <div class="stat-grid">
           <div class="stat-card">
@@ -417,7 +417,7 @@
       <section class="tab-panel" data-tab-panel="riwayat-laporan-publikasi">
         <div class="section-head">
           <h2>Riwayat Laporan</h2>
-          <p>Log lengkap seluruh laporan publikasi Satlak Sibersos, termasuk draft dan yang sudah diputuskan DANPUS.</p>
+          <p>Log lengkap seluruh laporan publikasi Satuan Pelaksanaan Siber Sosial, termasuk draft dan yang sudah diputuskan DANPUS.</p>
         </div>
         <div class="panel">
           <div class="tbl-wrap">

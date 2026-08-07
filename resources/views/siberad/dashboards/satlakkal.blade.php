@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Satlakal (Penangkalan) — SIBERAD</title>
+<title>Satuan Pelaksanaan Penangkalan — SIBERAD</title>
 <link rel="icon" type="image/jpeg" href="{{ asset('images/logo-pussiberad.jpg') }}">
 @include('siberad.dashboards.partials.dash-styles')
 {{-- Library untuk fitur "Export PDF/Excel" pada tab Laporan Periodik.
-     Hanya dimuat di dashboard Satlakal karena fitur ini spesifik di sini. --}}
+     Hanya dimuat di dashboard Satuan Pelaksanaan Penangkalan karena fitur ini spesifik di sini. --}}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
@@ -249,7 +249,7 @@
       <section class="tab-panel active" data-tab-panel="dashboard">
         <div class="section-head">
           <h2>Ringkasan Pemantauan</h2>
-          <p>Status aset/website yang dipantau Satlakal (Penangkalan) hari ini.</p>
+          <p>Status aset/website yang dipantau Satuan Pelaksanaan Penangkalan hari ini.</p>
         </div>
         <div class="stat-grid">
           <div class="stat-card">
@@ -447,7 +447,7 @@
       <section class="tab-panel" data-tab-panel="riwayat-laporan">
         <div class="section-head">
           <h2>Riwayat Laporan</h2>
-          <p>Log lengkap seluruh laporan monitoring &amp; recovery Satlakal, termasuk draft dan yang sudah diputuskan DANPUS.</p>
+          <p>Log lengkap seluruh laporan monitoring &amp; recovery Satuan Pelaksanaan Penangkalan, termasuk draft dan yang sudah diputuskan DANPUS.</p>
         </div>
         <div class="panel">
           <div class="tbl-wrap">
@@ -608,7 +608,7 @@
       <section class="tab-panel" data-tab-panel="monitoring-sistem">
         <div class="section-head">
           <h2>Monitoring Sistem</h2>
-          <p>Pemakaian resource server dan uptime untuk setiap aset/website yang dipantau Satlakal (Penangkalan).</p>
+          <p>Pemakaian resource server dan uptime untuk setiap aset/website yang dipantau Satuan Pelaksanaan Penangkalan.</p>
         </div>
 
         <div class="stat-grid">
@@ -823,7 +823,7 @@
             var ws = XLSX.utils.aoa_to_sheet([HEADER_PERIODIK].concat(data.rows));
             var wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Laporan ' + data.period);
-            XLSX.writeFile(wb, 'laporan-monitoring-satlakal-' + data.period + '.xlsx');
+            XLSX.writeFile(wb, 'laporan-monitoring-satlakkal-' + data.period + '.xlsx');
           });
         }
 
@@ -840,7 +840,7 @@
             var namaPeriode = data.period.charAt(0).toUpperCase() + data.period.slice(1);
 
             doc.setFontSize(14);
-            doc.text('Laporan Monitoring — Satlakal (Penangkalan)', 14, 16);
+            doc.text('Laporan Monitoring — Satuan Pelaksanaan Penangkalan', 14, 16);
             doc.setFontSize(10);
             doc.text('Periode: ' + namaPeriode + '  |  Dicetak: ' + new Date().toLocaleString('id-ID'), 14, 23);
 
@@ -852,7 +852,7 @@
               headStyles: { fillColor: [212, 175, 55], textColor: [36, 26, 5] }
             });
 
-            doc.save('laporan-monitoring-satlakal-' + data.period + '.pdf');
+            doc.save('laporan-monitoring-satlakkal-' + data.period + '.pdf');
           });
         }
       })();

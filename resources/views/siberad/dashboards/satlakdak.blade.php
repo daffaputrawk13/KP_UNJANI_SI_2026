@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Satlak Penindakan — SIBERAD</title>
+<title>Satuan Pelaksanaan Penindakan — SIBERAD</title>
 <link rel="icon" type="image/jpeg" href="{{ asset('images/logo-pussiberad.jpg') }}">
 @include('siberad.dashboards.partials.dash-styles')
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
@@ -274,7 +274,7 @@
       <section class="tab-panel active" data-tab-panel="dashboard">
         <div class="section-head">
           <h2>Ringkasan Penanganan Ancaman</h2>
-          <p>Status ancaman siber yang ditangani Satlak Penindakan hari ini.</p>
+          <p>Status ancaman siber yang ditangani Satuan Pelaksanaan Penindakan hari ini.</p>
         </div>
         <div class="stat-grid">
           <div class="stat-card">
@@ -428,7 +428,7 @@
       <section class="tab-panel" data-tab-panel="tambah-laporan">
         <div class="section-head">
           <h2>Tambah Laporan</h2>
-          <p>Catat insiden ancaman siber baru yang terdeteksi atau ditangani Satlak Penindakan.</p>
+          <p>Catat insiden ancaman siber baru yang terdeteksi atau ditangani Satuan Pelaksanaan Penindakan.</p>
         </div>
         <div class="panel">
           <form class="form-grid" id="formTambahLaporan" style="padding:22px;" novalidate>
@@ -486,7 +486,7 @@
       <section class="tab-panel" data-tab-panel="status-laporan">
         <div class="section-head">
           <h2>Status Laporan</h2>
-          <p>Pantau progres laporan yang sudah diajukan oleh Satlak Penindakan.</p>
+          <p>Pantau progres laporan yang sudah diajukan oleh Satuan Pelaksanaan Penindakan.</p>
         </div>
         <div class="panel">
           <div class="tbl-wrap">
@@ -506,7 +506,7 @@
                   <td><span class="status-dot warn">Diteruskan ke DANPUS</span></td>
                 </tr>
                 <tr>
-                  <td>Gateway Email satlak Duktek (Dukungan Teknologi)</td>
+                  <td>Gateway Email Satuan Pelaksanaan Dukungan Teknologi</td>
                   <td>Phishing campaign berhasil diblokir</td>
                   <td>02 Agu 2026</td>
                   <td><span class="status-dot green">Disetujui DANPUS</span></td>
@@ -521,7 +521,7 @@
       <section class="tab-panel" data-tab-panel="riwayat-laporan">
         <div class="section-head">
           <h2>Riwayat Laporan</h2>
-          <p>Log lengkap ancaman dan tindak lanjut yang pernah ditangani Satlak Penindakan.</p>
+          <p>Log lengkap ancaman dan tindak lanjut yang pernah ditangani Satuan Pelaksanaan Penindakan.</p>
         </div>
         <div class="panel">
           <div class="btn-row" style="margin-bottom:18px;">
@@ -593,7 +593,7 @@
             }
             var doc = new window.jspdf.jsPDF();
             doc.setFontSize(14);
-            doc.text('Riwayat Laporan — Satlak Penindakan', 14, 16);
+            doc.text('Riwayat Laporan — Satuan Pelaksanaan Penindakan', 14, 16);
             doc.setFontSize(10);
             doc.text('Dicetak: ' + new Date().toLocaleString('id-ID'), 14, 23);
             doc.autoTable({
@@ -613,7 +613,7 @@
       <section class="tab-panel" data-tab-panel="investigasi">
         <div class="section-head">
           <h2>Manajemen Investigasi</h2>
-          <p>Kasus yang sedang atau sudah diinvestigasi oleh tim Satlak Penindakan.</p>
+          <p>Kasus yang sedang atau sudah diinvestigasi oleh tim Satuan Pelaksanaan Penindakan.</p>
         </div>
         <div class="panel">
           <div class="tbl-wrap">

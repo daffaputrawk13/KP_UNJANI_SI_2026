@@ -53,7 +53,7 @@ Route::get('/dashboard', DashboardController::class)
     ->middleware('auth')
     ->name('dashboard');
 
-// Kirim laporan dari satuan pengirim (mis. satlak Duktek/Bangtek) ke DANPUS,
+// Kirim laporan dari satuan pengirim (mis. Satuan Pelaksanaan Dukungan Teknologi) ke DANPUS,
 // sekaligus memicu notifikasi database ke seluruh akun DANPUS.
 Route::post('/laporan', [LaporanController::class, 'store'])
     ->middleware('auth')
@@ -65,9 +65,9 @@ Route::delete('/laporan/{laporan}', [LaporanController::class, 'destroy'])
     ->middleware('auth')
     ->name('laporan.destroy');
 
-// ===== Laporan Publikasi ke DANPUS (Satlak Sibersos) =====
+// ===== Laporan Publikasi ke DANPUS (Satuan Pelaksanaan Siber Sosial) =====
 // Dipakai fitur Buat Laporan Publikasi, Draft, Kirim ke DANPUS, Upload
-// Dokumentasi, dan Hapus Draft pada dashboard Satlak Sibersos.
+// Dokumentasi, dan Hapus Draft pada dashboard Satuan Pelaksanaan Siber Sosial.
 Route::post('/laporan-publikasi', [LaporanPublikasiController::class, 'store'])
     ->middleware('auth')
     ->name('laporan-publikasi.store');
@@ -92,9 +92,9 @@ Route::delete('/laporan-publikasi/{laporanPublikasi}', [LaporanPublikasiControll
     ->middleware('auth')
     ->name('laporan-publikasi.destroy');
 
-// ===== Laporan Monitoring & Recovery ke DANPUS (Satlakal/Penangkalan) =====
+// ===== Laporan Monitoring & Recovery ke DANPUS (Satuan Pelaksanaan Penangkalan) =====
 // Dipakai fitur Buat Laporan Monitoring & Recovery, Draft, Kirim/Kirim Ulang
-// (setelah Direvisi), Upload Lampiran, dan Hapus Draft pada dashboard Satlakal.
+// (setelah Direvisi), Upload Lampiran, dan Hapus Draft pada dashboard Satuan Pelaksanaan Penangkalan.
 Route::post('/laporan-monitoring', [LaporanMonitoringController::class, 'store'])
     ->middleware('auth')
     ->name('laporan-monitoring.store');
@@ -119,7 +119,7 @@ Route::delete('/laporan-monitoring/{laporanMonitoring}', [LaporanMonitoringContr
     ->middleware('auth')
     ->name('laporan-monitoring.destroy');
 
-// Aksi DANPUS: Setujui / Tolak / Minta Revisi laporan monitoring dari Satlakal.
+// Aksi DANPUS: Setujui / Tolak / Minta Revisi laporan monitoring dari Satuan Pelaksanaan Penangkalan.
 Route::patch('/laporan-monitoring/{laporanMonitoring}/status', [DanpusLaporanMonitoringController::class, 'updateStatus'])
     ->middleware('auth')
     ->name('laporan-monitoring.update-status');
@@ -129,7 +129,7 @@ Route::post('/notifikasi/baca-semua', [NotifikasiController::class, 'bacaSemua']
     ->name('notifikasi.baca-semua');
 
 // ===== Manajemen Akun Media Sosial =====
-// Akun resmi yang dikelola satuan (mis. Instagram resmi Satlak Sibersos),
+// Akun resmi yang dikelola satuan (mis. Instagram resmi Satuan Pelaksanaan Siber Sosial),
 // dipakai fitur "Manajemen Akun Media Sosial".
 Route::post('/akun-medsos', [AkunMedsosController::class, 'store'])
     ->middleware('auth')
@@ -163,9 +163,10 @@ Route::delete('/posting/{posting}', [PostinganController::class, 'destroy'])
     ->middleware('auth')
     ->name('posting.destroy');
 
-// ===== satlak Duktek (Dukungan Teknologi) =====
+// ===== Satuan Pelaksanaan Dukungan Teknologi =====
 // Mencakup fitur "Riset & Pengembangan" (CRUD proyek riset), "Log Uji &
-// Pengembangan", dan "Log Dukungan Teknis" ke Satlakal/Sibersos/Rindak.
+// Pengembangan", dan "Log Dukungan Teknis" ke Satuan Pelaksanaan Penangkalan,
+// Siber Sosial, dan Penindakan.
 Route::post('/proyek-riset', [ProyekRisetController::class, 'store'])
     ->middleware('auth')
     ->name('proyek-riset.store');

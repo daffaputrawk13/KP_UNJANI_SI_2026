@@ -12,7 +12,7 @@ class SosmedSeeder extends Seeder
 {
     /**
      * Data contoh untuk fitur manajemen akun & posting media sosial di
-     * dashboard Satlak Sibersos, supaya tab Manajemen Akun, Kalender
+     * dashboard Satuan Pelaksanaan Siber Sosial, supaya tab Manajemen Akun, Kalender
      * Konten, Monitoring Engagement, Statistik Performa, dan Arsip Posting
      * tidak kosong saat pertama kali dicoba.
      */
@@ -26,11 +26,11 @@ class SosmedSeeder extends Seeder
         $user = User::where('satuan_id', $satuan->id)->first();
 
         $akunInstagram = AkunMedsos::updateOrCreate(
-            ['satuan_id' => $satuan->id, 'username_platform' => '@satlaksibersos'],
+            ['satuan_id' => $satuan->id, 'username_platform' => '@satlaksisos'],
             [
-                'nama_akun' => 'Instagram Resmi Satlak Sibersos',
+                'nama_akun' => 'Instagram Resmi Satuan Pelaksanaan Siber Sosial',
                 'platform' => 'Instagram',
-                'url_profil' => 'https://instagram.com/satlaksibersos',
+                'url_profil' => 'https://instagram.com/satlaksisos',
                 'status' => 'Aktif',
             ]
         );
@@ -38,7 +38,7 @@ class SosmedSeeder extends Seeder
         $akunTiktok = AkunMedsos::updateOrCreate(
             ['satuan_id' => $satuan->id, 'username_platform' => '@sibersos.update'],
             [
-                'nama_akun' => 'TikTok Edukasi Sibersos',
+                'nama_akun' => 'TikTok Edukasi Siber Sosial',
                 'platform' => 'TikTok',
                 'url_profil' => 'https://tiktok.com/@sibersos.update',
                 'status' => 'Aktif',

@@ -27,7 +27,7 @@ class AppServiceProvider extends ServiceProvider
         // partial (dash-styles/dash-script) yang di-@include tiap halaman tidak
         // ikut memicu query berulang.
         $viewDashboard = [
-            'admin', 'danpus', 'wadan', 'satlakal', 'satlaksibersos', 'satlakrindak',
+            'admin', 'danpus', 'wadan', 'satlakkal', 'satlaksisos', 'satlakdak',
             'satlakduktek', 'binfung', 'binum', 'diklat', 'binmat', 'sdir', 'generic',
         ];
         View::composer(

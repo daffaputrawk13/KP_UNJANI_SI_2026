@@ -9,7 +9,7 @@ return new class extends Migration
     /**
      * Lampiran (foto/PDF/dokumen) untuk satu Laporan Monitoring & Recovery.
      * Satu laporan bisa punya banyak lampiran — dipakai fitur "Upload
-     * Lampiran" di dashboard Satlakal.
+     * Lampiran" di dashboard Satuan Pelaksanaan Penangkalan.
      */
     public function up(): void
     {

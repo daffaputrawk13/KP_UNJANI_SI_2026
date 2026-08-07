@@ -23,20 +23,20 @@ class SatuanSeeder extends Seeder
 
             // --- SATLAK (Satuan Pelaksana) ---
             ['kode' => 'SATLAKKAL',      'username' => 'satlakkal',   'nama' => 'Satuan Pelaksanaan Penangkalan',        'kategori' => Satuan::KATEGORI_SATLAK,      'deskripsi' => 'Pemantauan & pemulihan (mis. website yang diserang).',   'urutan' => 10],
-            ['kode' => 'SATLAKSISOS',    'username' => 'satlaksibersos', 'nama' => 'Satuan Pelaksanaan Siber Sosial',   'kategori' => Satuan::KATEGORI_SATLAK,      'deskripsi' => 'Pengelolaan media sosial di daerah.',                    'urutan' => 20],
+            ['kode' => 'SATLAKSISOS',    'username' => 'satlaksisos', 'nama' => 'Satuan Pelaksanaan Siber Sosial',   'kategori' => Satuan::KATEGORI_SATLAK,      'deskripsi' => 'Pengelolaan media sosial di daerah.',                    'urutan' => 20],
             ['kode' => 'SATLAKDAK',      'username' => 'satlakdak',   'nama' => 'Satuan Pelaksanaan Penindakan',         'kategori' => Satuan::KATEGORI_SATLAK,      'deskripsi' => 'Penanganan aksi cyber: malware, ransomware, serangan.', 'urutan' => 30],
             ['kode' => 'SATLAKDUKTEK',  'username' => 'satlakduktek', 'nama' => 'Satuan Pelaksanaan Dukungan Teknologi', 'kategori' => Satuan::KATEGORI_SATLAK,      'deskripsi' => 'Riset & pengembangan teknologi terkini (AI, drone, dll).', 'urutan' => 40],
 
             // --- DIR (Direktorat) ---
-            ['kode' => 'BINFUNG', 'username' => 'binfung', 'nama' => 'Binfung (Pembinaan Fungsi)',    'kategori' => Satuan::KATEGORI_DIREKTORAT, 'deskripsi' => 'Penempatan personel yang masuk.',                  'urutan' => 50],
-            ['kode' => 'BINUM',  'username' => 'binum',  'nama' => 'Binum (Pembinaan Umum)',      'kategori' => Satuan::KATEGORI_DIREKTORAT, 'deskripsi' => 'Pengawasan satuan, lomba internal, personel baru.', 'urutan' => 60],
-            ['kode' => 'DIKLAT',  'username' => 'diklat', 'nama' => 'Diklat (Pendidikan & Latihan)', 'kategori' => Satuan::KATEGORI_DIREKTORAT, 'deskripsi' => 'Pendidikan dan latihan satuan.',                   'urutan' => 70],
+            ['kode' => 'BINFUNG', 'username' => 'binfung', 'nama' => 'Pembinaan Fungsi',    'kategori' => Satuan::KATEGORI_DIREKTORAT, 'deskripsi' => 'Penempatan personel yang masuk.',                  'urutan' => 50],
+            ['kode' => 'BINUM',  'username' => 'binum',  'nama' => 'Pembinaan Umum',      'kategori' => Satuan::KATEGORI_DIREKTORAT, 'deskripsi' => 'Pengawasan satuan, lomba internal, personel baru.', 'urutan' => 60],
+            ['kode' => 'DIKLAT',  'username' => 'diklat', 'nama' => 'Pendidikan dan Latihan', 'kategori' => Satuan::KATEGORI_DIREKTORAT, 'deskripsi' => 'Pendidikan dan latihan satuan.',                   'urutan' => 70],
             ['kode' => 'BINMAT',  'username' => 'binmat', 'nama' => 'Pembinaan Materil',  'kategori' => Satuan::KATEGORI_DIREKTORAT, 'deskripsi' => 'Pengurusan material/perlengkapan satuan.',         'urutan' => 80],
 
             // --- Koordinasi / Pimpinan ---
-            ['kode' => 'SDIR',   'username' => 'sdir',   'nama' => 'SDIR (Sekretaris Direktorat)',  'kategori' => Satuan::KATEGORI_PIMPINAN, 'deskripsi' => 'Koordinasi antar Satlak, pelaporan ke DANPUS.', 'urutan' => 90],
-            ['kode' => 'WADAN',  'username' => 'wadan',  'nama' => 'WADAN (Wakil Komandan)',       'kategori' => Satuan::KATEGORI_PIMPINAN, 'deskripsi' => 'Penerima laporan dari SDIR/Satlak.',            'urutan' => 100],
-            ['kode' => 'DANPUS', 'username' => 'danpus', 'nama' => 'DANPUS', 'kategori' => Satuan::KATEGORI_PIMPINAN, 'deskripsi' => 'Penerima laporan tertinggi dari seluruh satuan.', 'urutan' => 110],
+            ['kode' => 'SDIR',   'username' => 'sdir',   'nama' => 'Staff Direktur',  'kategori' => Satuan::KATEGORI_PIMPINAN, 'deskripsi' => 'Koordinasi antar Satlak, pelaporan ke DANPUS.', 'urutan' => 90],
+            ['kode' => 'WADAN',  'username' => 'wadan',  'nama' => 'Wakil Komandan',       'kategori' => Satuan::KATEGORI_PIMPINAN, 'deskripsi' => 'Penerima laporan dari SDIR/Satlak.',            'urutan' => 100],
+            ['kode' => 'DANPUS', 'username' => 'danpus', 'nama' => 'Komandan Pusat', 'kategori' => Satuan::KATEGORI_PIMPINAN, 'deskripsi' => 'Penerima laporan tertinggi dari seluruh satuan.', 'urutan' => 110],
         ];
 
         foreach ($satuans as $data) {

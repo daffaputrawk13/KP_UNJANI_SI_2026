@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Satlak Duktek (Dukungan Teknologi) — SIBERAD</title>
+<title>Satuan Pelaksanaan Dukungan Teknologi — SIBERAD</title>
 <link rel="icon" type="image/jpeg" href="{{ asset('images/logo-pussiberad.jpg') }}">
 @include('siberad.dashboards.partials.dash-styles')
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
@@ -235,7 +235,7 @@
       <section class="tab-panel active" data-tab-panel="dashboard">
         <div class="section-head">
           <h2>Ringkasan Riset & Pengembangan</h2>
-          <p>Status proyek teknologi yang dikerjakan Satlak Duktek (Dukungan Teknologi) saat ini.</p>
+          <p>Status proyek teknologi yang dikerjakan Satuan Pelaksanaan Dukungan Teknologi saat ini.</p>
         </div>
         <div class="stat-grid">
           <div class="stat-card">
@@ -262,7 +262,7 @@
 
         <div class="panel chart-box">
           <div class="chart-box-head-row">
-            <div><h3 style="font-family:var(--display);font-size:17px;font-weight:700;">Analitik Riset & Perbandingan Satlak</h3><p style="font-size:12px;color:var(--text-muted);margin-top:2px;">Progres proyek, komposisi kategori, dan posisi satlak Duktek (Dukungan Teknologi) dibanding tiga Satlak lainnya.</p></div>
+            <div><h3 style="font-family:var(--display);font-size:17px;font-weight:700;">Analitik Riset & Perbandingan Satlak</h3><p style="font-size:12px;color:var(--text-muted);margin-top:2px;">Progres proyek, komposisi kategori, dan posisi Satuan Pelaksanaan Dukungan Teknologi dibanding tiga Satlak lainnya.</p></div>
             <div class="chart-filter-group">
               <select class="chart-type-select" id="chartDateFilterGlobal">
                 <option value="7d">7 Hari Terakhir</option>
@@ -296,13 +296,13 @@
 
             <div class="chart-mini">
               <div class="chart-mini-head">
-                <h4>Perbandingan Antar Satlak</h4><p>Bangtek jadi acuan utama.</p>
+                <h4>Perbandingan Antar Satlak</h4><p>Duktek jadi acuan utama.</p>
               </div>
               <div class="chart-wrap"><canvas id="chartPerbandinganSatlak"></canvas></div>
             </div>
 
           </div>
-          <p class="chart-legend-note">Emas = satlak Duktek (Dukungan Teknologi), disorot sebagai Satlak yang paling krusial pada riset & pengembangan teknologi. Ganti jenis grafik lewat dropdown di kanan atas — pilihan selain "Batang" akan otomatis memisah tiap grafik menjadi tampilan yang lebih besar. Filter tanggal masih simulasi proporsional karena histori progres per tanggal belum tersambung ke database.</p>
+          <p class="chart-legend-note">Emas = Satuan Pelaksanaan Dukungan Teknologi, disorot sebagai Satlak yang paling krusial pada riset & pengembangan teknologi. Ganti jenis grafik lewat dropdown di kanan atas — pilihan selain "Batang" akan otomatis memisah tiap grafik menjadi tampilan yang lebih besar. Filter tanggal masih simulasi proporsional karena histori progres per tanggal belum tersambung ke database.</p>
         </div>
 
         <div class="panel">
@@ -475,7 +475,7 @@
       <section class="tab-panel" data-tab-panel="dukungan-teknis">
         <div class="section-head">
           <h2>Log Dukungan Teknis</h2>
-          <p>Catatan bantuan teknis yang diberikan ke Satlakal, Satlak Sibersos, dan Satlak Rindak.</p>
+          <p>Catatan bantuan teknis yang diberikan ke Satuan Pelaksanaan Penangkalan, Satuan Pelaksanaan Siber Sosial, dan Satuan Pelaksanaan Penindakan.</p>
         </div>
 
         @if (session('status'))
@@ -593,7 +593,7 @@
       <section class="tab-panel" data-tab-panel="status-laporan">
         <div class="section-head">
           <h2>Status Laporan</h2>
-          <p>Pantau progres laporan yang sudah diajukan oleh Satlak Duktek (Dukungan Teknologi) ke DANPUS.</p>
+          <p>Pantau progres laporan yang sudah diajukan oleh Satuan Pelaksanaan Dukungan Teknologi ke DANPUS.</p>
         </div>
         <div class="panel">
           <div class="tbl-wrap">
@@ -626,7 +626,7 @@
       <section class="tab-panel" data-tab-panel="riwayat-laporan">
         <div class="section-head">
           <h2>Riwayat Laporan</h2>
-          <p>Log lengkap kegiatan uji dan pengembangan yang pernah ditangani Satlak Duktek (Dukungan Teknologi).</p>
+          <p>Log lengkap kegiatan uji dan pengembangan yang pernah ditangani Satuan Pelaksanaan Dukungan Teknologi.</p>
         </div>
         <div class="panel">
           <div class="tbl-wrap">

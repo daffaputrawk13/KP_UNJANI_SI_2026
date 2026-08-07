@@ -8,9 +8,9 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 /**
- * Aksi DANPUS atas Laporan Monitoring & Recovery yang dikirim Satlakal:
+ * Aksi DANPUS atas Laporan Monitoring & Recovery yang dikirim Satuan Pelaksanaan Penangkalan:
  * Setujui, Tolak, atau Minta Revisi. Terpisah dari LaporanMonitoringController
- * (yang khusus sisi Satlakal/pembuat laporan) supaya wewenangnya jelas.
+ * (yang khusus sisi Satuan Pelaksanaan Penangkalan/pembuat laporan) supaya wewenangnya jelas.
  */
 class DanpusLaporanMonitoringController extends Controller
 {

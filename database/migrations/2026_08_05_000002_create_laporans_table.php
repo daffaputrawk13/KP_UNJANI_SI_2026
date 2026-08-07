@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Laporan yang dikirim satu satuan (mis. satlak Duktek/Bangtek) ke satuan
+     * Laporan yang dikirim satu satuan (mis. Satuan Pelaksanaan Dukungan Teknologi) ke satuan
      * tujuan (mis. DANPUS). Statusnya sengaja sederhana (Menunggu / Disetujui
      * DANPUS / Ditolak DANPUS) karena pada fitur ini laporan dikirim langsung
      * ke DANPUS, bukan lewat alur verifikasi WADAN.

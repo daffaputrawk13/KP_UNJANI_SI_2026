@@ -50,7 +50,7 @@ class Satuan extends Model
     }
 
     /**
-     * Laporan yang dikirim oleh satuan ini (mis. laporan dari satlak Duktek).
+     * Laporan yang dikirim oleh satuan ini (mis. laporan dari Satuan Pelaksanaan Dukungan Teknologi).
      */
     public function laporanTerkirim(): HasMany
     {
@@ -67,7 +67,7 @@ class Satuan extends Model
 
     /**
      * Akun media sosial resmi yang dikelola satuan ini (mis. akun Instagram
-     * resmi Satlak Sibersos) — dipakai fitur manajemen & posting konten.
+     * resmi Satuan Pelaksanaan Siber Sosial) — dipakai fitur manajemen & posting konten.
      */
     public function akunMedsos(): HasMany
     {

@@ -6,7 +6,7 @@ use App\Models\LaporanMonitoring;
 use Illuminate\Notifications\Notification;
 
 /**
- * Dikirim ke pembuat laporan (Satlakal) setiap kali DANPUS memutuskan
+ * Dikirim ke pembuat laporan (Satuan Pelaksanaan Penangkalan) setiap kali DANPUS memutuskan
  * laporan monitoring & recovery-nya: Disetujui, Ditolak, atau Direvisi.
  */
 class LaporanMonitoringStatusDiubah extends Notification

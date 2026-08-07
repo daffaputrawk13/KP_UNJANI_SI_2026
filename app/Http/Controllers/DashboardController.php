@@ -27,7 +27,7 @@ class DashboardController extends Controller
     /**
      * Mengarahkan user ke halaman dashboard sesuai satuan (role) tempat ia login.
      * Seluruh 12 role sudah punya halaman dashboard khusus (ADMIN, DANPUS, WADAN,
-     * Satlakal (Penangkalan), Satlak Sibersos, Satlak Penindakan, satlak Duktek (Dukungan Teknologi),
+     * Satuan Pelaksanaan Penangkalan, Satuan Pelaksanaan Siber Sosial, Satuan Pelaksanaan Penindakan, Satuan Pelaksanaan Dukungan Teknologi,
      * Binfung, Binum, Diklat, Binmat, SDIR). ADMIN bukan satuan operasional —
      * perannya khusus mengelola akun pengguna, data satuan, dan permintaan
      * reset password. Dashboard generik tetap dipertahankan sebagai fallback
@@ -48,9 +48,9 @@ class DashboardController extends Controller
             'ADMIN' => $this->admin($user, $satuan),
             'DANPUS' => $this->danpus($user, $satuan),
             'WADAN' => $this->wadan($user, $satuan),
-            'SATLAKKAL' => $this->satlakAlmon($user, $satuan),
-            'SATLAKSISOS' => $this->satlakSibersos($user, $satuan),
-            'SATLAKDAK' => $this->satlakRindak($user, $satuan),
+            'SATLAKKAL' => $this->satlakKal($user, $satuan),
+            'SATLAKSISOS' => $this->satlakSisos($user, $satuan),
+            'SATLAKDAK' => $this->satlakDak($user, $satuan),
             'SATLAKDUKTEK' => $this->satlakDuktek($user, $satuan),
             'BINFUNG' => $this->binfung($user, $satuan),
             'BINUM' => $this->binum($user, $satuan),
@@ -71,15 +71,15 @@ class DashboardController extends Controller
         $semuaSatuan = Satuan::withCount('users')->orderBy('urutan')->get();
 
         $permintaanResetPassword = [
-            ['satuan' => 'Satlak Sibersos', 'catatan' => 'Lupa kata sandi lama', 'tanggal' => '02 Agu 2026', 'status' => 'Menunggu', 'status_class' => 'amber'],
-            ['satuan' => 'Binmat (Pembinaan Materiil)', 'catatan' => 'Akun terkunci setelah beberapa kali salah input', 'tanggal' => '01 Agu 2026', 'status' => 'Menunggu', 'status_class' => 'amber'],
-            ['satuan' => 'Diklat (Pendidikan & Latihan)', 'catatan' => 'Pergantian operator baru', 'tanggal' => '29 Jul 2026', 'status' => 'Selesai', 'status_class' => 'green'],
+            ['satuan' => 'Satuan Pelaksanaan Siber Sosial', 'catatan' => 'Lupa kata sandi lama', 'tanggal' => '02 Agu 2026', 'status' => 'Menunggu', 'status_class' => 'amber'],
+            ['satuan' => 'Pembinaan Materil', 'catatan' => 'Akun terkunci setelah beberapa kali salah input', 'tanggal' => '01 Agu 2026', 'status' => 'Menunggu', 'status_class' => 'amber'],
+            ['satuan' => 'Pendidikan dan Latihan', 'catatan' => 'Pergantian operator baru', 'tanggal' => '29 Jul 2026', 'status' => 'Selesai', 'status_class' => 'green'],
         ];
 
         $aktivitasTerbaru = [
-            ['kegiatan' => 'Permintaan reset password baru dari Satlak Sibersos', 'waktu' => '3 jam lalu', 'status' => 'Menunggu', 'status_class' => 'amber'],
-            ['kegiatan' => 'Akun WADAN (Wakil Komandan) login dari perangkat baru', 'waktu' => 'Kemarin', 'status' => 'Info', 'status_class' => 'ok'],
-            ['kegiatan' => 'Data satuan Binfung (Pembinaan Fungsi) diperbarui', 'waktu' => '2 hari lalu', 'status' => 'Selesai', 'status_class' => 'green'],
+            ['kegiatan' => 'Permintaan reset password baru dari Satuan Pelaksanaan Siber Sosial', 'waktu' => '3 jam lalu', 'status' => 'Menunggu', 'status_class' => 'amber'],
+            ['kegiatan' => 'Akun Wakil Komandan login dari perangkat baru', 'waktu' => 'Kemarin', 'status' => 'Info', 'status_class' => 'ok'],
+            ['kegiatan' => 'Data satuan Pembinaan Fungsi diperbarui', 'waktu' => '2 hari lalu', 'status' => 'Selesai', 'status_class' => 'green'],
         ];
 
         // ===== Data untuk grafik Dashboard =====
@@ -198,9 +198,9 @@ class DashboardController extends Controller
             'DANPUS' => ['label' => 'Normal', 'class' => 'ok', 'update' => 'Hari ini'],
         ];
 
-        // Laporan asli yang dikirim langsung ke DANPUS (mis. dari satlak Duktek/
-        // Bangtek). Tidak ada lagi data dummy — semua baris di tabel "Laporan
-        // Masuk" sekarang murni berasal dari database.
+        // Laporan asli yang dikirim langsung ke DANPUS (mis. dari Satuan
+        // Pelaksanaan Dukungan Teknologi). Tidak ada lagi data dummy — semua
+        // baris di tabel "Laporan Masuk" sekarang murni berasal dari database.
         $laporanMasukFinal = Laporan::with('satuan')
             ->where('tujuan_satuan_id', $satuan->id)
             ->latest()
@@ -232,7 +232,7 @@ class DashboardController extends Controller
             ])
             ->toArray();
 
-        // Laporan Monitoring & Recovery yang masuk dari Satlakal (REAL, dari DB)
+        // Laporan Monitoring & Recovery yang masuk dari Satuan Pelaksanaan Penangkalan (REAL, dari DB)
         // — DANPUS bisa Setujui / Tolak / Minta Revisi lewat tab ini.
         $laporanMonitoringMasuk = LaporanMonitoring::where('tujuan_satuan_id', $satuan->id)
             ->where('status', 'Dikirim')
@@ -281,9 +281,9 @@ class DashboardController extends Controller
                 'siaga_hijau' => $semuaSatuan->count() - 2,
             ],
             'laporanPrioritas' => [
-                ['satuan' => 'Satlakal (Penangkalan)', 'perihal' => 'Serangan DDoS pada portal utama', 'prioritas' => 'Tinggi', 'prioritas_class' => 'bad', 'tanggal' => '02 Agu 2026', 'status' => 'Menunggu DANPUS', 'status_class' => 'amber'],
-                ['satuan' => 'Satlak Sibersos', 'perihal' => 'Hoaks rekrutmen mengatasnamakan TNI AD', 'prioritas' => 'Sedang', 'prioritas_class' => 'warn', 'tanggal' => '01 Agu 2026', 'status' => 'Menunggu DANPUS', 'status_class' => 'amber'],
-                ['satuan' => 'Satlak Penindakan', 'perihal' => 'Indikasi ransomware pada server unit', 'prioritas' => 'Tinggi', 'prioritas_class' => 'bad', 'tanggal' => '31 Jul 2026', 'status' => 'Disetujui', 'status_class' => 'green'],
+                ['satuan' => 'Satuan Pelaksanaan Penangkalan', 'perihal' => 'Serangan DDoS pada portal utama', 'prioritas' => 'Tinggi', 'prioritas_class' => 'bad', 'tanggal' => '02 Agu 2026', 'status' => 'Menunggu DANPUS', 'status_class' => 'amber'],
+                ['satuan' => 'Satuan Pelaksanaan Siber Sosial', 'perihal' => 'Hoaks rekrutmen mengatasnamakan TNI AD', 'prioritas' => 'Sedang', 'prioritas_class' => 'warn', 'tanggal' => '01 Agu 2026', 'status' => 'Menunggu DANPUS', 'status_class' => 'amber'],
+                ['satuan' => 'Satuan Pelaksanaan Penindakan', 'perihal' => 'Indikasi ransomware pada server unit', 'prioritas' => 'Tinggi', 'prioritas_class' => 'bad', 'tanggal' => '31 Jul 2026', 'status' => 'Disetujui', 'status_class' => 'green'],
             ],
             'laporanMasuk' => $laporanMasukFinal,
             'laporanMonitoringMasuk' => $laporanMonitoringMasuk,
@@ -299,14 +299,14 @@ class DashboardController extends Controller
     private function wadan($user, $satuan): View
     {
         $laporanMasuk = [
-            ['satuan' => 'Satlakal (Penangkalan)', 'perihal' => 'Serangan DDoS pada portal utama', 'tanggal' => '02 Agu 2026', 'prioritas' => 'Tinggi', 'prioritas_class' => 'bad', 'status' => 'Menunggu', 'status_class' => 'amber'],
-            ['satuan' => 'Satlak Sibersos', 'perihal' => 'Hoaks rekrutmen mengatasnamakan TNI AD', 'tanggal' => '01 Agu 2026', 'prioritas' => 'Sedang', 'prioritas_class' => 'warn', 'status' => 'Menunggu', 'status_class' => 'amber'],
-            ['satuan' => 'Satlak Penindakan', 'perihal' => 'Indikasi ransomware pada server unit', 'tanggal' => '31 Jul 2026', 'prioritas' => 'Tinggi', 'prioritas_class' => 'bad', 'status' => 'Menunggu', 'status_class' => 'amber'],
+            ['satuan' => 'Satuan Pelaksanaan Penangkalan', 'perihal' => 'Serangan DDoS pada portal utama', 'tanggal' => '02 Agu 2026', 'prioritas' => 'Tinggi', 'prioritas_class' => 'bad', 'status' => 'Menunggu', 'status_class' => 'amber'],
+            ['satuan' => 'Satuan Pelaksanaan Siber Sosial', 'perihal' => 'Hoaks rekrutmen mengatasnamakan TNI AD', 'tanggal' => '01 Agu 2026', 'prioritas' => 'Sedang', 'prioritas_class' => 'warn', 'status' => 'Menunggu', 'status_class' => 'amber'],
+            ['satuan' => 'Satuan Pelaksanaan Penindakan', 'perihal' => 'Indikasi ransomware pada server unit', 'tanggal' => '31 Jul 2026', 'prioritas' => 'Tinggi', 'prioritas_class' => 'bad', 'status' => 'Menunggu', 'status_class' => 'amber'],
             ['satuan' => 'Binfung', 'perihal' => 'Laporan penempatan 3 personel baru', 'tanggal' => '29 Jul 2026', 'prioritas' => 'Rendah', 'prioritas_class' => 'ok', 'status' => 'Diteruskan', 'status_class' => 'green'],
         ];
 
         $koordinasi = [
-            ['satuan' => 'satlak Duktek (Dukungan Teknologi)', 'perihal' => 'Permintaan pengiriman 2 personel untuk riset AI', 'diminta_oleh' => 'SDIR', 'tanggal' => '30 Jul 2026', 'status' => 'Menunggu', 'status_class' => 'amber'],
+            ['satuan' => 'Satuan Pelaksanaan Dukungan Teknologi', 'perihal' => 'Permintaan pengiriman 2 personel untuk riset AI', 'diminta_oleh' => 'SDIR', 'tanggal' => '30 Jul 2026', 'status' => 'Menunggu', 'status_class' => 'amber'],
             ['satuan' => 'Diklat', 'perihal' => 'Koordinasi jadwal latihan gabungan', 'diminta_oleh' => 'SDIR', 'tanggal' => '28 Jul 2026', 'status' => 'Selesai', 'status_class' => 'green'],
         ];
 
@@ -343,9 +343,9 @@ class DashboardController extends Controller
                 'permintaan_koordinasi' => 2,
             ],
             'aktivitasTerbaru' => [
-                ['satuan' => 'Satlakal (Penangkalan)', 'perihal' => 'Serangan DDoS pada portal utama', 'tanggal' => '02 Agu 2026', 'status' => 'Menunggu Verifikasi', 'status_class' => 'amber'],
-                ['satuan' => 'Satlak Sibersos', 'perihal' => 'Hoaks rekrutmen mengatasnamakan TNI AD', 'tanggal' => '01 Agu 2026', 'status' => 'Menunggu Verifikasi', 'status_class' => 'amber'],
-                ['satuan' => 'SDIR', 'perihal' => 'Permintaan personel tambahan satlak Duktek (Dukungan Teknologi)', 'tanggal' => '31 Jul 2026', 'status' => 'Diteruskan', 'status_class' => 'green'],
+                ['satuan' => 'Satuan Pelaksanaan Penangkalan', 'perihal' => 'Serangan DDoS pada portal utama', 'tanggal' => '02 Agu 2026', 'status' => 'Menunggu Verifikasi', 'status_class' => 'amber'],
+                ['satuan' => 'Satuan Pelaksanaan Siber Sosial', 'perihal' => 'Hoaks rekrutmen mengatasnamakan TNI AD', 'tanggal' => '01 Agu 2026', 'status' => 'Menunggu Verifikasi', 'status_class' => 'amber'],
+                ['satuan' => 'SDIR', 'perihal' => 'Permintaan personel tambahan Satuan Pelaksanaan Dukungan Teknologi', 'tanggal' => '31 Jul 2026', 'status' => 'Diteruskan', 'status_class' => 'green'],
             ],
             'laporanMasuk' => $laporanMasuk,
             'koordinasi' => $koordinasi,
@@ -353,7 +353,7 @@ class DashboardController extends Controller
             'laporanPerSatuanChart' => $laporanPerSatuanChart,
             'statusKoordinasi' => $statusKoordinasi,
             'riwayatDiteruskan' => [
-                ['satuan' => 'Satlak Penindakan', 'perihal' => 'Indikasi ransomware pada server unit', 'tanggal' => '31 Jul 2026', 'status' => 'Disetujui DANPUS', 'status_class' => 'green'],
+                ['satuan' => 'Satuan Pelaksanaan Penindakan', 'perihal' => 'Indikasi ransomware pada server unit', 'tanggal' => '31 Jul 2026', 'status' => 'Disetujui DANPUS', 'status_class' => 'green'],
                 ['satuan' => 'Binmat', 'perihal' => 'Pengadaan perangkat pemantauan baru', 'tanggal' => '29 Jul 2026', 'status' => 'Disetujui DANPUS', 'status_class' => 'green'],
                 ['satuan' => 'Binfung', 'perihal' => 'Laporan penempatan 3 personel baru', 'tanggal' => '29 Jul 2026', 'status' => 'Menunggu DANPUS', 'status_class' => 'amber'],
             ],
@@ -361,9 +361,9 @@ class DashboardController extends Controller
     }
 
     /**
-     * Satlakal (Penangkalan) — pemantauan & pemulihan website/aset digital.
+     * Satuan Pelaksanaan Penangkalan — pemantauan & pemulihan website/aset digital.
      */
-    private function satlakAlmon($user, $satuan): View
+    private function satlakKal($user, $satuan): View
     {
         // Data pemakaian resource (CPU/RAM/Storage/Network) & uptime masih mock
         // (belum ditarik dari agent monitoring sungguhan) — akan disambungkan ke
@@ -397,7 +397,7 @@ class DashboardController extends Controller
         ];
 
         // ===== Laporan Monitoring & Recovery ke DANPUS (REAL, dari DB) =====
-        // Fitur inti Satlakal: Buat Laporan, Draft, Riwayat, Status, Upload
+        // Fitur inti Satuan Pelaksanaan Penangkalan: Buat Laporan, Draft, Riwayat, Status, Upload
         // Lampiran, dan Detail Laporan (semua berbasis tabel ini).
         $semuaLaporanMonitoring = LaporanMonitoring::where('satuan_id', $satuan->id)
             ->with('lampiran', 'tujuanSatuan')
@@ -430,10 +430,10 @@ class DashboardController extends Controller
         });
 
         // Notifikasi status laporan (Disetujui/Ditolak/Direvisi) untuk user
-        // Satlakal yang sedang login — ditampilkan di lonceng notifikasi topbar.
+        // Satuan Pelaksanaan Penangkalan yang sedang login — ditampilkan di lonceng notifikasi topbar.
         $notifikasi = $user->unreadNotifications;
 
-        return view('siberad.dashboards.satlakal', [
+        return view('siberad.dashboards.satlakkal', [
             'user' => $user,
             'satuan' => $satuan,
             'notifikasi' => $notifikasi,
@@ -474,8 +474,8 @@ class DashboardController extends Controller
                 ['aset' => 'Portal Data Kodim', 'jenis' => 'Defacement', 'waktu' => '28 Jul 2026, 14:40', 'tindakan' => 'Restore dari backup, perkuat firewall', 'status' => 'Pulih', 'status_class' => 'green'],
             ],
             'laporanPiket' => [
-                ['aset' => 'Portal Utama Pussiberad', 'perihal' => 'Serangan DDoS pada portal utama', 'pelapor' => 'Piket Satlakal (Penangkalan)', 'tanggal' => '02 Agu 2026', 'prioritas' => 'Tinggi', 'prioritas_class' => 'bad'],
-                ['aset' => 'Sistem Layanan Internal', 'perihal' => 'Percobaan SQL Injection terdeteksi', 'pelapor' => 'Piket Satlakal (Penangkalan)', 'tanggal' => '02 Agu 2026', 'prioritas' => 'Sedang', 'prioritas_class' => 'warn'],
+                ['aset' => 'Portal Utama Pussiberad', 'perihal' => 'Serangan DDoS pada portal utama', 'pelapor' => 'Piket Satuan Pelaksanaan Penangkalan', 'tanggal' => '02 Agu 2026', 'prioritas' => 'Tinggi', 'prioritas_class' => 'bad'],
+                ['aset' => 'Sistem Layanan Internal', 'perihal' => 'Percobaan SQL Injection terdeteksi', 'pelapor' => 'Piket Satuan Pelaksanaan Penangkalan', 'tanggal' => '02 Agu 2026', 'prioritas' => 'Sedang', 'prioritas_class' => 'warn'],
             ],
             // Rekap periodik (harian/mingguan/bulanan) untuk tab "Laporan Periodik".
             // Sumber data sementara masih statis; nanti diganti agregat query dari
@@ -502,12 +502,12 @@ class DashboardController extends Controller
     }
 
     /**
-     * Satlak Sibersos — pengelolaan & pemantauan media sosial di daerah.
+     * Satuan Pelaksanaan Siber Sosial — pengelolaan & pemantauan media sosial di daerah.
      */
-    private function satlakSibersos($user, $satuan): View
+    private function satlakSisos($user, $satuan): View
     {
         // ===== Laporan Publikasi ke DANPUS (REAL, dari DB) =====
-        // Satu-satunya fitur inti Satlak Sibersos sekarang: Dashboard, Buat
+        // Satu-satunya fitur inti Satuan Pelaksanaan Siber Sosial sekarang: Dashboard, Buat
         // Laporan Publikasi, Draft Laporan, Status Laporan, Riwayat Laporan,
         // Upload Dokumentasi, dan Detail Laporan (semua berbasis tabel ini).
         $semuaLaporanPublikasi = LaporanPublikasi::where('satuan_id', $satuan->id)
@@ -537,7 +537,7 @@ class DashboardController extends Controller
             ];
         });
 
-        return view('siberad.dashboards.satlaksibersos', [
+        return view('siberad.dashboards.satlaksisos', [
             'user' => $user,
             'satuan' => $satuan,
 
@@ -556,22 +556,22 @@ class DashboardController extends Controller
     }
 
     /**
-     * Satlak Penindakan — penanganan aksi cyber: malware, ransomware, dan serangan.
+     * Satuan Pelaksanaan Penindakan — penanganan aksi cyber: malware, ransomware, dan serangan.
      */
-    private function satlakRindak($user, $satuan): View
+    private function satlakDak($user, $satuan): View
     {
         $ancamanTerdeteksi = [
             ['nama' => 'Server File Sharing Ditjen', 'jenis' => 'Ransomware (Lockbit variant)', 'tingkat' => 'Kritis', 'tingkat_class' => 'bad', 'terdeteksi' => '8 menit lalu'],
             ['nama' => 'Endpoint Staf Binmat #14', 'jenis' => 'Malware (Trojan)', 'tingkat' => 'Tinggi', 'tingkat_class' => 'bad', 'terdeteksi' => '40 menit lalu'],
-            ['nama' => 'Gateway Email satlak Duktek (Dukungan Teknologi)', 'jenis' => 'Phishing campaign', 'tingkat' => 'Sedang', 'tingkat_class' => 'warn', 'terdeteksi' => '1 jam lalu'],
+            ['nama' => 'Gateway Email Satuan Pelaksanaan Dukungan Teknologi', 'jenis' => 'Phishing campaign', 'tingkat' => 'Sedang', 'tingkat_class' => 'warn', 'terdeteksi' => '1 jam lalu'],
             ['nama' => 'Jaringan Internal SDIR', 'jenis' => 'Percobaan brute force', 'tingkat' => 'Rendah', 'tingkat_class' => 'ok', 'terdeteksi' => '3 jam lalu'],
         ];
 
         $logPenanganan = [
             ['aset' => 'Server File Sharing Ditjen', 'jenis' => 'Ransomware (Lockbit variant)', 'waktu' => '02 Agu 2026, 09:32', 'tindakan' => 'Isolasi jaringan, forensik disk, siapkan restore dari backup', 'status' => 'Berlangsung', 'status_class' => 'amber'],
             ['aset' => 'Endpoint Staf Binmat #14', 'jenis' => 'Malware (Trojan)', 'waktu' => '02 Agu 2026, 09:00', 'tindakan' => 'Karantina endpoint, scan menyeluruh, reset kredensial', 'status' => 'Dalam Penanganan', 'status_class' => 'amber'],
-            ['aset' => 'Gateway Email satlak Duktek (Dukungan Teknologi)', 'jenis' => 'Phishing campaign', 'waktu' => '02 Agu 2026, 08:20', 'tindakan' => 'Blokir domain pengirim, edukasi pengguna terdampak', 'status' => 'Selesai', 'status_class' => 'green'],
-            ['aset' => 'Portal Data Kodim', 'jenis' => 'Defacement (rujukan Satlakal (Penangkalan))', 'waktu' => '28 Jul 2026, 15:10', 'tindakan' => 'Analisis malware yang disisipkan, patch celah upload', 'status' => 'Selesai', 'status_class' => 'green'],
+            ['aset' => 'Gateway Email Satuan Pelaksanaan Dukungan Teknologi', 'jenis' => 'Phishing campaign', 'waktu' => '02 Agu 2026, 08:20', 'tindakan' => 'Blokir domain pengirim, edukasi pengguna terdampak', 'status' => 'Selesai', 'status_class' => 'green'],
+            ['aset' => 'Portal Data Kodim', 'jenis' => 'Defacement (rujukan Satuan Pelaksanaan Penangkalan)', 'waktu' => '28 Jul 2026, 15:10', 'tindakan' => 'Analisis malware yang disisipkan, patch celah upload', 'status' => 'Selesai', 'status_class' => 'green'],
         ];
 
         // Data komposisi untuk 3 grafik mini di dashboard — diturunkan dari
@@ -589,7 +589,7 @@ class DashboardController extends Controller
             ->map(fn ($g, $status) => ['status' => $status, 'jumlah' => $g->count()])
             ->values();
 
-        return view('siberad.dashboards.satlakrindak', [
+        return view('siberad.dashboards.satlakdak', [
             'user' => $user,
             'satuan' => $satuan,
             'ancamanTerdeteksi' => $ancamanTerdeteksi,
@@ -608,13 +608,13 @@ class DashboardController extends Controller
             ],
             'logPenanganan' => $logPenanganan,
             'laporanPiket' => [
-                ['aset' => 'Server File Sharing Ditjen', 'perihal' => 'Indikasi ransomware mengenkripsi file bersama', 'pelapor' => 'Piket Satlak Penindakan', 'tanggal' => '02 Agu 2026', 'prioritas' => 'Tinggi', 'prioritas_class' => 'bad'],
-                ['aset' => 'Endpoint Staf Binmat #14', 'perihal' => 'Trojan terdeteksi via antivirus terpusat', 'pelapor' => 'Piket Satlak Penindakan', 'tanggal' => '02 Agu 2026', 'prioritas' => 'Sedang', 'prioritas_class' => 'warn'],
+                ['aset' => 'Server File Sharing Ditjen', 'perihal' => 'Indikasi ransomware mengenkripsi file bersama', 'pelapor' => 'Piket Satuan Pelaksanaan Penindakan', 'tanggal' => '02 Agu 2026', 'prioritas' => 'Tinggi', 'prioritas_class' => 'bad'],
+                ['aset' => 'Endpoint Staf Binmat #14', 'perihal' => 'Trojan terdeteksi via antivirus terpusat', 'pelapor' => 'Piket Satuan Pelaksanaan Penindakan', 'tanggal' => '02 Agu 2026', 'prioritas' => 'Sedang', 'prioritas_class' => 'warn'],
             ],
             'investigasi' => [
                 ['kasus' => 'INV-2026-014', 'aset' => 'Server File Sharing Ditjen', 'jenis' => 'Ransomware (Lockbit variant)', 'investigator' => 'Serma Ridho Pratama', 'mulai' => '02 Agu 2026', 'progres' => 65, 'status' => 'Berlangsung', 'status_class' => 'amber'],
                 ['kasus' => 'INV-2026-013', 'aset' => 'Endpoint Staf Binmat #14', 'jenis' => 'Malware (Trojan)', 'investigator' => 'Sertu Dimas Aditya', 'mulai' => '02 Agu 2026', 'progres' => 40, 'status' => 'Berlangsung', 'status_class' => 'amber'],
-                ['kasus' => 'INV-2026-012', 'aset' => 'Gateway Email satlak Duktek (Dukungan Teknologi)', 'jenis' => 'Phishing campaign', 'investigator' => 'Serma Ridho Pratama', 'mulai' => '02 Agu 2026', 'progres' => 100, 'status' => 'Selesai', 'status_class' => 'green'],
+                ['kasus' => 'INV-2026-012', 'aset' => 'Gateway Email Satuan Pelaksanaan Dukungan Teknologi', 'jenis' => 'Phishing campaign', 'investigator' => 'Serma Ridho Pratama', 'mulai' => '02 Agu 2026', 'progres' => 100, 'status' => 'Selesai', 'status_class' => 'green'],
                 ['kasus' => 'INV-2026-009', 'aset' => 'Portal Data Kodim', 'jenis' => 'Defacement', 'investigator' => 'Sertu Dimas Aditya', 'mulai' => '28 Jul 2026', 'progres' => 100, 'status' => 'Selesai', 'status_class' => 'green'],
             ],
             'timelinePenanganan' => [
@@ -627,13 +627,13 @@ class DashboardController extends Controller
             'mitigasi' => [
                 ['aset' => 'Server File Sharing Ditjen', 'ancaman' => 'Ransomware (Lockbit variant)', 'tindakan' => 'Perkuat segmentasi jaringan & aktifkan backup terenkripsi harian', 'penanggung_jawab' => 'Serma Ridho Pratama', 'tenggat' => '10 Agu 2026', 'status' => 'Berjalan', 'status_class' => 'amber'],
                 ['aset' => 'Endpoint Staf Binmat #14', 'ancaman' => 'Malware (Trojan)', 'tindakan' => 'Update signature antivirus terpusat & audit endpoint lain', 'penanggung_jawab' => 'Sertu Dimas Aditya', 'tenggat' => '08 Agu 2026', 'status' => 'Berjalan', 'status_class' => 'amber'],
-                ['aset' => 'Gateway Email satlak Duktek (Dukungan Teknologi)', 'ancaman' => 'Phishing campaign', 'tindakan' => 'Blokir domain pengirim & edukasi pengguna terdampak', 'penanggung_jawab' => 'Serma Ridho Pratama', 'tenggat' => '05 Agu 2026', 'status' => 'Selesai', 'status_class' => 'green'],
+                ['aset' => 'Gateway Email Satuan Pelaksanaan Dukungan Teknologi', 'ancaman' => 'Phishing campaign', 'tindakan' => 'Blokir domain pengirim & edukasi pengguna terdampak', 'penanggung_jawab' => 'Serma Ridho Pratama', 'tenggat' => '05 Agu 2026', 'status' => 'Selesai', 'status_class' => 'green'],
             ],
         ]);
     }
 
     /**
-     * satlak Duktek (Dukungan Teknologi) — riset & pengembangan teknologi (AI, drone, dll).
+     * Satuan Pelaksanaan Dukungan Teknologi — riset & pengembangan teknologi (AI, drone, dll).
      */
     private function satlakDuktek($user, $satuan): View
     {
@@ -653,10 +653,10 @@ class DashboardController extends Controller
         // progres proyek riset asli; 3 satlak lain tetap perbandingan simulasi
         // karena metrik progres mereka bukan bagian dari modul ini.
         $perbandinganSatlak = [
-            ['nama' => 'Duktek (Bangtek)', 'singkatan' => 'Bangtek', 'progres' => $proyekRiset->isNotEmpty() ? round($proyekRiset->avg('progres')) : 0, 'highlight' => true],
-            ['nama' => 'Penangkalan (Almon)', 'singkatan' => 'Almon', 'progres' => 60, 'highlight' => false],
-            ['nama' => 'Sosial Media (Sibersos)', 'singkatan' => 'Sibersos', 'progres' => 67, 'highlight' => false],
-            ['nama' => 'Penindakan (Rindak)', 'singkatan' => 'Rindak', 'progres' => 50, 'highlight' => false],
+            ['nama' => 'Dukungan Teknologi', 'singkatan' => 'Duktek', 'progres' => $proyekRiset->isNotEmpty() ? round($proyekRiset->avg('progres')) : 0, 'highlight' => true],
+            ['nama' => 'Penangkalan', 'singkatan' => 'Kal', 'progres' => 60, 'highlight' => false],
+            ['nama' => 'Siber Sosial', 'singkatan' => 'Sisos', 'progres' => 67, 'highlight' => false],
+            ['nama' => 'Penindakan', 'singkatan' => 'Dak', 'progres' => 50, 'highlight' => false],
         ];
 
         // Laporan yang sudah pernah dikirim satuan ini ke DANPUS — dipakai di
@@ -671,7 +671,8 @@ class DashboardController extends Controller
             ->latest('waktu_uji')
             ->get();
 
-        // Log dukungan teknis ke 3 Satlak operasional lain (Satlakal, Sibersos, Rindak).
+        // Log dukungan teknis ke 3 Satlak operasional lain (Satuan Pelaksanaan
+        // Penangkalan, Siber Sosial, Penindakan).
         $satuanTujuanDukungan = Satuan::whereIn('kode', ['SATLAKKAL', 'SATLAKSISOS', 'SATLAKDAK'])
             ->orderBy('urutan')
             ->get();
@@ -817,10 +818,10 @@ class DashboardController extends Controller
     private function binum($user, $satuan): View
     {
         $pengawasanSatuan = [
-            ['satuan' => 'Satlak Penindakan', 'aspek' => 'Kepatuhan SOP penanganan insiden', 'hasil' => 'Baik', 'hasil_class' => 'ok', 'tanggal' => '01 Agu 2026'],
-            ['satuan' => 'Satlak Sibersos', 'aspek' => 'Disiplin pelaporan harian', 'hasil' => 'Perlu Perbaikan', 'hasil_class' => 'warn', 'tanggal' => '30 Jul 2026'],
+            ['satuan' => 'Satuan Pelaksanaan Penindakan', 'aspek' => 'Kepatuhan SOP penanganan insiden', 'hasil' => 'Baik', 'hasil_class' => 'ok', 'tanggal' => '01 Agu 2026'],
+            ['satuan' => 'Satuan Pelaksanaan Siber Sosial', 'aspek' => 'Disiplin pelaporan harian', 'hasil' => 'Perlu Perbaikan', 'hasil_class' => 'warn', 'tanggal' => '30 Jul 2026'],
             ['satuan' => 'Binmat', 'aspek' => 'Administrasi inventaris', 'hasil' => 'Baik', 'hasil_class' => 'ok', 'tanggal' => '28 Jul 2026'],
-            ['satuan' => 'satlak Duktek (Dukungan Teknologi)', 'aspek' => 'Keamanan dokumen riset', 'hasil' => 'Pelanggaran Ringan', 'hasil_class' => 'bad', 'tanggal' => '25 Jul 2026'],
+            ['satuan' => 'Satuan Pelaksanaan Dukungan Teknologi', 'aspek' => 'Keamanan dokumen riset', 'hasil' => 'Pelanggaran Ringan', 'hasil_class' => 'bad', 'tanggal' => '25 Jul 2026'],
         ];
 
         return view('siberad.dashboards.binum', [
@@ -834,15 +835,15 @@ class DashboardController extends Controller
                 'pelanggaran_tercatat' => 1,
             ],
             'aktivitasTerbaru' => [
-                ['satuan' => 'satlak Duktek (Dukungan Teknologi)', 'kegiatan' => 'Temuan pelanggaran ringan keamanan dokumen riset', 'waktu' => '3 hari lalu', 'status' => 'Ditindaklanjuti', 'status_class' => 'warn'],
-                ['satuan' => 'Satlak Sibersos', 'kegiatan' => 'Evaluasi disiplin pelaporan harian', 'waktu' => '5 hari lalu', 'status' => 'Selesai', 'status_class' => 'ok'],
+                ['satuan' => 'Satuan Pelaksanaan Dukungan Teknologi', 'kegiatan' => 'Temuan pelanggaran ringan keamanan dokumen riset', 'waktu' => '3 hari lalu', 'status' => 'Ditindaklanjuti', 'status_class' => 'warn'],
+                ['satuan' => 'Satuan Pelaksanaan Siber Sosial', 'kegiatan' => 'Evaluasi disiplin pelaporan harian', 'waktu' => '5 hari lalu', 'status' => 'Selesai', 'status_class' => 'ok'],
             ],
             'lombaInternal' => [
                 ['nama' => 'Lomba Satuan Terbaik Triwulan III', 'peserta' => '11 Satuan', 'periode' => 'Jul – Sep 2026', 'status' => 'Berlangsung', 'status_class' => 'amber'],
                 ['nama' => 'Lomba Kedisiplinan Pelaporan', 'peserta' => '11 Satuan', 'periode' => 'Apr – Jun 2026', 'status' => 'Selesai', 'status_class' => 'green'],
             ],
             'laporanPiket' => [
-                ['satuan' => 'satlak Duktek (Dukungan Teknologi)', 'perihal' => 'Temuan pelanggaran ringan keamanan dokumen riset', 'pelapor' => 'Piket Binum', 'tanggal' => '25 Jul 2026', 'prioritas' => 'Sedang', 'prioritas_class' => 'warn'],
+                ['satuan' => 'Satuan Pelaksanaan Dukungan Teknologi', 'perihal' => 'Temuan pelanggaran ringan keamanan dokumen riset', 'pelapor' => 'Piket Binum', 'tanggal' => '25 Jul 2026', 'prioritas' => 'Sedang', 'prioritas_class' => 'warn'],
             ],
         ]);
     }
@@ -874,8 +875,8 @@ class DashboardController extends Controller
                 ['program' => 'Latihan Gabungan Penanganan Insiden', 'kegiatan' => 'Evaluasi akhir & penyerahan sertifikat', 'waktu' => 'Kemarin', 'status' => 'Selesai', 'status_class' => 'ok'],
             ],
             'jadwalLatihan' => [
-                ['nama' => 'Latihan Simulasi Serangan Siber (Redteam)', 'satuan_terlibat' => 'Satlak Penindakan, Satlakal (Penangkalan)', 'lokasi' => 'Puslatpur Pussiberad', 'tanggal' => '10 Okt 2026', 'status' => 'Terjadwal', 'status_class' => 'amber'],
-                ['nama' => 'Kursus Forensik Digital Lanjutan', 'satuan_terlibat' => 'Satlak Penindakan', 'lokasi' => 'Ruang Kelas Diklat', 'tanggal' => 'Berlangsung s/d 15 Sep 2026', 'status' => 'Berlangsung', 'status_class' => 'amber'],
+                ['nama' => 'Latihan Simulasi Serangan Siber (Redteam)', 'satuan_terlibat' => 'Satuan Pelaksanaan Penindakan, Satuan Pelaksanaan Penangkalan', 'lokasi' => 'Puslatpur Pussiberad', 'tanggal' => '10 Okt 2026', 'status' => 'Terjadwal', 'status_class' => 'amber'],
+                ['nama' => 'Kursus Forensik Digital Lanjutan', 'satuan_terlibat' => 'Satuan Pelaksanaan Penindakan', 'lokasi' => 'Ruang Kelas Diklat', 'tanggal' => 'Berlangsung s/d 15 Sep 2026', 'status' => 'Berlangsung', 'status_class' => 'amber'],
                 ['nama' => 'Dikjur Operator Siber Dasar Angkatan Berikutnya', 'satuan_terlibat' => 'Seluruh Satlak', 'lokasi' => 'Ruang Kelas Diklat', 'tanggal' => '01 Nov 2026', 'status' => 'Direncanakan', 'status_class' => 'ok'],
             ],
             'laporanPiket' => [
@@ -892,7 +893,7 @@ class DashboardController extends Controller
         $inventaris = [
             ['nama' => 'Firewall Appliance (unit)', 'kategori' => 'Perangkat Jaringan', 'jumlah' => 14, 'kondisi' => 'Baik', 'kondisi_class' => 'ok', 'update' => '1 hari lalu'],
             ['nama' => 'Laptop Operasional Satlak', 'kategori' => 'Komputer', 'jumlah' => 62, 'kondisi' => 'Baik', 'kondisi_class' => 'ok', 'update' => '2 hari lalu'],
-            ['nama' => 'Drone Uji satlak Duktek (Dukungan Teknologi)', 'kategori' => 'Alat Khusus', 'jumlah' => 4, 'kondisi' => 'Perlu Perawatan', 'kondisi_class' => 'warn', 'update' => 'Kemarin'],
+            ['nama' => 'Drone Uji Satuan Pelaksanaan Dukungan Teknologi', 'kategori' => 'Alat Khusus', 'jumlah' => 4, 'kondisi' => 'Perlu Perawatan', 'kondisi_class' => 'warn', 'update' => 'Kemarin'],
             ['nama' => 'Server Rack Pusat Data', 'kategori' => 'Perangkat Server', 'jumlah' => 6, 'kondisi' => 'Kritis (1 unit rusak)', 'kondisi_class' => 'bad', 'update' => '5 jam lalu'],
         ];
 
@@ -908,12 +909,12 @@ class DashboardController extends Controller
             ],
             'aktivitasTerbaru' => [
                 ['item' => 'Server Rack Pusat Data', 'kegiatan' => 'Laporan kerusakan 1 unit server, menunggu suku cadang', 'waktu' => '5 jam lalu', 'status' => 'Kritis', 'status_class' => 'bad'],
-                ['item' => 'Drone Uji satlak Duktek (Dukungan Teknologi)', 'kegiatan' => 'Jadwal perawatan berkala unit drone', 'waktu' => 'Kemarin', 'status' => 'Perlu Perawatan', 'status_class' => 'warn'],
+                ['item' => 'Drone Uji Satuan Pelaksanaan Dukungan Teknologi', 'kegiatan' => 'Jadwal perawatan berkala unit drone', 'waktu' => 'Kemarin', 'status' => 'Perlu Perawatan', 'status_class' => 'warn'],
             ],
             'permintaanPengadaan' => [
                 ['item' => 'Suku cadang Server Rack Pusat Data', 'diajukan_oleh' => 'Binmat', 'tanggal' => '02 Agu 2026', 'prioritas' => 'Tinggi', 'prioritas_class' => 'bad', 'status' => 'Menunggu Persetujuan', 'status_class' => 'amber'],
-                ['item' => 'Komponen gimbal kamera drone', 'diajukan_oleh' => 'satlak Duktek (Dukungan Teknologi)', 'tanggal' => '02 Agu 2026', 'prioritas' => 'Sedang', 'prioritas_class' => 'warn', 'status' => 'Menunggu Persetujuan', 'status_class' => 'amber'],
-                ['item' => 'Firewall Appliance tambahan', 'diajukan_oleh' => 'Satlak Penindakan', 'tanggal' => '29 Jul 2026', 'prioritas' => 'Sedang', 'prioritas_class' => 'warn', 'status' => 'Disetujui', 'status_class' => 'green'],
+                ['item' => 'Komponen gimbal kamera drone', 'diajukan_oleh' => 'Satuan Pelaksanaan Dukungan Teknologi', 'tanggal' => '02 Agu 2026', 'prioritas' => 'Sedang', 'prioritas_class' => 'warn', 'status' => 'Menunggu Persetujuan', 'status_class' => 'amber'],
+                ['item' => 'Firewall Appliance tambahan', 'diajukan_oleh' => 'Satuan Pelaksanaan Penindakan', 'tanggal' => '29 Jul 2026', 'prioritas' => 'Sedang', 'prioritas_class' => 'warn', 'status' => 'Disetujui', 'status_class' => 'green'],
             ],
             'laporanPiket' => [
                 ['item' => 'Server Rack Pusat Data', 'perihal' => 'Kerusakan hardware pada 1 unit server', 'pelapor' => 'Piket Binmat', 'tanggal' => '02 Agu 2026', 'prioritas' => 'Tinggi', 'prioritas_class' => 'bad'],
@@ -927,9 +928,9 @@ class DashboardController extends Controller
     private function sdir($user, $satuan): View
     {
         $koordinasiSatlak = [
-            ['satuan' => 'satlak Duktek (Dukungan Teknologi)', 'perihal' => 'Permintaan pengiriman 2 personel untuk riset AI', 'jenis' => 'Permintaan Personel', 'tanggal' => '30 Jul 2026', 'status' => 'Menunggu Binfung', 'status_class' => 'amber'],
+            ['satuan' => 'Satuan Pelaksanaan Dukungan Teknologi', 'perihal' => 'Permintaan pengiriman 2 personel untuk riset AI', 'jenis' => 'Permintaan Personel', 'tanggal' => '30 Jul 2026', 'status' => 'Menunggu Binfung', 'status_class' => 'amber'],
             ['satuan' => 'Diklat', 'perihal' => 'Koordinasi jadwal latihan gabungan', 'jenis' => 'Jadwal', 'tanggal' => '28 Jul 2026', 'status' => 'Selesai', 'status_class' => 'green'],
-            ['satuan' => 'Satlak Penindakan', 'perihal' => 'Koordinasi eskalasi insiden ransomware', 'jenis' => 'Insiden', 'tanggal' => '02 Agu 2026', 'status' => 'Berlangsung', 'status_class' => 'amber'],
+            ['satuan' => 'Satuan Pelaksanaan Penindakan', 'perihal' => 'Koordinasi eskalasi insiden ransomware', 'jenis' => 'Insiden', 'tanggal' => '02 Agu 2026', 'status' => 'Berlangsung', 'status_class' => 'amber'],
         ];
 
         return view('siberad.dashboards.sdir', [
@@ -943,16 +944,16 @@ class DashboardController extends Controller
                 'menunggu_wadan' => 3,
             ],
             'aktivitasTerbaru' => [
-                ['satuan' => 'Satlak Penindakan', 'kegiatan' => 'Koordinasi eskalasi insiden ransomware ke WADAN', 'waktu' => '1 jam lalu', 'status' => 'Berlangsung', 'status_class' => 'amber'],
-                ['satuan' => 'satlak Duktek (Dukungan Teknologi)', 'kegiatan' => 'Meneruskan permintaan personel ke Binfung', 'waktu' => 'Kemarin', 'status' => 'Menunggu', 'status_class' => 'amber'],
+                ['satuan' => 'Satuan Pelaksanaan Penindakan', 'kegiatan' => 'Koordinasi eskalasi insiden ransomware ke WADAN', 'waktu' => '1 jam lalu', 'status' => 'Berlangsung', 'status_class' => 'amber'],
+                ['satuan' => 'Satuan Pelaksanaan Dukungan Teknologi', 'kegiatan' => 'Meneruskan permintaan personel ke Binfung', 'waktu' => 'Kemarin', 'status' => 'Menunggu', 'status_class' => 'amber'],
             ],
             'laporanDiteruskan' => [
-                ['satuan' => 'Satlakal (Penangkalan)', 'perihal' => 'Serangan DDoS pada portal utama', 'tanggal' => '02 Agu 2026', 'diteruskan_ke' => 'WADAN', 'status' => 'Menunggu', 'status_class' => 'amber'],
-                ['satuan' => 'Satlak Sibersos', 'perihal' => 'Hoaks rekrutmen mengatasnamakan TNI AD', 'tanggal' => '01 Agu 2026', 'diteruskan_ke' => 'WADAN', 'status' => 'Menunggu', 'status_class' => 'amber'],
-                ['satuan' => 'Satlak Penindakan', 'perihal' => 'Indikasi ransomware pada server unit', 'tanggal' => '31 Jul 2026', 'diteruskan_ke' => 'WADAN', 'status' => 'Diteruskan', 'status_class' => 'green'],
+                ['satuan' => 'Satuan Pelaksanaan Penangkalan', 'perihal' => 'Serangan DDoS pada portal utama', 'tanggal' => '02 Agu 2026', 'diteruskan_ke' => 'WADAN', 'status' => 'Menunggu', 'status_class' => 'amber'],
+                ['satuan' => 'Satuan Pelaksanaan Siber Sosial', 'perihal' => 'Hoaks rekrutmen mengatasnamakan TNI AD', 'tanggal' => '01 Agu 2026', 'diteruskan_ke' => 'WADAN', 'status' => 'Menunggu', 'status_class' => 'amber'],
+                ['satuan' => 'Satuan Pelaksanaan Penindakan', 'perihal' => 'Indikasi ransomware pada server unit', 'tanggal' => '31 Jul 2026', 'diteruskan_ke' => 'WADAN', 'status' => 'Diteruskan', 'status_class' => 'green'],
             ],
             'laporanPiket' => [
-                ['satuan' => 'Satlak Penindakan', 'perihal' => 'Permintaan koordinasi eskalasi insiden ransomware', 'pelapor' => 'Piket SDIR', 'tanggal' => '02 Agu 2026', 'prioritas' => 'Tinggi', 'prioritas_class' => 'bad'],
+                ['satuan' => 'Satuan Pelaksanaan Penindakan', 'perihal' => 'Permintaan koordinasi eskalasi insiden ransomware', 'pelapor' => 'Piket SDIR', 'tanggal' => '02 Agu 2026', 'prioritas' => 'Tinggi', 'prioritas_class' => 'bad'],
             ],
         ]);
     }

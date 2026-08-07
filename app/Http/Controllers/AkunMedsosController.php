@@ -11,7 +11,7 @@ class AkunMedsosController extends Controller
 {
     /**
      * Tambah akun media sosial resmi baru milik satuan yang sedang login
-     * (mis. akun Instagram resmi Satlak Sibersos). Dipakai tab "Manajemen
+     * (mis. akun Instagram resmi Satuan Pelaksanaan Siber Sosial). Dipakai tab "Manajemen
      * Akun".
      */
     public function store(Request $request): RedirectResponse

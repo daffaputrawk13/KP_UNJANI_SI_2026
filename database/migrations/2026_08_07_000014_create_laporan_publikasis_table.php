@@ -7,16 +7,17 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Laporan Publikasi — dipakai khusus fitur Satlak Sibersos untuk
+     * Laporan Publikasi — dipakai khusus fitur Satuan Pelaksanaan Siber Sosial untuk
      * melaporkan kegiatan publikasi/konten media sosial ke DANPUS.
-     * Tabel terpisah dari 'laporans' (Duktek/Bangtek) supaya alur Sibersos
-     * (yang punya status Draft) tidak bercampur dengan alur laporan lain.
+     * Tabel terpisah dari 'laporans' (Satuan Pelaksanaan Dukungan Teknologi)
+     * supaya alur Siber Sosial (yang punya status Draft) tidak bercampur
+     * dengan alur laporan lain.
      */
     public function up(): void
     {
         Schema::create('laporan_publikasis', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('satuan_id')->constrained('satuans')->cascadeOnDelete(); // satuan asal (Satlak Sibersos)
+            $table->foreignId('satuan_id')->constrained('satuans')->cascadeOnDelete(); // satuan asal (Satuan Pelaksanaan Siber Sosial)
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();     // pembuat laporan
             $table->foreignId('tujuan_satuan_id')->constrained('satuans')->cascadeOnDelete(); // satuan tujuan (DANPUS)
             $table->string('judul');                 // judul/perihal publikasi

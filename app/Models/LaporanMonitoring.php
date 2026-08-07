@@ -34,7 +34,7 @@ class LaporanMonitoring extends Model
     }
 
     /**
-     * Satuan asal pembuat laporan (Satlakal).
+     * Satuan asal pembuat laporan (Satuan Pelaksanaan Penangkalan).
      */
     public function satuan(): BelongsTo
     {

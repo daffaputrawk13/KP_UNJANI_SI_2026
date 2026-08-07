@@ -63,7 +63,7 @@
       <p class="meta" style="margin-top:26px;margin-bottom:0;">
         Halaman peran untuk satuan ini belum dibuat secara khusus — modul laporan, verifikasi
         berjenjang, dan visualisasi akan dikembangkan menyusul (mengikuti DANPUS, WADAN,
-        Satlakal (Penangkalan), dan Satlak Sibersos yang sudah tersedia).
+        Satuan Pelaksanaan Penangkalan, dan Satuan Pelaksanaan Siber Sosial yang sudah tersedia).
       </p>
     </div>
   </main>

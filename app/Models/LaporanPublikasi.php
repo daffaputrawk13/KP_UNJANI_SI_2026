@@ -31,7 +31,7 @@ class LaporanPublikasi extends Model
     }
 
     /**
-     * Satuan asal pembuat laporan publikasi (Satlak Sibersos).
+     * Satuan asal pembuat laporan publikasi (Satuan Pelaksanaan Siber Sosial).
      */
     public function satuan(): BelongsTo
     {

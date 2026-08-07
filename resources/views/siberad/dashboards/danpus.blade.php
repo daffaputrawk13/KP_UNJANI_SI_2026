@@ -111,7 +111,7 @@
       <div class="side-nav-label">Menu</div>
       <a href="#" class="side-link active" data-tab-link="ringkasan"><span class="dot"></span>Dashboard</a>
       <a href="#" class="side-link" data-tab-link="laporan"><span class="dot"></span>Laporan Masuk</a>
-      <a href="#" class="side-link" data-tab-link="laporan-monitoring"><span class="dot"></span>Laporan Monitoring (Satlakal)</a>
+      <a href="#" class="side-link" data-tab-link="laporan-monitoring"><span class="dot"></span>Laporan Monitoring (Satuan Pelaksanaan Penangkalan)</a>
       <a href="#" class="side-link" data-tab-link="riwayat"><span class="dot"></span>Riwayat Laporan</a>
       <a href="#" class="side-link" data-tab-link="status-satuan"><span class="dot"></span>Status Seluruh Satuan</a>
     </nav>
@@ -246,7 +246,7 @@
           <div class="stat-card">
             <div class="lbl">Insiden Aktif</div>
             <div class="val" style="color:var(--red);">{{ $stats['insiden_aktif'] }}</div>
-            <div class="sub">Ditangani Satlakal (Penangkalan)</div>
+            <div class="sub">Ditangani Satuan Pelaksanaan Penangkalan</div>
           </div>
           <div class="stat-card">
             <div class="lbl">Laporan Menunggu Persetujuan</div>
@@ -370,7 +370,7 @@
       <section class="tab-panel" data-tab-panel="laporan-monitoring">
         <div class="section-head">
           <h2>Laporan Monitoring &amp; Recovery</h2>
-          <p>Laporan insiden/pemulihan aset digital yang dikirim Satlakal (Penangkalan), menunggu keputusan DANPUS.</p>
+          <p>Laporan insiden/pemulihan aset digital yang dikirim Satuan Pelaksanaan Penangkalan, menunggu keputusan DANPUS.</p>
         </div>
         <div class="panel">
           @if(session('status'))
@@ -411,7 +411,7 @@
       <div class="modal-overlay" id="modalRevisiLaporanMonitoring">
         <div class="modal-box" style="max-width:420px;">
           <div class="modal-head">
-            <div><h3 id="rlmJudul">Catatan untuk Satlakal</h3></div>
+            <div><h3 id="rlmJudul">Catatan untuk Satuan Pelaksanaan Penangkalan</h3></div>
             <button type="button" class="modal-close" onclick="tutupRevisiLaporanMonitoring()">&times;</button>
           </div>
           <div class="modal-body">
@@ -423,7 +423,7 @@
                 <textarea id="rlmCatatan" name="catatan_danpus" rows="4" required placeholder="Jelaskan apa yang perlu diperbaiki atau alasan penolakan..."></textarea>
               </div>
               <div class="form-field full" style="display:flex;justify-content:flex-end;">
-                <button class="btn btn-primary" type="submit">Kirim ke Satlakal</button>
+                <button class="btn btn-primary" type="submit">Kirim ke Satuan Pelaksanaan Penangkalan</button>
               </div>
             </form>
           </div>
@@ -434,7 +434,7 @@
         function bukaRevisiLaporanMonitoring(id, status) {
           document.getElementById('formRevisiLaporanMonitoring').action = '/laporan-monitoring/' + id + '/status';
           document.getElementById('rlmStatusInput').value = status;
-          document.getElementById('rlmJudul').textContent = status === 'Ditolak' ? 'Alasan Penolakan' : 'Catatan Revisi untuk Satlakal';
+          document.getElementById('rlmJudul').textContent = status === 'Ditolak' ? 'Alasan Penolakan' : 'Catatan Revisi untuk Satuan Pelaksanaan Penangkalan';
           document.getElementById('modalRevisiLaporanMonitoring').classList.add('open');
         }
         function tutupRevisiLaporanMonitoring() {
