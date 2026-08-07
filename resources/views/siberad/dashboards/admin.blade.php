@@ -134,7 +134,7 @@
           <svg class="side-dropdown-arrow" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg>
         </button>
         <div class="side-dropdown-menu" id="sistemSubmenu">
-          <a href="#" class="side-link side-sublink" data-tab-link="satlak">Manajemen Satlak</a>
+          <a href="#" class="side-link side-sublink" data-tab-link="satlak">Manajemen Satuan</a>
           <a href="#" class="side-link side-sublink" data-tab-link="role-akses">Role &amp; Hak Akses</a>
           <a href="#" class="side-link side-sublink" data-tab-link="data-master">Data Master</a>
           <a href="#" class="side-link side-sublink" data-tab-link="log-aktivitas">Log Aktivitas</a>
@@ -475,10 +475,10 @@
         }
       </script>
 
-      {{-- ===== MANAJEMEN SATLAK ===== --}}
+      {{-- ===== MANAJEMEN SATUAN ===== --}}
       <section class="tab-panel" data-tab-panel="satlak">
         <div class="section-head">
-          <h2>Manajemen Satlak</h2>
+          <h2>Manajemen Satuan</h2>
           <p>Kelola daftar satuan/Satlak yang terdaftar di SIBERAD.</p>
         </div>
 
