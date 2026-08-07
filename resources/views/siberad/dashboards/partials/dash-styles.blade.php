@@ -161,7 +161,7 @@
   .side-dropdown.open .side-dropdown-toggle{color:var(--text);}
   .side-dropdown.open .side-dropdown-arrow{transform:rotate(180deg);}
   .side-dropdown-menu{max-height:0;overflow:hidden;transition:max-height .22s ease;display:flex;flex-direction:column;gap:2px;}
-  .side-dropdown.open .side-dropdown-menu{max-height:220px;margin-top:2px;}
+  .side-dropdown.open .side-dropdown-menu{max-height:420px;margin-top:2px;}
   .side-sublink{padding-left:32px;}
 
   .side-foot{padding:14px 22px 20px;border-top:1px solid var(--border-soft);}
