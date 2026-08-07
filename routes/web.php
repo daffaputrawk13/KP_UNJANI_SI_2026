@@ -8,9 +8,11 @@ use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\AkunMedsosController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\DanpusLaporanMonitoringController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\JabatanController;
 use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\LaporanMonitoringController;
 use App\Http\Controllers\LaporanPublikasiController;
 use App\Http\Controllers\NotifikasiController;
 use App\Http\Controllers\PangkatController;
@@ -84,6 +86,38 @@ Route::delete('/laporan-publikasi-dokumen/{dokumen}', [LaporanPublikasiControlle
 Route::delete('/laporan-publikasi/{laporanPublikasi}', [LaporanPublikasiController::class, 'destroy'])
     ->middleware('auth')
     ->name('laporan-publikasi.destroy');
+
+// ===== Laporan Monitoring & Recovery ke DANPUS (Satlakal/Penangkalan) =====
+// Dipakai fitur Buat Laporan Monitoring & Recovery, Draft, Kirim/Kirim Ulang
+// (setelah Direvisi), Upload Lampiran, dan Hapus Draft pada dashboard Satlakal.
+Route::post('/laporan-monitoring', [LaporanMonitoringController::class, 'store'])
+    ->middleware('auth')
+    ->name('laporan-monitoring.store');
+
+Route::patch('/laporan-monitoring/{laporanMonitoring}', [LaporanMonitoringController::class, 'update'])
+    ->middleware('auth')
+    ->name('laporan-monitoring.update');
+
+Route::post('/laporan-monitoring/{laporanMonitoring}/kirim', [LaporanMonitoringController::class, 'kirim'])
+    ->middleware('auth')
+    ->name('laporan-monitoring.kirim');
+
+Route::post('/laporan-monitoring/{laporanMonitoring}/lampiran', [LaporanMonitoringController::class, 'uploadLampiran'])
+    ->middleware('auth')
+    ->name('laporan-monitoring.upload-lampiran');
+
+Route::delete('/laporan-monitoring-lampiran/{lampiran}', [LaporanMonitoringController::class, 'destroyLampiran'])
+    ->middleware('auth')
+    ->name('laporan-monitoring-lampiran.destroy');
+
+Route::delete('/laporan-monitoring/{laporanMonitoring}', [LaporanMonitoringController::class, 'destroy'])
+    ->middleware('auth')
+    ->name('laporan-monitoring.destroy');
+
+// Aksi DANPUS: Setujui / Tolak / Minta Revisi laporan monitoring dari Satlakal.
+Route::patch('/laporan-monitoring/{laporanMonitoring}/status', [DanpusLaporanMonitoringController::class, 'updateStatus'])
+    ->middleware('auth')
+    ->name('laporan-monitoring.update-status');
 
 Route::post('/notifikasi/baca-semua', [NotifikasiController::class, 'bacaSemua'])
     ->middleware('auth')

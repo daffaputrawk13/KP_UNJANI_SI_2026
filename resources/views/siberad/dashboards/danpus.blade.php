@@ -111,6 +111,7 @@
       <div class="side-nav-label">Menu</div>
       <a href="#" class="side-link active" data-tab-link="ringkasan"><span class="dot"></span>Dashboard</a>
       <a href="#" class="side-link" data-tab-link="laporan"><span class="dot"></span>Laporan Masuk</a>
+      <a href="#" class="side-link" data-tab-link="laporan-monitoring"><span class="dot"></span>Laporan Monitoring (Satlakal)</a>
       <a href="#" class="side-link" data-tab-link="riwayat"><span class="dot"></span>Riwayat Laporan</a>
       <a href="#" class="side-link" data-tab-link="status-satuan"><span class="dot"></span>Status Seluruh Satuan</a>
     </nav>
@@ -363,6 +364,85 @@
           </div>
         </div>
       </section>
+
+      {{-- ===== LAPORAN MONITORING & RECOVERY (SATLAKAL) ===== --}}
+      <section class="tab-panel" data-tab-panel="laporan-monitoring">
+        <div class="section-head">
+          <h2>Laporan Monitoring &amp; Recovery</h2>
+          <p>Laporan insiden/pemulihan aset digital yang dikirim Satlakal (Penangkalan), menunggu keputusan DANPUS.</p>
+        </div>
+        <div class="panel">
+          @if(session('status'))
+          <div class="profile-form-notice" style="margin:22px 22px 0;border-color:var(--green);color:var(--green);">{{ session('status') }}</div>
+          @endif
+          <div class="tbl-wrap">
+            <table class="dtbl">
+              <thead><tr><th>Aset</th><th>Perihal</th><th>Prioritas</th><th>Tanggal Kirim</th><th>Aksi</th></tr></thead>
+              <tbody>
+                @forelse($laporanMonitoringMasuk as $lm)
+                <tr>
+                  <td>{{ $lm->aset ?? '—' }}</td>
+                  <td>{{ $lm->perihal }}</td>
+                  <td><span class="status-dot {{ match($lm->prioritas) { 'Tinggi' => 'bad', 'Sedang' => 'warn', default => 'ok' } }}">{{ $lm->prioritas }}</span></td>
+                  <td>{{ $lm->tanggal_kirim?->translatedFormat('d M Y H:i') ?? '—' }}</td>
+                  <td>
+                    <div class="btn-row">
+                      <form method="POST" action="{{ route('laporan-monitoring.update-status', $lm) }}" style="display:inline;">
+                        @csrf @method('PATCH')
+                        <input type="hidden" name="status" value="Disetujui">
+                        <button class="btn btn-primary btn-sm" type="submit">Setujui</button>
+                      </form>
+                      <button class="btn btn-ghost btn-sm" type="button" onclick="bukaRevisiLaporanMonitoring({{ $lm->id }}, 'Direvisi')">Minta Revisi</button>
+                      <button class="btn btn-ghost-red btn-sm" type="button" onclick="bukaRevisiLaporanMonitoring({{ $lm->id }}, 'Ditolak')">Tolak</button>
+                    </div>
+                  </td>
+                </tr>
+                @empty
+                <tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:20px;">Belum ada laporan monitoring yang menunggu keputusan.</td></tr>
+                @endforelse
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      {{-- ===== MODAL: TOLAK / MINTA REVISI LAPORAN MONITORING ===== --}}
+      <div class="modal-overlay" id="modalRevisiLaporanMonitoring">
+        <div class="modal-box" style="max-width:420px;">
+          <div class="modal-head">
+            <div><h3 id="rlmJudul">Catatan untuk Satlakal</h3></div>
+            <button type="button" class="modal-close" onclick="tutupRevisiLaporanMonitoring()">&times;</button>
+          </div>
+          <div class="modal-body">
+            <form method="POST" id="formRevisiLaporanMonitoring" class="form-grid">
+              @csrf @method('PATCH')
+              <input type="hidden" name="status" id="rlmStatusInput">
+              <div class="form-field full">
+                <label for="rlmCatatan">Catatan / Alasan</label>
+                <textarea id="rlmCatatan" name="catatan_danpus" rows="4" required placeholder="Jelaskan apa yang perlu diperbaiki atau alasan penolakan..."></textarea>
+              </div>
+              <div class="form-field full" style="display:flex;justify-content:flex-end;">
+                <button class="btn btn-primary" type="submit">Kirim ke Satlakal</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        function bukaRevisiLaporanMonitoring(id, status) {
+          document.getElementById('formRevisiLaporanMonitoring').action = '/laporan-monitoring/' + id + '/status';
+          document.getElementById('rlmStatusInput').value = status;
+          document.getElementById('rlmJudul').textContent = status === 'Ditolak' ? 'Alasan Penolakan' : 'Catatan Revisi untuk Satlakal';
+          document.getElementById('modalRevisiLaporanMonitoring').classList.add('open');
+        }
+        function tutupRevisiLaporanMonitoring() {
+          document.getElementById('modalRevisiLaporanMonitoring').classList.remove('open');
+        }
+        document.getElementById('modalRevisiLaporanMonitoring').addEventListener('click', function (e) {
+          if (e.target === this) tutupRevisiLaporanMonitoring();
+        });
+      </script>
 
       {{-- ===== RIWAYAT LAPORAN ===== --}}
       <section class="tab-panel" data-tab-panel="riwayat">

@@ -103,7 +103,8 @@
           <svg class="side-dropdown-arrow" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg>
         </button>
         <div class="side-dropdown-menu" id="laporanSubmenu">
-          <a href="#" class="side-link side-sublink" data-tab-link="tambah-laporan">Tambah Laporan</a>
+          <a href="#" class="side-link side-sublink" data-tab-link="tambah-laporan">Buat Laporan Monitoring &amp; Recovery</a>
+          <a href="#" class="side-link side-sublink" data-tab-link="draft-laporan">Draft Laporan</a>
           <a href="#" class="side-link side-sublink" data-tab-link="status-laporan">Status Laporan</a>
           <a href="#" class="side-link side-sublink" data-tab-link="riwayat-laporan">Riwayat Laporan</a>
         </div>
@@ -156,20 +157,42 @@
               <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" style="fill:var(--gold-dim) !important;stroke:var(--gold-bright) !important;"></path>
               <path d="M13.73 21a2 2 0 0 1-3.46 0" style="fill:none !important;stroke:var(--gold-bright) !important;"></path>
             </svg>
+            @if(($notifikasi ?? collect())->isNotEmpty())
             <span style="position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--red);box-shadow:0 0 0 2px var(--panel,#0c2417);"></span>
+            @endif
           </button>
 
           <div class="profile-dropdown" id="notifDropdown" role="menu" aria-label="Notifikasi">
-            <div class="profile-dropdown-head" style="border-bottom:1px solid var(--border-soft);">
+            <div class="profile-dropdown-head" style="border-bottom:1px solid var(--border-soft);display:flex;justify-content:space-between;align-items:center;gap:8px;">
               <div class="profile-dropdown-name" style="font-size:14px;">Notifikasi</div>
+              @if(($notifikasi ?? collect())->isNotEmpty())
+              <form method="POST" action="{{ route('notifikasi.baca-semua') }}">
+                @csrf
+                <button type="submit" class="btn-link" style="font-size:11px;color:var(--gold-bright);background:none;border:none;cursor:pointer;">Tandai dibaca</button>
+              </form>
+              @endif
             </div>
+
+            @forelse(($notifikasi ?? collect()) as $n)
+            <div class="profile-dropdown-item" style="align-items:flex-start;white-space:normal;cursor:default;">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="var(--gold-bright)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px;">
+                <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+              </svg>
+              <div>
+                <div style="font-size:12.5px;line-height:1.5;color:var(--text);">{{ $n->data['pesan'] ?? 'Status laporan diperbarui.' }}</div>
+                <div style="font-size:11px;color:var(--text-dim);margin-top:2px;">{{ $n->created_at->diffForHumans() }}</div>
+              </div>
+            </div>
+            @empty
             <div style="text-align:center;padding:20px 6px 8px;">
               <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="var(--text-dim)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 14px;display:block;">
                 <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path>
                 <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
               </svg>
-              <p style="margin:0;font-size:12.5px;line-height:1.6;color:var(--text-muted);">Belum ada notifikasi saat ini.<br>Fitur pusat notifikasi masih prototype dan belum tersambung ke database.</p>
+              <p style="margin:0;font-size:12.5px;line-height:1.6;color:var(--text-muted);">Belum ada notifikasi saat ini.</p>
             </div>
+            @endforelse
           </div>
         </div>
 
@@ -273,42 +296,114 @@
       {{-- ===== LAPORAN › TAMBAH LAPORAN ===== --}}
       <section class="tab-panel" data-tab-panel="tambah-laporan">
         <div class="section-head">
-          <h2>Tambah Laporan</h2>
-          <p>Catat insiden atau gangguan baru pada aset/website yang dipantau Satlakal.</p>
+          <h2>Buat Laporan Monitoring &amp; Recovery</h2>
+          <p>Laporkan insiden dan tindakan pemulihan aset digital ke DANPUS. Bisa disimpan sebagai draft dulu atau langsung dikirim.</p>
         </div>
         <div class="panel">
-          <form class="form-grid" id="formTambahLaporan" style="padding:22px;" novalidate>
+          @if(session('status'))
+          <div class="profile-form-notice" style="margin:22px 22px 0;border-color:var(--green);color:var(--green);">{{ session('status') }}</div>
+          @endif
+          @if($errors->any())
+          <div class="profile-form-notice" style="margin:22px 22px 0;border-color:var(--red);color:var(--red);">{{ $errors->first() }}</div>
+          @endif
+          <form class="form-grid" method="POST" action="{{ route('laporan-monitoring.store') }}" enctype="multipart/form-data" style="padding:22px;">
+            @csrf
             <div class="form-field">
               <label for="asetTambahLaporan">Aset / Website Terdampak</label>
-              <select id="asetTambahLaporan" required>
+              <select id="asetTambahLaporan" name="aset">
+                <option value="">— Pilih aset —</option>
                 @foreach($asetMonitoring as $a)
-                  <option>{{ $a['nama'] }}</option>
+                  <option value="{{ $a['nama'] }}">{{ $a['nama'] }}</option>
                 @endforeach
+                <option value="Lainnya">Lainnya</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="jenisInsidenTambahLaporan">Jenis Insiden</label>
+              <select id="jenisInsidenTambahLaporan" name="jenis_insiden">
+                <option value="">— Pilih jenis —</option>
+                <option value="DDoS Attack">DDoS Attack</option>
+                <option value="Defacement">Defacement</option>
+                <option value="SQL Injection">SQL Injection</option>
+                <option value="Malware">Malware</option>
+                <option value="Percobaan Akses Ilegal">Percobaan Akses Ilegal</option>
+                <option value="Lainnya">Lainnya</option>
               </select>
             </div>
             <div class="form-field">
               <label for="prioritasTambahLaporan">Prioritas</label>
-              <select id="prioritasTambahLaporan" required>
-                <option>Tinggi</option><option>Sedang</option><option>Rendah</option>
+              <select id="prioritasTambahLaporan" name="prioritas" required>
+                <option value="Tinggi">Tinggi</option>
+                <option value="Sedang" selected>Sedang</option>
+                <option value="Rendah">Rendah</option>
               </select>
             </div>
-            <div class="form-field full">
+            <div class="form-field">
               <label for="perihalTambahLaporan">Perihal</label>
-              <input id="perihalTambahLaporan" type="text" placeholder="Contoh: Percobaan akses ilegal terdeteksi" required>
+              <input id="perihalTambahLaporan" name="perihal" type="text" placeholder="Contoh: Percobaan akses ilegal terdeteksi" required>
             </div>
             <div class="form-field full">
-              <label for="deskripsiTambahLaporan">Deskripsi Kejadian</label>
-              <textarea id="deskripsiTambahLaporan" rows="4" placeholder="Jelaskan kronologi dan dampak insiden..." required></textarea>
+              <label for="deskripsiTambahLaporan">Deskripsi / Kronologi Kejadian</label>
+              <textarea id="deskripsiTambahLaporan" name="deskripsi" rows="4" placeholder="Jelaskan kronologi dan dampak insiden..." required></textarea>
             </div>
             <div class="form-field full">
-              <label for="lampiranTambahLaporan">Lampiran (bukti / dokumentasi)</label>
-              <input id="lampiranTambahLaporan" type="file" accept="application/pdf,.pdf">
-              <span class="form-hint">Format PDF, maksimal 20 MB.</span>
+              <label for="tindakanTambahLaporan">Tindakan Monitoring &amp; Recovery</label>
+              <textarea id="tindakanTambahLaporan" name="tindakan" rows="3" placeholder="Jelaskan tindakan mitigasi/pemulihan yang sudah/akan dilakukan..."></textarea>
             </div>
             <div class="form-field full">
-              <button class="btn btn-primary" type="button" onclick="alert('Prototype — form Tambah Laporan belum tersambung ke database.')">Simpan Laporan</button>
+              <label for="lampiranTambahLaporan">Upload Lampiran (Foto, PDF, Dokumen)</label>
+              <input id="lampiranTambahLaporan" name="lampiran[]" type="file" multiple accept="image/*,.pdf,.doc,.docx">
+              <span class="form-hint">Bisa pilih beberapa file sekaligus. Maks. 20 MB per file.</span>
+            </div>
+            <div class="form-field full" style="display:flex;gap:12px;flex-wrap:wrap;">
+              <button class="btn btn-ghost" type="submit" name="aksi" value="draft">Simpan sebagai Draft</button>
+              <button class="btn btn-primary" type="submit" name="aksi" value="kirim">Kirim ke DANPUS</button>
             </div>
           </form>
+        </div>
+      </section>
+
+      {{-- ===== LAPORAN › DRAFT LAPORAN ===== --}}
+      <section class="tab-panel" data-tab-panel="draft-laporan">
+        <div class="section-head">
+          <h2>Draft Laporan</h2>
+          <p>Laporan yang belum dikirim, atau yang dikembalikan DANPUS untuk direvisi. Bisa diedit, ditambah lampiran, atau dikirim kapan saja.</p>
+        </div>
+        <div class="panel">
+          <div class="tbl-wrap">
+            <table class="dtbl">
+              <thead><tr><th>Perihal</th><th>Aset</th><th>Status</th><th>Lampiran</th><th>Dibuat</th><th>Aksi</th></tr></thead>
+              <tbody>
+                @forelse($draftLaporanMonitoring as $d)
+                <tr>
+                  <td>{{ $d->perihal }}</td>
+                  <td>{{ $d->aset ?? '—' }}</td>
+                  <td><span class="badge {{ $d->status === 'Direvisi' ? 'amber' : '' }}">{{ $d->status }}</span></td>
+                  <td>{{ $d->lampiran->count() }} file</td>
+                  <td>{{ $d->created_at->translatedFormat('d M Y') }}</td>
+                  <td>
+                    <div class="btn-row">
+                      <button class="btn btn-ghost btn-sm" type="button" onclick="bukaDetailLaporanMonitoring({{ $d->id }})">Detail</button>
+                      <button class="btn btn-ghost btn-sm" type="button" onclick="bukaUploadLampiran({{ $d->id }})">+ Lampiran</button>
+                      <form method="POST" action="{{ route('laporan-monitoring.kirim', $d) }}" style="display:inline;">
+                        @csrf
+                        <button class="btn btn-primary btn-sm" type="submit">Kirim</button>
+                      </form>
+                      @if($d->status === 'Draft')
+                      <form method="POST" action="{{ route('laporan-monitoring.destroy', $d) }}" style="display:inline;" onsubmit="return confirm('Hapus draft ini?');">
+                        @csrf @method('DELETE')
+                        <button class="btn btn-ghost-red btn-sm" type="submit">Hapus</button>
+                      </form>
+                      @endif
+                    </div>
+                  </td>
+                </tr>
+                @empty
+                <tr><td colspan="6" style="text-align:center;color:var(--text-muted);">Belum ada draft laporan.</td></tr>
+                @endforelse
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
 
@@ -316,31 +411,31 @@
       <section class="tab-panel" data-tab-panel="status-laporan">
         <div class="section-head">
           <h2>Status Laporan</h2>
-          <p>Pantau progres laporan yang sudah diajukan oleh Satlakal (Penangkalan).</p>
+          <p>Pantau progres laporan yang sudah dikirim ke DANPUS.</p>
         </div>
         <div class="panel">
           <div class="tbl-wrap">
             <table class="dtbl">
-              <thead><tr><th>Aset</th><th>Perihal</th><th>Tanggal</th><th>Status</th></tr></thead>
+              <thead><tr><th>Aset</th><th>Perihal</th><th>Tanggal Kirim</th><th>Status</th><th>Detail</th></tr></thead>
               <tbody>
+                @forelse($statusLaporanMonitoring as $s)
                 <tr>
-                  <td>Portal Utama Pussiberad</td>
-                  <td>Serangan DDoS pada portal utama</td>
-                  <td>02 Agu 2026</td>
-                  <td><span class="status-dot amber">Menunggu Verifikasi</span></td>
+                  <td>{{ $s->aset ?? '—' }}</td>
+                  <td>{{ $s->perihal }}</td>
+                  <td>{{ $s->tanggal_kirim?->translatedFormat('d M Y') ?? '—' }}</td>
+                  <td>
+                    <span class="status-dot {{ match($s->status) {
+                      'Disetujui' => 'ok',
+                      'Ditolak' => 'bad',
+                      'Direvisi' => 'amber',
+                      default => 'warn',
+                    } }}">{{ $s->status }}</span>
+                  </td>
+                  <td><button class="btn btn-ghost btn-sm" type="button" onclick="bukaDetailLaporanMonitoring({{ $s->id }})">Lihat Detail</button></td>
                 </tr>
-                <tr>
-                  <td>Sistem Layanan Internal</td>
-                  <td>Percobaan SQL Injection terdeteksi</td>
-                  <td>02 Agu 2026</td>
-                  <td><span class="status-dot warn">Diteruskan ke DANPUS</span></td>
-                </tr>
-                <tr>
-                  <td>Portal Data Kodim</td>
-                  <td>Defacement pada halaman utama</td>
-                  <td>28 Jul 2026</td>
-                  <td><span class="status-dot green">Disetujui DANPUS</span></td>
-                </tr>
+                @empty
+                <tr><td colspan="5" style="text-align:center;color:var(--text-muted);">Belum ada laporan yang dikirim ke DANPUS.</td></tr>
+                @endforelse
               </tbody>
             </table>
           </div>
@@ -351,27 +446,162 @@
       <section class="tab-panel" data-tab-panel="riwayat-laporan">
         <div class="section-head">
           <h2>Riwayat Laporan</h2>
-          <p>Log lengkap insiden dan tindak lanjut yang pernah ditangani Satlakal.</p>
+          <p>Log lengkap seluruh laporan monitoring &amp; recovery Satlakal, termasuk draft dan yang sudah diputuskan DANPUS.</p>
         </div>
         <div class="panel">
           <div class="tbl-wrap">
             <table class="dtbl">
-              <thead><tr><th>Aset</th><th>Jenis Gangguan</th><th>Waktu</th><th>Tindakan</th><th>Status</th></tr></thead>
+              <thead><tr><th>Perihal</th><th>Aset</th><th>Dibuat</th><th>Status</th><th>Detail</th></tr></thead>
               <tbody>
-                @foreach($logInsiden as $log)
+                @forelse($semuaLaporanMonitoring as $r)
                 <tr>
-                  <td>{{ $log['aset'] }}</td>
-                  <td>{{ $log['jenis'] }}</td>
-                  <td>{{ $log['waktu'] }}</td>
-                  <td>{{ $log['tindakan'] }}</td>
-                  <td><span class="status-dot {{ $log['status_class'] }}">{{ $log['status'] }}</span></td>
+                  <td>{{ $r->perihal }}</td>
+                  <td>{{ $r->aset ?? '—' }}</td>
+                  <td>{{ $r->created_at->translatedFormat('d M Y') }}</td>
+                  <td>
+                    <span class="badge {{ match($r->status) {
+                      'Disetujui' => 'green',
+                      'Ditolak' => 'red',
+                      'Direvisi' => 'amber',
+                      default => '',
+                    } }}">{{ $r->status }}</span>
+                  </td>
+                  <td><button class="btn btn-ghost btn-sm" type="button" onclick="bukaDetailLaporanMonitoring({{ $r->id }})">Lihat Detail</button></td>
                 </tr>
-                @endforeach
+                @empty
+                <tr><td colspan="5" style="text-align:center;color:var(--text-muted);">Belum ada riwayat laporan.</td></tr>
+                @endforelse
               </tbody>
             </table>
           </div>
         </div>
       </section>
+
+      {{-- ===== MODAL: DETAIL LAPORAN MONITORING ===== --}}
+      <div class="modal-overlay" id="modalDetailLaporanMonitoring">
+        <div class="modal-box" style="max-width:560px;">
+          <div class="modal-head">
+            <div>
+              <h3 id="dlmPerihal">-</h3>
+              <p id="dlmAset" style="margin:2px 0 0;font-size:12.5px;color:var(--text-muted);">-</p>
+            </div>
+            <button type="button" class="modal-close" onclick="tutupDetailLaporanMonitoring()">&times;</button>
+          </div>
+          <div class="modal-body">
+            <div class="detail-grid">
+              <div class="detail-item"><span class="detail-label">Status</span><span id="dlmStatus">-</span></div>
+              <div class="detail-item"><span class="detail-label">Prioritas</span><span id="dlmPrioritas">-</span></div>
+              <div class="detail-item"><span class="detail-label">Jenis Insiden</span><span id="dlmJenis">-</span></div>
+              <div class="detail-item"><span class="detail-label">Tanggal Kirim</span><span id="dlmTanggal">-</span></div>
+              <div class="detail-item full"><span class="detail-label">Deskripsi</span><span id="dlmDeskripsi">-</span></div>
+              <div class="detail-item full"><span class="detail-label">Tindakan Monitoring &amp; Recovery</span><span id="dlmTindakan">-</span></div>
+              <div class="detail-item full" id="dlmCatatanWrap" style="display:none;">
+                <span class="detail-label">Catatan DANPUS</span>
+                <span id="dlmCatatan" style="color:var(--gold-bright);"></span>
+              </div>
+              <div class="detail-item full">
+                <span class="detail-label">Lampiran</span>
+                <div id="dlmLampiran" class="btn-row" style="flex-wrap:wrap;">-</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {{-- ===== MODAL: UPLOAD LAMPIRAN ===== --}}
+      <div class="modal-overlay" id="modalUploadLampiran">
+        <div class="modal-box" style="max-width:420px;">
+          <div class="modal-head">
+            <div><h3>Upload Lampiran</h3></div>
+            <button type="button" class="modal-close" onclick="tutupUploadLampiran()">&times;</button>
+          </div>
+          <div class="modal-body">
+            <form method="POST" id="formUploadLampiran" enctype="multipart/form-data" class="form-grid">
+              @csrf
+              <div class="form-field full">
+                <label for="ulInput">Pilih file (foto/PDF/dokumen)</label>
+                <input id="ulInput" name="lampiran[]" type="file" multiple required accept="image/*,.pdf,.doc,.docx">
+                <span class="form-hint">Bisa pilih beberapa file sekaligus. Maks. 20 MB per file.</span>
+              </div>
+              <div class="form-field full" style="display:flex;justify-content:flex-end;">
+                <button class="btn btn-primary" type="submit">Unggah</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <style>
+        .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:center;justify-content:center;padding:20px;}
+        .modal-overlay.open{display:flex;}
+        .modal-box{background:var(--panel,#0f1a14);border:1px solid var(--border-strong,#2a3a30);border-radius:12px;max-width:720px;width:100%;max-height:80vh;display:flex;flex-direction:column;}
+        .modal-head{display:flex;align-items:flex-start;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--border-soft,#22302a);}
+        .modal-head h3{margin:0;font-size:16px;}
+        .modal-close{background:none;border:none;color:var(--text-muted,#9fb0a8);font-size:22px;line-height:1;cursor:pointer;}
+        .modal-close:hover{color:var(--gold-bright,#f2c14e);}
+        .modal-body{padding:16px 20px 20px;overflow-y:auto;}
+        .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 20px;}
+        .detail-item{display:flex;flex-direction:column;gap:4px;}
+        .detail-item.full{grid-column:1 / -1;}
+        .detail-label{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-dim);}
+      </style>
+
+      <script>
+        const laporanMonitoringData = @json($laporanMonitoringData);
+
+        function bukaDetailLaporanMonitoring(id) {
+          const l = laporanMonitoringData[id];
+          if (!l) return;
+          document.getElementById('dlmPerihal').textContent = l.perihal;
+          document.getElementById('dlmAset').textContent = l.aset;
+          document.getElementById('dlmStatus').textContent = l.status;
+          document.getElementById('dlmPrioritas').textContent = l.prioritas;
+          document.getElementById('dlmJenis').textContent = l.jenis_insiden;
+          document.getElementById('dlmTanggal').textContent = l.tanggal;
+          document.getElementById('dlmDeskripsi').textContent = l.deskripsi;
+          document.getElementById('dlmTindakan').textContent = l.tindakan;
+
+          const catatanWrap = document.getElementById('dlmCatatanWrap');
+          if (l.catatan_danpus) {
+            document.getElementById('dlmCatatan').textContent = l.catatan_danpus;
+            catatanWrap.style.display = '';
+          } else {
+            catatanWrap.style.display = 'none';
+          }
+
+          const lampiranWrap = document.getElementById('dlmLampiran');
+          if (l.lampiran.length) {
+            lampiranWrap.innerHTML = l.lampiran.map(function (d) {
+              return '<a href="' + d.url + '" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">' + d.nama + '</a>';
+            }).join('');
+          } else {
+            lampiranWrap.innerHTML = '<span style="font-size:12.5px;color:var(--text-dim);">Belum ada lampiran</span>';
+          }
+
+          document.getElementById('modalDetailLaporanMonitoring').classList.add('open');
+        }
+
+        function tutupDetailLaporanMonitoring() {
+          document.getElementById('modalDetailLaporanMonitoring').classList.remove('open');
+        }
+
+        document.getElementById('modalDetailLaporanMonitoring').addEventListener('click', function (e) {
+          if (e.target === this) tutupDetailLaporanMonitoring();
+        });
+
+        function bukaUploadLampiran(id) {
+          document.getElementById('formUploadLampiran').action = '/laporan-monitoring/' + id + '/lampiran';
+          document.getElementById('modalUploadLampiran').classList.add('open');
+        }
+
+        function tutupUploadLampiran() {
+          document.getElementById('modalUploadLampiran').classList.remove('open');
+        }
+
+        document.getElementById('modalUploadLampiran').addEventListener('click', function (e) {
+          if (e.target === this) tutupUploadLampiran();
+        });
+      </script>
 
       {{-- ===== MONITORING SISTEM ===== --}}
       <section class="tab-panel" data-tab-panel="monitoring-sistem">

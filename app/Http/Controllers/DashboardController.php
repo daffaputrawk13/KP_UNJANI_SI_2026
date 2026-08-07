@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ActivityLog;
 use App\Models\Jabatan;
 use App\Models\Laporan;
+use App\Models\LaporanMonitoring;
 use App\Models\LaporanPublikasi;
 use App\Models\Pangkat;
 use App\Models\Pengaturan;
@@ -194,6 +195,14 @@ class DashboardController extends Controller
             ])
             ->toArray();
 
+        // Laporan Monitoring & Recovery yang masuk dari Satlakal (REAL, dari DB)
+        // — DANPUS bisa Setujui / Tolak / Minta Revisi lewat tab ini.
+        $laporanMonitoringMasuk = LaporanMonitoring::where('tujuan_satuan_id', $satuan->id)
+            ->where('status', 'Dikirim')
+            ->with('satuan')
+            ->latest('tanggal_kirim')
+            ->get();
+
         // Notifikasi laporan baru untuk DANPUS yang sedang login — ditampilkan
         // di lonceng notifikasi pada topbar.
         $notifikasi = $user->unreadNotifications;
@@ -240,6 +249,7 @@ class DashboardController extends Controller
                 ['satuan' => 'Satlak Penindakan', 'perihal' => 'Indikasi ransomware pada server unit', 'prioritas' => 'Tinggi', 'prioritas_class' => 'bad', 'tanggal' => '31 Jul 2026', 'status' => 'Disetujui', 'status_class' => 'green'],
             ],
             'laporanMasuk' => $laporanMasukFinal,
+            'laporanMonitoringMasuk' => $laporanMonitoringMasuk,
             'statusDistribusi' => $statusDistribusi,
             'laporanPerPrioritas' => $laporanPerPrioritas,
             'laporanPerSatuanChart' => $laporanPerSatuanChart,
@@ -349,10 +359,59 @@ class DashboardController extends Controller
             ],
         ];
 
+        // ===== Laporan Monitoring & Recovery ke DANPUS (REAL, dari DB) =====
+        // Fitur inti Satlakal: Buat Laporan, Draft, Riwayat, Status, Upload
+        // Lampiran, dan Detail Laporan (semua berbasis tabel ini).
+        $semuaLaporanMonitoring = LaporanMonitoring::where('satuan_id', $satuan->id)
+            ->with('lampiran', 'tujuanSatuan')
+            ->orderByDesc('created_at')
+            ->get();
+
+        $draftLaporanMonitoring = $semuaLaporanMonitoring->whereIn('status', ['Draft', 'Direvisi'])->values();
+        $statusLaporanMonitoring = $semuaLaporanMonitoring->where('status', '!=', 'Draft')->values();
+
+        // Dibangun di sini (bukan langsung di dalam @json() pada Blade) karena
+        // Blade meng-explode isi @json(...) berdasarkan koma untuk mencari
+        // parameter options/depth. Array kompleks dengan banyak koma di dalam
+        // @json() akan membuat hasil kompilasinya rusak (ParseError).
+        $laporanMonitoringData = $semuaLaporanMonitoring->keyBy('id')->map(function ($l) {
+            return [
+                'aset' => $l->aset ?? '—',
+                'jenis_insiden' => $l->jenis_insiden ?? '—',
+                'perihal' => $l->perihal,
+                'status' => $l->status,
+                'prioritas' => $l->prioritas,
+                'tanggal' => $l->tanggal_kirim?->translatedFormat('d M Y H:i') ?? '—',
+                'deskripsi' => $l->deskripsi,
+                'tindakan' => $l->tindakan ?? '—',
+                'catatan_danpus' => $l->catatan_danpus,
+                'lampiran' => $l->lampiran->map(fn ($d) => [
+                    'nama' => $d->nama_file,
+                    'url' => asset('storage/'.$d->path),
+                ]),
+            ];
+        });
+
+        // Notifikasi status laporan (Disetujui/Ditolak/Direvisi) untuk user
+        // Satlakal yang sedang login — ditampilkan di lonceng notifikasi topbar.
+        $notifikasi = $user->unreadNotifications;
+
         return view('siberad.dashboards.satlakal', [
             'user' => $user,
             'satuan' => $satuan,
+            'notifikasi' => $notifikasi,
             'asetMonitoring' => $asetMonitoring,
+
+            'semuaLaporanMonitoring' => $semuaLaporanMonitoring,
+            'draftLaporanMonitoring' => $draftLaporanMonitoring,
+            'statusLaporanMonitoring' => $statusLaporanMonitoring,
+            'laporanMonitoringData' => $laporanMonitoringData,
+            'statsLaporanMonitoring' => [
+                'total' => $semuaLaporanMonitoring->count(),
+                'draft' => $semuaLaporanMonitoring->where('status', 'Draft')->count(),
+                'dikirim' => $semuaLaporanMonitoring->where('status', 'Dikirim')->count(),
+                'disetujui' => $semuaLaporanMonitoring->where('status', 'Disetujui')->count(),
+            ],
             'stats' => [
                 'total_aset' => count($asetMonitoring),
                 'normal' => 3,
