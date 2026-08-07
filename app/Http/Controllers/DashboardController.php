@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ActivityLog;
 use App\Models\Jabatan;
 use App\Models\Laporan;
+use App\Models\LaporanPublikasi;
 use App\Models\Pangkat;
 use App\Models\Pengaturan;
 use App\Models\Personel;
@@ -409,75 +410,32 @@ class DashboardController extends Controller
      */
     private function satlakSibersos($user, $satuan): View
     {
-        $akunMonitoring = [
-            ['nama' => '@infokodim0612', 'platform' => 'Instagram', 'wilayah' => 'Kodim 0612/Bandung', 'status' => 'Normal', 'status_class' => 'ok', 'terakhir' => '10 menit lalu'],
-            ['nama' => 'Forum Warga Jabar', 'platform' => 'Facebook', 'wilayah' => 'Jawa Barat', 'status' => 'Terpantau Isu', 'status_class' => 'warn', 'terakhir' => '18 menit lalu'],
-            ['nama' => '@tnad_update', 'platform' => 'X (Twitter)', 'wilayah' => 'Nasional', 'status' => 'Normal', 'status_class' => 'ok', 'terakhir' => '30 menit lalu'],
-            ['nama' => 'Kanal Info Karawang', 'platform' => 'TikTok', 'wilayah' => 'Karawang', 'status' => 'Normal', 'status_class' => 'ok', 'terakhir' => '1 jam lalu'],
-        ];
-
-        // ===== Data manajemen akun & posting media sosial (REAL, dari DB) =====
-        // Berbeda dari $akunMonitoring di atas (akun pihak luar yang dipantau
-        // untuk isu/hoaks), ini akun RESMI milik Satlak Sibersos sendiri yang
-        // dipakai untuk publikasi konten.
-        $akunMedsosList = $satuan->akunMedsos()->orderBy('nama_akun')->get();
-
-        $semuaPosting = $satuan->postingan()
-            ->with('akunMedsos', 'user')
+        // ===== Laporan Publikasi ke DANPUS (REAL, dari DB) =====
+        // Satu-satunya fitur inti Satlak Sibersos sekarang: Dashboard, Buat
+        // Laporan Publikasi, Draft Laporan, Status Laporan, Riwayat Laporan,
+        // Upload Dokumentasi, dan Detail Laporan (semua berbasis tabel ini).
+        $semuaLaporanPublikasi = LaporanPublikasi::where('satuan_id', $satuan->id)
+            ->with('dokumentasi', 'tujuanSatuan')
             ->orderByDesc('created_at')
             ->get();
 
-        $postinganDraftJadwal = $semuaPosting->whereIn('status', ['Draft', 'Terjadwal']);
-        $postinganTerbit = $semuaPosting->where('status', 'Terbit');
-
-        // Kalender konten: kelompokkan postingan terjadwal & yang sudah
-        // terbit per tanggal (format Y-m-d) supaya mudah dirender per hari.
-        $kalenderKonten = $semuaPosting
-            ->whereIn('status', ['Terjadwal', 'Terbit'])
-            ->groupBy(function ($p) {
-                return ($p->status === 'Terjadwal' ? $p->scheduled_at : $p->published_at)?->format('Y-m-d');
-            })
-            ->sortKeys();
-
-        $totalEngagement = $postinganTerbit->sum(fn ($p) => $p->likes + $p->komentar + $p->share);
-        $postinganTerbaik = $postinganTerbit->sortByDesc(fn ($p) => $p->likes + $p->komentar + $p->share)->first();
+        $draftLaporanPublikasi = $semuaLaporanPublikasi->where('status', 'Draft')->values();
+        $statusLaporanPublikasi = $semuaLaporanPublikasi->where('status', '!=', 'Draft')->values();
 
         return view('siberad.dashboards.satlaksibersos', [
             'user' => $user,
             'satuan' => $satuan,
-            'akunMonitoring' => $akunMonitoring,
+
             'stats' => [
-                'akun_dipantau' => count($akunMonitoring),
-                'isu_aktif' => 1,
-                'wilayah' => 6,
-                'laporan_bulan_ini' => 9,
-            ],
-            'isuTerbaru' => [
-                ['platform' => 'Facebook', 'wilayah' => 'Jawa Barat', 'ringkasan' => 'Hoaks rekrutmen mengatasnamakan TNI AD', 'waktu' => '18 menit lalu', 'status' => 'Ditindaklanjuti', 'status_class' => 'warn'],
-                ['platform' => 'X (Twitter)', 'wilayah' => 'Nasional', 'ringkasan' => 'Narasi provokasi soal latihan gabungan', 'waktu' => '2 jam lalu', 'status' => 'Selesai', 'status_class' => 'ok'],
-            ],
-            'riwayatIsu' => [
-                ['platform' => 'Facebook', 'wilayah' => 'Jawa Barat', 'ringkasan' => 'Hoaks rekrutmen mengatasnamakan TNI AD', 'prioritas' => 'Sedang', 'prioritas_class' => 'warn', 'status' => 'Ditindaklanjuti', 'status_class' => 'amber'],
-                ['platform' => 'X (Twitter)', 'wilayah' => 'Nasional', 'ringkasan' => 'Narasi provokasi soal latihan gabungan', 'prioritas' => 'Rendah', 'prioritas_class' => 'ok', 'status' => 'Selesai', 'status_class' => 'green'],
-                ['platform' => 'Instagram', 'wilayah' => 'Kodim 0612/Bandung', 'ringkasan' => 'Akun tiruan mengatasnamakan satuan', 'prioritas' => 'Tinggi', 'prioritas_class' => 'bad', 'status' => 'Selesai', 'status_class' => 'green'],
-            ],
-            'laporanPiket' => [
-                ['platform' => 'Facebook', 'wilayah' => 'Jawa Barat', 'ringkasan' => 'Hoaks rekrutmen mengatasnamakan TNI AD', 'pelapor' => 'Piket Satlak Sibersos', 'prioritas' => 'Sedang', 'prioritas_class' => 'warn'],
+                'total_laporan' => $semuaLaporanPublikasi->count(),
+                'draft' => $draftLaporanPublikasi->count(),
+                'menunggu' => $semuaLaporanPublikasi->where('status', 'Menunggu')->count(),
+                'disetujui' => $semuaLaporanPublikasi->where('status', 'Disetujui DANPUS')->count(),
             ],
 
-            // ---- Data baru: manajemen konten media sosial ----
-            'akunMedsosList' => $akunMedsosList,
-            'postinganDraftJadwal' => $postinganDraftJadwal,
-            'postinganTerbit' => $postinganTerbit,
-            'kalenderKonten' => $kalenderKonten,
-            'statsMedsos' => [
-                'total_akun' => $akunMedsosList->count(),
-                'total_posting' => $semuaPosting->count(),
-                'terjadwal' => $semuaPosting->where('status', 'Terjadwal')->count(),
-                'sudah_terbit' => $postinganTerbit->count(),
-                'total_engagement' => $totalEngagement,
-                'postingan_terbaik' => $postinganTerbaik,
-            ],
+            'semuaLaporanPublikasi' => $semuaLaporanPublikasi,
+            'draftLaporanPublikasi' => $draftLaporanPublikasi,
+            'statusLaporanPublikasi' => $statusLaporanPublikasi,
         ]);
     }
 

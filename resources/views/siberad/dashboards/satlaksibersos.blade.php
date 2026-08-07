@@ -107,29 +107,14 @@
       <div class="side-dropdown" id="laporanDropdown">
         <button type="button" class="side-link side-dropdown-toggle" id="laporanToggle" aria-expanded="false" aria-controls="laporanSubmenu">
           <span class="dot"></span>
-          <span class="side-link-label">Laporan</span>
+          <span class="side-link-label">Laporan Publikasi</span>
           <svg class="side-dropdown-arrow" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg>
         </button>
         <div class="side-dropdown-menu" id="laporanSubmenu">
-          <a href="#" class="side-link side-sublink" data-tab-link="tambah-laporan">Tambah Laporan</a>
-          <a href="#" class="side-link side-sublink" data-tab-link="status-laporan">Status Laporan</a>
-          <a href="#" class="side-link side-sublink" data-tab-link="riwayat-laporan">Riwayat Laporan</a>
-        </div>
-      </div>
-
-      <div class="side-dropdown" id="medsosDropdown">
-        <button type="button" class="side-link side-dropdown-toggle" id="medsosToggle" aria-expanded="false" aria-controls="medsosSubmenu">
-          <span class="dot"></span>
-          <span class="side-link-label">Media Sosial</span>
-          <svg class="side-dropdown-arrow" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg>
-        </button>
-        <div class="side-dropdown-menu" id="medsosSubmenu">
-          <a href="#" class="side-link side-sublink" data-tab-link="akun-medsos">Manajemen Akun</a>
-          <a href="#" class="side-link side-sublink" data-tab-link="buat-posting">Buat &amp; Jadwalkan Posting</a>
-          <a href="#" class="side-link side-sublink" data-tab-link="kalender-konten">Kalender Konten</a>
-          <a href="#" class="side-link side-sublink" data-tab-link="monitoring-engagement">Monitoring Engagement</a>
-          <a href="#" class="side-link side-sublink" data-tab-link="statistik-performa">Statistik Performa</a>
-          <a href="#" class="side-link side-sublink" data-tab-link="arsip-posting">Arsip Posting</a>
+          <a href="#" class="side-link side-sublink" data-tab-link="buat-laporan-publikasi">Buat Laporan Publikasi</a>
+          <a href="#" class="side-link side-sublink" data-tab-link="draft-laporan-publikasi">Draft Laporan</a>
+          <a href="#" class="side-link side-sublink" data-tab-link="status-laporan-publikasi">Status Laporan</a>
+          <a href="#" class="side-link side-sublink" data-tab-link="riwayat-laporan-publikasi">Riwayat Laporan</a>
         </div>
       </div>
     </nav>
@@ -246,428 +231,146 @@
       {{-- ===== RINGKASAN ===== --}}
       <section class="tab-panel active" data-tab-panel="dashboard">
         <div class="section-head">
-          <h2>Ringkasan Pemantauan Medsos</h2>
-          <p>Kondisi pemantauan media sosial daerah hari ini.</p>
+          <h2>Ringkasan Laporan Publikasi</h2>
+          <p>Rekap laporan publikasi Satlak Sibersos ke DANPUS.</p>
         </div>
         <div class="stat-grid">
           <div class="stat-card">
-            <div class="lbl">Akun Dipantau</div>
-            <div class="val">{{ $stats['akun_dipantau'] }}</div>
-            <div class="sub">Seluruh platform</div>
+            <div class="lbl">Total Laporan</div>
+            <div class="val">{{ $stats['total_laporan'] }}</div>
+            <div class="sub">Draft &amp; terkirim</div>
           </div>
           <div class="stat-card">
-            <div class="lbl">Isu Aktif</div>
-            <div class="val" style="color:var(--red);">{{ $stats['isu_aktif'] }}</div>
-            <div class="sub">Perlu ditindaklanjuti</div>
+            <div class="lbl">Draft</div>
+            <div class="val" style="color:var(--text-muted);">{{ $stats['draft'] }}</div>
+            <div class="sub">Belum dikirim ke DANPUS</div>
           </div>
           <div class="stat-card">
-            <div class="lbl">Wilayah Terpantau</div>
-            <div class="val" style="color:var(--green-bright);">{{ $stats['wilayah'] }}</div>
-            <div class="sub">Cakupan daerah</div>
+            <div class="lbl">Menunggu Verifikasi</div>
+            <div class="val" style="color:var(--amber);">{{ $stats['menunggu'] }}</div>
+            <div class="sub">Sudah dikirim, belum diputuskan</div>
           </div>
           <div class="stat-card">
-            <div class="lbl">Laporan Bulan Ini</div>
-            <div class="val">{{ $stats['laporan_bulan_ini'] }}</div>
-            <div class="sub">Sudah tercatat bulan ini</div>
+            <div class="lbl">Disetujui DANPUS</div>
+            <div class="val" style="color:var(--green-bright);">{{ $stats['disetujui'] }}</div>
+            <div class="sub">Laporan yang sudah disetujui</div>
           </div>
-        </div>
-
-
-        <div class="panel chart-box">
-          <div class="chart-box-head-row">
-            <div><h3 style="font-family:var(--display);font-size:17px;font-weight:700;">Analitik Pemantauan Media Sosial</h3><p style="font-size:12px;color:var(--text-muted);margin-top:2px;">Sebaran akun yang dipantau per platform, status akun, dan tingkat prioritas isu.</p></div>
-            <div class="chart-filter-group">
-              <select class="chart-type-select" id="chartDateFilterGlobal">
-                <option value="7d">7 Hari Terakhir</option>
-                <option value="30d">30 Hari Terakhir</option>
-                <option value="90d">3 Bulan Terakhir</option>
-                <option value="all" selected>Semua Waktu</option>
-              </select>
-              <select class="chart-type-select" id="chartTypeFilterGlobal">
-                <option value="bar" selected>Grafik Batang</option>
-                <option value="line">Grafik Garis</option>
-                <option value="radar">Grafik Radar</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="chart-box-grid" id="chartBoxGrid">
-
-            <div class="chart-mini">
-              <div class="chart-mini-head">
-                <h4>Akun per Platform</h4><p>Instagram, Facebook, X, TikTok, dsb.</p>
-              </div>
-              <div class="chart-wrap"><canvas id="chartAkunPlatform"></canvas></div>
-            </div>
-
-            <div class="chart-mini">
-              <div class="chart-mini-head">
-                <h4>Status Akun Dipantau</h4><p>Normal vs Terpantau Isu.</p>
-              </div>
-              <div class="chart-wrap"><canvas id="chartStatusAkun"></canvas></div>
-            </div>
-
-            <div class="chart-mini">
-              <div class="chart-mini-head">
-                <h4>Isu per Prioritas</h4><p>Tingkat urgensi isu yang tercatat.</p>
-              </div>
-              <div class="chart-wrap"><canvas id="chartIsuPrioritas"></canvas></div>
-            </div>
-          </div>
-          <p class="chart-legend-note">Merah = prioritas tinggi (perlu ditindaklanjuti segera). Ganti jenis grafik lewat dropdown di kanan atas — pilihan selain "Batang" akan otomatis memisah tiap grafik menjadi tampilan yang lebih besar. Filter tanggal masih simulasi proporsional karena histori isu per tanggal belum tersambung ke database.</p>
         </div>
 
         <div class="panel">
-          <div class="panel-head"><div><h3>Isu Terbaru</h3><p>Isu atau konten mencurigakan yang baru terdeteksi.</p></div></div>
+          <div class="panel-head"><div><h3>Laporan Publikasi Terbaru</h3><p>5 laporan publikasi terakhir yang dibuat.</p></div></div>
           <div class="tbl-wrap">
             <table class="dtbl">
-              <thead><tr><th>Platform</th><th>Wilayah</th><th>Ringkasan Isu</th><th>Terdeteksi</th><th>Status</th></tr></thead>
+              <thead><tr><th>Judul</th><th>Platform</th><th>Dibuat</th><th>Status</th></tr></thead>
               <tbody>
-                @foreach($isuTerbaru as $i)
+                @forelse($semuaLaporanPublikasi->take(5) as $l)
                 <tr>
-                  <td>{{ $i['platform'] }}</td>
-                  <td>{{ $i['wilayah'] }}</td>
-                  <td>{{ $i['ringkasan'] }}</td>
-                  <td>{{ $i['waktu'] }}</td>
-                  <td><span class="status-dot {{ $i['status_class'] }}">{{ $i['status'] }}</span></td>
+                  <td>{{ $l->judul }}</td>
+                  <td>{{ $l->platform ?? '—' }}</td>
+                  <td>{{ $l->created_at->translatedFormat('d M Y') }}</td>
+                  <td>
+                    <span class="badge {{ match($l->status) {
+                      'Disetujui DANPUS' => 'green',
+                      'Ditolak DANPUS' => 'red',
+                      default => 'amber',
+                    } }}">{{ $l->status }}</span>
+                  </td>
                 </tr>
-                @endforeach
+                @empty
+                <tr><td colspan="4" style="text-align:center;color:var(--text-muted);">Belum ada laporan publikasi.</td></tr>
+                @endforelse
               </tbody>
             </table>
           </div>
         </div>
       </section>
 
-      {{-- ===== MONITORING MEDSOS ===== --}}
-      <section class="tab-panel" data-tab-panel="monitoring">
+      {{-- ===== LAPORAN PUBLIKASI › BUAT LAPORAN PUBLIKASI ===== --}}
+      <section class="tab-panel" data-tab-panel="buat-laporan-publikasi">
         <div class="section-head">
-          <h2>Monitoring Akun Media Sosial</h2>
-          <p>Daftar akun/kanal media sosial daerah yang dipantau.</p>
+          <h2>Buat Laporan Publikasi</h2>
+          <p>Laporkan kegiatan publikasi/konten media sosial ke DANPUS. Bisa disimpan sebagai draft dulu atau langsung dikirim.</p>
         </div>
         <div class="panel">
-          <div class="tbl-wrap">
-            <table class="dtbl">
-              <thead><tr><th>Nama Akun</th><th>Platform</th><th>Wilayah</th><th>Status</th><th>Pantauan Terakhir</th></tr></thead>
-              <tbody>
-                @foreach($akunMonitoring as $a)
-                <tr>
-                  <td>{{ $a['nama'] }}</td>
-                  <td>{{ $a['platform'] }}</td>
-                  <td>{{ $a['wilayah'] }}</td>
-                  <td><span class="status-dot {{ $a['status_class'] }}">{{ $a['status'] }}</span></td>
-                  <td>{{ $a['terakhir'] }}</td>
-                </tr>
-                @endforeach
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      {{-- ===== ISU TERDETEKSI ===== --}}
-      <section class="tab-panel" data-tab-panel="isu">
-        <div class="section-head">
-          <h2>Isu Terdeteksi</h2>
-          <p>Riwayat isu, hoaks, atau konten negatif yang terpantau di media sosial daerah.</p>
-        </div>
-        <div class="panel">
-          <div class="tbl-wrap">
-            <table class="dtbl">
-              <thead><tr><th>Platform</th><th>Wilayah</th><th>Ringkasan Isu</th><th>Prioritas</th><th>Status Penanganan</th></tr></thead>
-              <tbody>
-                @foreach($riwayatIsu as $r)
-                <tr>
-                  <td>{{ $r['platform'] }}</td>
-                  <td>{{ $r['wilayah'] }}</td>
-                  <td>{{ $r['ringkasan'] }}</td>
-                  <td><span class="status-dot {{ $r['prioritas_class'] }}">{{ $r['prioritas'] }}</span></td>
-                  <td><span class="badge {{ $r['status_class'] }}">{{ $r['status'] }}</span></td>
-                </tr>
-                @endforeach
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      {{-- ===== LAPORAN › TAMBAH LAPORAN ===== --}}
-      <section class="tab-panel" data-tab-panel="tambah-laporan">
-        <div class="section-head">
-          <h2>Tambah Laporan</h2>
-          <p>Catat isu, hoaks, atau konten negatif baru yang terpantau di media sosial daerah.</p>
-        </div>
-        <div class="panel">
-          <form class="form-grid" id="formTambahLaporan" style="padding:22px;" novalidate>
-            <div class="form-field">
-              <label for="akunTambahLaporan">Akun / Platform Terdampak</label>
-              <select id="akunTambahLaporan" required>
-                @foreach($akunMonitoring as $a)
-                  <option>{{ $a['nama'] }}</option>
-                @endforeach
-              </select>
-            </div>
-            <div class="form-field">
-              <label for="prioritasTambahLaporan">Prioritas</label>
-              <select id="prioritasTambahLaporan" required>
-                <option>Tinggi</option><option>Sedang</option><option>Rendah</option>
-              </select>
-            </div>
-            <div class="form-field full">
-              <label for="perihalTambahLaporan">Perihal</label>
-              <input id="perihalTambahLaporan" type="text" placeholder="Contoh: Hoaks rekrutmen mengatasnamakan TNI AD" required>
-            </div>
-            <div class="form-field full">
-              <label for="deskripsiTambahLaporan">Deskripsi Kejadian</label>
-              <textarea id="deskripsiTambahLaporan" rows="4" placeholder="Jelaskan kronologi dan dampak isu..." required></textarea>
-            </div>
-            <div class="form-field full">
-              <label for="lampiranTambahLaporan">Lampiran (tangkapan layar / dokumentasi)</label>
-              <input id="lampiranTambahLaporan" type="file" accept="application/pdf,.pdf">
-              <span class="form-hint">Format PDF, maksimal 20 MB.</span>
-            </div>
-            <div class="form-field full">
-              <button class="btn btn-primary" type="button" onclick="alert('Prototype — form Tambah Laporan belum tersambung ke database.')">Simpan Laporan</button>
-            </div>
-          </form>
-        </div>
-      </section>
-
-      {{-- ===== LAPORAN › STATUS LAPORAN ===== --}}
-      <section class="tab-panel" data-tab-panel="status-laporan">
-        <div class="section-head">
-          <h2>Status Laporan</h2>
-          <p>Pantau progres laporan yang sudah diajukan oleh Satlak Sibersos.</p>
-        </div>
-        <div class="panel">
-          <div class="tbl-wrap">
-            <table class="dtbl">
-              <thead><tr><th>Platform</th><th>Wilayah</th><th>Perihal</th><th>Tanggal</th><th>Status</th></tr></thead>
-              <tbody>
-                <tr>
-                  <td>Facebook</td>
-                  <td>Jawa Barat</td>
-                  <td>Hoaks rekrutmen mengatasnamakan TNI AD</td>
-                  <td>02 Agu 2026</td>
-                  <td><span class="status-dot amber">Menunggu Verifikasi</span></td>
-                </tr>
-                <tr>
-                  <td>X (Twitter)</td>
-                  <td>Nasional</td>
-                  <td>Narasi provokasi soal latihan gabungan</td>
-                  <td>01 Agu 2026</td>
-                  <td><span class="status-dot warn">Diteruskan ke DANPUS</span></td>
-                </tr>
-                <tr>
-                  <td>Instagram</td>
-                  <td>Kodim 0612/Bandung</td>
-                  <td>Akun tiruan mengatasnamakan satuan</td>
-                  <td>28 Jul 2026</td>
-                  <td><span class="status-dot green">Disetujui DANPUS</span></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      {{-- ===== LAPORAN › RIWAYAT LAPORAN ===== --}}
-      <section class="tab-panel" data-tab-panel="riwayat-laporan">
-        <div class="section-head">
-          <h2>Riwayat Laporan</h2>
-          <p>Log lengkap isu dan tindak lanjut yang pernah ditangani Satlak Sibersos.</p>
-        </div>
-        <div class="panel">
-          <div class="tbl-wrap">
-            <table class="dtbl">
-              <thead><tr><th>Platform</th><th>Wilayah</th><th>Ringkasan Isu</th><th>Prioritas</th><th>Status</th></tr></thead>
-              <tbody>
-                @foreach($riwayatIsu as $r)
-                <tr>
-                  <td>{{ $r['platform'] }}</td>
-                  <td>{{ $r['wilayah'] }}</td>
-                  <td>{{ $r['ringkasan'] }}</td>
-                  <td><span class="status-dot {{ $r['prioritas_class'] }}">{{ $r['prioritas'] }}</span></td>
-                  <td><span class="badge {{ $r['status_class'] }}">{{ $r['status'] }}</span></td>
-                </tr>
-                @endforeach
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      {{-- ===== MEDIA SOSIAL › MANAJEMEN AKUN ===== --}}
-      <section class="tab-panel" data-tab-panel="akun-medsos">
-        <div class="section-head">
-          <h2>Manajemen Akun Media Sosial</h2>
-          <p>Kelola akun media sosial resmi yang dipegang langsung oleh Satlak Sibersos.</p>
-        </div>
-
-        @if (session('status'))
-          <div class="notice">{{ session('status') }}</div>
-        @endif
-
-        <div class="panel">
-          <div class="panel-head"><div><h3>Tambah Akun Baru</h3><p>Daftarkan akun media sosial resmi satuan.</p></div></div>
-          <form class="form-grid" method="POST" action="{{ route('akun-medsos.store') }}" enctype="multipart/form-data">
+          @if(session('status'))
+          <div class="profile-form-notice" style="margin:22px 22px 0;border-color:var(--green);color:var(--green);">{{ session('status') }}</div>
+          @endif
+          @if($errors->any())
+          <div class="profile-form-notice" style="margin:22px 22px 0;border-color:var(--red);color:var(--red);">{{ $errors->first() }}</div>
+          @endif
+          <form class="form-grid" method="POST" action="{{ route('laporan-publikasi.store') }}" enctype="multipart/form-data" style="padding:22px;">
             @csrf
             <div class="form-field">
-              <label for="namaAkunBaru">Nama Akun</label>
-              <input id="namaAkunBaru" name="nama_akun" type="text" placeholder="Contoh: Instagram Resmi Satlak Sibersos" required>
+              <label for="judulLaporanPublikasi">Judul / Perihal Publikasi</label>
+              <input id="judulLaporanPublikasi" name="judul" type="text" placeholder="Contoh: Publikasi kegiatan bakti sosial Kodim 0612" required>
             </div>
             <div class="form-field">
-              <label for="platformAkunBaru">Platform</label>
-              <select id="platformAkunBaru" name="platform" required>
+              <label for="platformLaporanPublikasi">Platform</label>
+              <select id="platformLaporanPublikasi" name="platform">
+                <option value="">— Pilih platform —</option>
                 <option value="Instagram">Instagram</option>
                 <option value="Facebook">Facebook</option>
                 <option value="X (Twitter)">X (Twitter)</option>
                 <option value="TikTok">TikTok</option>
                 <option value="YouTube">YouTube</option>
+                <option value="Lainnya">Lainnya</option>
               </select>
             </div>
-            <div class="form-field">
-              <label for="usernameAkunBaru">Username / Handle</label>
-              <input id="usernameAkunBaru" name="username_platform" type="text" placeholder="@satlaksibersos" required>
-            </div>
-            <div class="form-field">
-              <label for="urlAkunBaru">URL Profil (opsional)</label>
-              <input id="urlAkunBaru" name="url_profil" type="url" placeholder="https://instagram.com/satlaksibersos">
+            <div class="form-field full">
+              <label for="linkLaporanPublikasi">Link Publikasi (opsional)</label>
+              <input id="linkLaporanPublikasi" name="link_publikasi" type="text" placeholder="https://...">
             </div>
             <div class="form-field full">
-              <label for="fotoAkunBaru">Foto Profil (opsional)</label>
-              <input id="fotoAkunBaru" name="foto_profil" type="file" accept="image/png,image/jpeg,image/webp">
-              <span class="form-hint">Format gambar, maksimal 5 MB.</span>
+              <label for="deskripsiLaporanPublikasi">Deskripsi</label>
+              <textarea id="deskripsiLaporanPublikasi" name="deskripsi" rows="4" placeholder="Jelaskan isi publikasi, konteks, dan tujuannya..." required></textarea>
             </div>
             <div class="form-field full">
-              <button class="btn btn-primary" type="submit">Simpan Akun</button>
+              <label for="dokumentasiLaporanPublikasi">Upload Dokumentasi (foto/video/PDF)</label>
+              <input id="dokumentasiLaporanPublikasi" name="dokumentasi[]" type="file" multiple accept="image/*,video/mp4,video/quicktime,application/pdf">
+              <span class="form-hint">Bisa pilih beberapa file sekaligus. Maks. 20 MB per file.</span>
+            </div>
+            <div class="form-field full" style="display:flex;gap:12px;flex-wrap:wrap;">
+              <button class="btn btn-ghost" type="submit" name="aksi" value="draft">Simpan sebagai Draft</button>
+              <button class="btn btn-primary" type="submit" name="aksi" value="kirim">Kirim ke DANPUS</button>
             </div>
           </form>
-        </div>
-
-        <div class="panel">
-          <div class="panel-head"><div><h3>Daftar Akun Terdaftar</h3><p>Seluruh akun resmi yang dikelola satuan ini.</p></div></div>
-          <div class="tbl-wrap">
-            <table class="dtbl">
-              <thead><tr><th>Nama Akun</th><th>Platform</th><th>Username</th><th>Status</th><th>Aksi</th></tr></thead>
-              <tbody>
-                @forelse($akunMedsosList as $a)
-                <tr>
-                  <td>{{ $a->nama_akun }}</td>
-                  <td>{{ $a->platform }}</td>
-                  <td>{{ $a->username_platform }}</td>
-                  <td><span class="status-dot {{ $a->status === 'Aktif' ? 'ok' : 'warn' }}">{{ $a->status }}</span></td>
-                  <td>
-                    <div class="btn-row">
-                      <form method="POST" action="{{ route('akun-medsos.update', $a) }}">
-                        @csrf @method('PATCH')
-                        <input type="hidden" name="status" value="{{ $a->status === 'Aktif' ? 'Nonaktif' : 'Aktif' }}">
-                        <button class="btn btn-sm" type="submit">{{ $a->status === 'Aktif' ? 'Nonaktifkan' : 'Aktifkan' }}</button>
-                      </form>
-                      <form method="POST" action="{{ route('akun-medsos.destroy', $a) }}" onsubmit="return confirm('Hapus akun ini beserta seluruh postingannya?');">
-                        @csrf @method('DELETE')
-                        <button class="btn btn-sm btn-ghost-red" type="submit">Hapus</button>
-                      </form>
-                    </div>
-                  </td>
-                </tr>
-                @empty
-                <tr><td colspan="5" style="color:var(--text-dim);text-align:center;padding:24px;">Belum ada akun media sosial terdaftar.</td></tr>
-                @endforelse
-              </tbody>
-            </table>
-          </div>
         </div>
       </section>
 
-      {{-- ===== MEDIA SOSIAL › BUAT & JADWALKAN POSTING ===== --}}
-      <section class="tab-panel" data-tab-panel="buat-posting">
+      {{-- ===== LAPORAN PUBLIKASI › DRAFT LAPORAN ===== --}}
+      <section class="tab-panel" data-tab-panel="draft-laporan-publikasi">
         <div class="section-head">
-          <h2>Buat &amp; Jadwalkan Posting</h2>
-          <p>Buat konten baru — simpan sebagai draft, jadwalkan tayang, atau terbitkan langsung.</p>
+          <h2>Draft Laporan</h2>
+          <p>Laporan publikasi yang belum dikirim ke DANPUS. Bisa diedit, ditambah dokumentasi, atau dikirim kapan saja.</p>
         </div>
-
-        @if (session('status'))
-          <div class="notice">{{ session('status') }}</div>
-        @endif
-
         <div class="panel">
-          @if ($akunMedsosList->isEmpty())
-            <p style="color:var(--text-muted);font-size:13px;">Tambahkan akun media sosial terlebih dahulu di menu <b>Manajemen Akun</b> sebelum membuat postingan.</p>
-          @else
-          <form class="form-grid" method="POST" action="{{ route('posting.store') }}" enctype="multipart/form-data">
-            @csrf
-            <div class="form-field">
-              <label for="akunPosting">Akun Tujuan</label>
-              <select id="akunPosting" name="akun_medsos_id" required>
-                @foreach($akunMedsosList as $a)
-                  <option value="{{ $a->id }}">{{ $a->nama_akun }} ({{ $a->platform }})</option>
-                @endforeach
-              </select>
-            </div>
-            <div class="form-field">
-              <label for="jenisPosting">Jenis Konten</label>
-              <select id="jenisPosting" name="jenis_konten" required>
-                <option value="Feed">Feed / Foto</option>
-                <option value="Reels/Video">Reels / Video</option>
-                <option value="Story">Story</option>
-                <option value="Carousel">Carousel</option>
-              </select>
-            </div>
-            <div class="form-field full">
-              <label for="judulPosting">Judul Internal</label>
-              <input id="judulPosting" name="judul" type="text" placeholder="Contoh: Edukasi Anti-Hoaks Minggu Ini" required>
-            </div>
-            <div class="form-field full">
-              <label for="captionPosting">Caption</label>
-              <textarea id="captionPosting" name="caption" rows="4" placeholder="Tulis caption postingan di sini..." required></textarea>
-            </div>
-            <div class="form-field full">
-              <label for="mediaPosting">Upload Foto / Video</label>
-              <input id="mediaPosting" name="media" type="file" accept="image/png,image/jpeg,image/webp,video/mp4,video/quicktime">
-              <span class="form-hint">Foto (JPG/PNG/WEBP) atau video (MP4/MOV), maksimal 50 MB.</span>
-            </div>
-            <div class="form-field full">
-              <label for="jadwalPosting">Jadwalkan Tayang (opsional)</label>
-              <input id="jadwalPosting" name="scheduled_at" type="datetime-local">
-              <span class="form-hint">Isi kalau ingin dijadwalkan. Kosongkan kalau mau disimpan draft atau langsung diterbitkan.</span>
-            </div>
-            <div class="form-field full btn-row">
-              <button class="btn" type="submit" name="aksi" value="simpan_draft">Simpan Draft</button>
-              <button class="btn" type="submit" name="aksi" value="jadwalkan">Jadwalkan</button>
-              <button class="btn btn-primary" type="submit" name="aksi" value="terbitkan">Terbitkan Sekarang</button>
-            </div>
-          </form>
-          @endif
-        </div>
-
-        <div class="panel">
-          <div class="panel-head"><div><h3>Draft &amp; Terjadwal</h3><p>Postingan yang belum tayang.</p></div></div>
           <div class="tbl-wrap">
             <table class="dtbl">
-              <thead><tr><th>Judul</th><th>Akun</th><th>Jenis</th><th>Status</th><th>Jadwal Tayang</th><th>Aksi</th></tr></thead>
+              <thead><tr><th>Judul</th><th>Platform</th><th>Dokumentasi</th><th>Dibuat</th><th>Aksi</th></tr></thead>
               <tbody>
-                @forelse($postinganDraftJadwal as $p)
+                @forelse($draftLaporanPublikasi as $i => $d)
                 <tr>
-                  <td>{{ $p->judul }}</td>
-                  <td>{{ $p->akunMedsos->nama_akun ?? '-' }}</td>
-                  <td>{{ $p->jenis_konten }}</td>
-                  <td><span class="status-dot {{ $p->status === 'Terjadwal' ? 'warn' : 'ok' }}">{{ $p->status }}</span></td>
-                  <td>{{ $p->scheduled_at?->translatedFormat('d M Y, H:i') ?? '—' }}</td>
+                  <td>{{ $d->judul }}</td>
+                  <td>{{ $d->platform ?? '—' }}</td>
+                  <td>{{ $d->dokumentasi->count() }} file</td>
+                  <td>{{ $d->created_at->translatedFormat('d M Y') }}</td>
                   <td>
                     <div class="btn-row">
-                      <form method="POST" action="{{ route('posting.terbitkan', $p) }}">
+                      <button class="btn btn-ghost btn-sm" type="button" onclick="bukaDetailLaporanPublikasi({{ $d->id }})">Detail</button>
+                      <button class="btn btn-ghost btn-sm" type="button" onclick="bukaUploadDokumentasi({{ $d->id }})">+ Dokumentasi</button>
+                      <form method="POST" action="{{ route('laporan-publikasi.kirim', $d) }}" style="display:inline;">
                         @csrf
-                        <button class="btn btn-sm btn-primary" type="submit">Terbitkan</button>
+                        <button class="btn btn-primary btn-sm" type="submit">Kirim</button>
                       </form>
-                      <form method="POST" action="{{ route('posting.destroy', $p) }}" onsubmit="return confirm('Hapus postingan ini?');">
+                      <form method="POST" action="{{ route('laporan-publikasi.destroy', $d) }}" style="display:inline;" onsubmit="return confirm('Hapus draft ini?');">
                         @csrf @method('DELETE')
-                        <button class="btn btn-sm btn-ghost-red" type="submit">Hapus</button>
+                        <button class="btn btn-ghost-red btn-sm" type="submit">Hapus</button>
                       </form>
                     </div>
                   </td>
                 </tr>
                 @empty
-                <tr><td colspan="6" style="color:var(--text-dim);text-align:center;padding:24px;">Belum ada draft atau postingan terjadwal.</td></tr>
+                <tr><td colspan="5" style="text-align:center;color:var(--text-muted);">Belum ada draft laporan publikasi.</td></tr>
                 @endforelse
               </tbody>
             </table>
@@ -675,161 +378,198 @@
         </div>
       </section>
 
-      {{-- ===== MEDIA SOSIAL › KALENDER KONTEN ===== --}}
-      <section class="tab-panel" data-tab-panel="kalender-konten">
+      {{-- ===== LAPORAN PUBLIKASI › STATUS LAPORAN ===== --}}
+      <section class="tab-panel" data-tab-panel="status-laporan-publikasi">
         <div class="section-head">
-          <h2>Kalender Konten</h2>
-          <p>Jadwal tayang seluruh konten, dikelompokkan per tanggal.</p>
-        </div>
-        <div class="panel">
-          @forelse($kalenderKonten as $tanggal => $daftar)
-            <div style="margin-bottom:22px;">
-              <div style="font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;color:var(--gold-bright);text-transform:uppercase;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border-soft);">
-                {{ \Illuminate\Support\Carbon::parse($tanggal)->translatedFormat('l, d F Y') }}
-              </div>
-              <div style="display:flex;flex-direction:column;gap:8px;">
-                @foreach($daftar as $p)
-                  <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 14px;background:var(--panel-alt);border:1px solid var(--border-soft);border-radius:9px;flex-wrap:wrap;">
-                    <div>
-                      <div style="font-weight:600;font-size:13.5px;">{{ $p->judul }}</div>
-                      <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px;">{{ $p->akunMedsos->nama_akun ?? '-' }} · {{ $p->jenis_konten }}</div>
-                    </div>
-                    <span class="status-dot {{ $p->status === 'Terjadwal' ? 'warn' : 'ok' }}">
-                      {{ $p->status === 'Terjadwal' ? 'Terjadwal ' . $p->scheduled_at?->translatedFormat('H:i') : 'Terbit ' . $p->published_at?->translatedFormat('H:i') }}
-                    </span>
-                  </div>
-                @endforeach
-              </div>
-            </div>
-          @empty
-            <p style="color:var(--text-dim);text-align:center;padding:24px;">Belum ada konten terjadwal maupun terbit.</p>
-          @endforelse
-        </div>
-      </section>
-
-      {{-- ===== MEDIA SOSIAL › MONITORING ENGAGEMENT ===== --}}
-      <section class="tab-panel" data-tab-panel="monitoring-engagement">
-        <div class="section-head">
-          <h2>Monitoring Engagement</h2>
-          <p>Pantau dan perbarui angka like, komentar, dan share tiap postingan yang sudah tayang.</p>
+          <h2>Status Laporan</h2>
+          <p>Pantau progres laporan publikasi yang sudah dikirim ke DANPUS.</p>
         </div>
         <div class="panel">
           <div class="tbl-wrap">
             <table class="dtbl">
-              <thead><tr><th>Postingan</th><th>Akun</th><th>Tayang</th><th>Like</th><th>Komentar</th><th>Share</th><th>Dilihat</th><th>Aksi</th></tr></thead>
+              <thead><tr><th>Judul</th><th>Platform</th><th>Tanggal Kirim</th><th>Status</th><th>Detail</th></tr></thead>
               <tbody>
-                @forelse($postinganTerbit as $p)
+                @forelse($statusLaporanPublikasi as $s)
                 <tr>
-                  <td>{{ $p->judul }}</td>
-                  <td>{{ $p->akunMedsos->nama_akun ?? '-' }}</td>
-                  <td>{{ $p->published_at?->translatedFormat('d M Y') }}</td>
-                  <td colspan="4">
-                    <form method="POST" action="{{ route('posting.engagement', $p) }}" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-                      @csrf @method('PATCH')
-                      <input type="number" name="likes" value="{{ $p->likes }}" min="0" style="width:80px;border:1px solid var(--border);border-radius:6px;padding:6px 8px;background:var(--bg-deep);color:var(--text);font-size:12.5px;">
-                      <input type="number" name="komentar" value="{{ $p->komentar }}" min="0" style="width:80px;border:1px solid var(--border);border-radius:6px;padding:6px 8px;background:var(--bg-deep);color:var(--text);font-size:12.5px;">
-                      <input type="number" name="share" value="{{ $p->share }}" min="0" style="width:80px;border:1px solid var(--border);border-radius:6px;padding:6px 8px;background:var(--bg-deep);color:var(--text);font-size:12.5px;">
-                      <input type="number" name="dilihat" value="{{ $p->dilihat }}" min="0" style="width:90px;border:1px solid var(--border);border-radius:6px;padding:6px 8px;background:var(--bg-deep);color:var(--text);font-size:12.5px;">
-                      <button class="btn btn-sm" type="submit">Simpan</button>
-                    </form>
+                  <td>{{ $s->judul }}</td>
+                  <td>{{ $s->platform ?? '—' }}</td>
+                  <td>{{ $s->tanggal_kirim?->translatedFormat('d M Y') ?? '—' }}</td>
+                  <td>
+                    <span class="status-dot {{ match($s->status) {
+                      'Disetujui DANPUS' => 'ok',
+                      'Ditolak DANPUS' => 'bad',
+                      default => 'warn',
+                    } }}">{{ $s->status }}</span>
                   </td>
+                  <td><button class="btn btn-ghost btn-sm" type="button" onclick="bukaDetailLaporanPublikasi({{ $s->id }})">Lihat Detail</button></td>
                 </tr>
                 @empty
-                <tr><td colspan="8" style="color:var(--text-dim);text-align:center;padding:24px;">Belum ada postingan yang tayang.</td></tr>
+                <tr><td colspan="5" style="text-align:center;color:var(--text-muted);">Belum ada laporan yang dikirim ke DANPUS.</td></tr>
                 @endforelse
               </tbody>
             </table>
           </div>
-          <p class="chart-legend-note">Kolom Like / Komentar / Share / Dilihat bisa diedit langsung lalu klik "Simpan" — dipakai untuk mencatat hasil pantauan manual karena sistem belum tersambung API resmi tiap platform.</p>
         </div>
       </section>
 
-      {{-- ===== MEDIA SOSIAL › STATISTIK PERFORMA ===== --}}
-      <section class="tab-panel" data-tab-panel="statistik-performa">
+      {{-- ===== LAPORAN PUBLIKASI › RIWAYAT LAPORAN ===== --}}
+      <section class="tab-panel" data-tab-panel="riwayat-laporan-publikasi">
         <div class="section-head">
-          <h2>Statistik Performa Posting</h2>
-          <p>Ringkasan performa seluruh konten yang sudah diterbitkan.</p>
+          <h2>Riwayat Laporan</h2>
+          <p>Log lengkap seluruh laporan publikasi Satlak Sibersos, termasuk draft dan yang sudah diputuskan DANPUS.</p>
         </div>
-        <div class="stat-grid">
-          <div class="stat-card">
-            <div class="lbl">Total Akun Dikelola</div>
-            <div class="val">{{ $statsMedsos['total_akun'] }}</div>
-            <div class="sub">Akun media sosial resmi</div>
-          </div>
-          <div class="stat-card">
-            <div class="lbl">Total Postingan</div>
-            <div class="val">{{ $statsMedsos['total_posting'] }}</div>
-            <div class="sub">Draft, terjadwal &amp; terbit</div>
-          </div>
-          <div class="stat-card">
-            <div class="lbl">Sudah Terbit</div>
-            <div class="val" style="color:var(--green-bright);">{{ $statsMedsos['sudah_terbit'] }}</div>
-            <div class="sub">{{ $statsMedsos['terjadwal'] }} menunggu jadwal tayang</div>
-          </div>
-          <div class="stat-card">
-            <div class="lbl">Total Engagement</div>
-            <div class="val">{{ number_format($statsMedsos['total_engagement'], 0, ',', '.') }}</div>
-            <div class="sub">Like + komentar + share</div>
-          </div>
-        </div>
-
-        <div class="panel chart-box">
-          <div class="panel-head"><div><h3>Engagement per Postingan</h3><p>Perbandingan like, komentar, dan share tiap konten yang sudah tayang.</p></div></div>
-          <div class="chart-wrap" style="height:280px;"><canvas id="chartEngagementPosting"></canvas></div>
-        </div>
-
-        @if($statsMedsos['postingan_terbaik'])
         <div class="panel">
-          <div class="panel-head"><div><h3>Postingan Paling Engaging</h3><p>Konten dengan total interaksi tertinggi.</p></div></div>
-          <div style="padding:4px 2px;">
-            <div style="font-weight:700;font-size:15px;">{{ $statsMedsos['postingan_terbaik']->judul }}</div>
-            <div style="font-size:12.5px;color:var(--text-muted);margin-top:4px;">{{ $statsMedsos['postingan_terbaik']->akunMedsos->nama_akun ?? '-' }} · Tayang {{ $statsMedsos['postingan_terbaik']->published_at?->translatedFormat('d M Y') }}</div>
-            <div class="btn-row" style="margin-top:12px;">
-              <span class="badge green">{{ $statsMedsos['postingan_terbaik']->likes }} Like</span>
-              <span class="badge">{{ $statsMedsos['postingan_terbaik']->komentar }} Komentar</span>
-              <span class="badge amber">{{ $statsMedsos['postingan_terbaik']->share }} Share</span>
+          <div class="tbl-wrap">
+            <table class="dtbl">
+              <thead><tr><th>Judul</th><th>Platform</th><th>Dibuat</th><th>Status</th><th>Detail</th></tr></thead>
+              <tbody>
+                @forelse($semuaLaporanPublikasi as $r)
+                <tr>
+                  <td>{{ $r->judul }}</td>
+                  <td>{{ $r->platform ?? '—' }}</td>
+                  <td>{{ $r->created_at->translatedFormat('d M Y') }}</td>
+                  <td>
+                    <span class="badge {{ match($r->status) {
+                      'Disetujui DANPUS' => 'green',
+                      'Ditolak DANPUS' => 'red',
+                      default => 'amber',
+                    } }}">{{ $r->status }}</span>
+                  </td>
+                  <td><button class="btn btn-ghost btn-sm" type="button" onclick="bukaDetailLaporanPublikasi({{ $r->id }})">Lihat Detail</button></td>
+                </tr>
+                @empty
+                <tr><td colspan="5" style="text-align:center;color:var(--text-muted);">Belum ada riwayat laporan publikasi.</td></tr>
+                @endforelse
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      {{-- ===== MODAL: DETAIL LAPORAN PUBLIKASI ===== --}}
+      <div class="modal-overlay" id="modalDetailLaporanPublikasi">
+        <div class="modal-box" style="max-width:560px;">
+          <div class="modal-head">
+            <div>
+              <h3 id="dlpJudul">-</h3>
+              <p id="dlpPlatform" style="margin:2px 0 0;font-size:12.5px;color:var(--text-muted);">-</p>
+            </div>
+            <button type="button" class="modal-close" onclick="tutupDetailLaporanPublikasi()">&times;</button>
+          </div>
+          <div class="modal-body">
+            <div class="detail-grid">
+              <div class="detail-item"><span class="detail-label">Status</span><span id="dlpStatus">-</span></div>
+              <div class="detail-item"><span class="detail-label">Tanggal Kirim</span><span id="dlpTanggal">-</span></div>
+              <div class="detail-item full"><span class="detail-label">Link Publikasi</span><span id="dlpLink">-</span></div>
+              <div class="detail-item full"><span class="detail-label">Deskripsi</span><span id="dlpDeskripsi">-</span></div>
+              <div class="detail-item full">
+                <span class="detail-label">Dokumentasi</span>
+                <div id="dlpDokumentasi" class="btn-row" style="flex-wrap:wrap;">-</div>
+              </div>
             </div>
           </div>
         </div>
-        @endif
-      </section>
+      </div>
 
-      {{-- ===== MEDIA SOSIAL › ARSIP POSTING ===== --}}
-      <section class="tab-panel" data-tab-panel="arsip-posting">
-        <div class="section-head">
-          <h2>Arsip Seluruh Posting</h2>
-          <p>Riwayat lengkap seluruh konten yang pernah dibuat, baik draft, terjadwal, maupun sudah tayang.</p>
-        </div>
-        <div class="panel">
-          <div class="tbl-wrap" data-row-limit="8">
-            <table class="dtbl">
-              <thead><tr><th>Judul</th><th>Akun</th><th>Jenis</th><th>Dibuat Oleh</th><th>Status</th><th>Tanggal</th><th>Aksi</th></tr></thead>
-              <tbody>
-                @forelse($postinganDraftJadwal->concat($postinganTerbit)->sortByDesc('created_at') as $p)
-                <tr>
-                  <td>{{ $p->judul }}</td>
-                  <td>{{ $p->akunMedsos->nama_akun ?? '-' }}</td>
-                  <td>{{ $p->jenis_konten }}</td>
-                  <td>{{ $p->user->name ?? '-' }}</td>
-                  <td>
-                    <span class="badge {{ match($p->status) { 'Terbit' => 'green', 'Terjadwal' => 'amber', default => '' } }}">{{ $p->status }}</span>
-                  </td>
-                  <td>{{ $p->created_at->translatedFormat('d M Y') }}</td>
-                  <td>
-                    <form method="POST" action="{{ route('posting.destroy', $p) }}" onsubmit="return confirm('Hapus postingan ini dari arsip?');">
-                      @csrf @method('DELETE')
-                      <button class="btn btn-sm btn-ghost-red" type="submit">Hapus</button>
-                    </form>
-                  </td>
-                </tr>
-                @empty
-                <tr><td colspan="7" style="color:var(--text-dim);text-align:center;padding:24px;">Arsip masih kosong.</td></tr>
-                @endforelse
-              </tbody>
-            </table>
+      {{-- ===== MODAL: UPLOAD DOKUMENTASI ===== --}}
+      <div class="modal-overlay" id="modalUploadDokumentasi">
+        <div class="modal-box" style="max-width:420px;">
+          <div class="modal-head">
+            <div><h3>Upload Dokumentasi</h3></div>
+            <button type="button" class="modal-close" onclick="tutupUploadDokumentasi()">&times;</button>
+          </div>
+          <div class="modal-body">
+            <form method="POST" id="formUploadDokumentasi" enctype="multipart/form-data" class="form-grid">
+              @csrf
+              <div class="form-field full">
+                <label for="udInput">Pilih file (foto/video/PDF)</label>
+                <input id="udInput" name="dokumentasi[]" type="file" multiple required accept="image/*,video/mp4,video/quicktime,application/pdf">
+                <span class="form-hint">Bisa pilih beberapa file sekaligus. Maks. 20 MB per file.</span>
+              </div>
+              <div class="form-field full" style="display:flex;justify-content:flex-end;">
+                <button class="btn btn-primary" type="submit">Unggah</button>
+              </div>
+            </form>
           </div>
         </div>
-      </section>
+      </div>
+
+      <style>
+        .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:center;justify-content:center;padding:20px;}
+        .modal-overlay.open{display:flex;}
+        .modal-box{background:var(--panel,#0f1a14);border:1px solid var(--border-strong,#2a3a30);border-radius:12px;max-width:720px;width:100%;max-height:80vh;display:flex;flex-direction:column;}
+        .modal-head{display:flex;align-items:flex-start;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--border-soft,#22302a);}
+        .modal-head h3{margin:0;font-size:16px;}
+        .modal-close{background:none;border:none;color:var(--text-muted,#9fb0a8);font-size:22px;line-height:1;cursor:pointer;}
+        .modal-close:hover{color:var(--gold-bright,#f2c14e);}
+        .modal-body{padding:16px 20px 20px;overflow-y:auto;}
+        .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 20px;}
+        .detail-item{display:flex;flex-direction:column;gap:4px;}
+        .detail-item.full{grid-column:1 / -1;}
+        .detail-label{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-dim);}
+      </style>
+
+      <script>
+        const laporanPublikasiData = @json($semuaLaporanPublikasi->keyBy('id')->map(function ($l) {
+            return [
+                'judul' => $l->judul,
+                'platform' => $l->platform ?? '—',
+                'status' => $l->status,
+                'tanggal' => $l->tanggal_kirim?->translatedFormat('d M Y H:i') ?? '—',
+                'link' => $l->link_publikasi,
+                'deskripsi' => $l->deskripsi,
+                'dokumentasi' => $l->dokumentasi->map(fn ($d) => [
+                    'nama' => $d->nama_file,
+                    'url' => asset('storage/'.$d->path),
+                ]),
+            ];
+        }));
+
+        function bukaDetailLaporanPublikasi(id) {
+          const l = laporanPublikasiData[id];
+          if (!l) return;
+          document.getElementById('dlpJudul').textContent = l.judul;
+          document.getElementById('dlpPlatform').textContent = l.platform;
+          document.getElementById('dlpStatus').textContent = l.status;
+          document.getElementById('dlpTanggal').textContent = l.tanggal;
+          document.getElementById('dlpLink').innerHTML = l.link
+            ? '<a href="' + l.link + '" target="_blank" rel="noopener">' + l.link + '</a>'
+            : '<span style="color:var(--text-dim);">—</span>';
+          document.getElementById('dlpDeskripsi').textContent = l.deskripsi;
+
+          const dokWrap = document.getElementById('dlpDokumentasi');
+          if (l.dokumentasi.length) {
+            dokWrap.innerHTML = l.dokumentasi.map(function (d) {
+              return '<a href="' + d.url + '" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">' + d.nama + '</a>';
+            }).join('');
+          } else {
+            dokWrap.innerHTML = '<span style="font-size:12.5px;color:var(--text-dim);">Belum ada dokumentasi</span>';
+          }
+
+          document.getElementById('modalDetailLaporanPublikasi').classList.add('open');
+        }
+
+        function tutupDetailLaporanPublikasi() {
+          document.getElementById('modalDetailLaporanPublikasi').classList.remove('open');
+        }
+
+        document.getElementById('modalDetailLaporanPublikasi').addEventListener('click', function (e) {
+          if (e.target === this) tutupDetailLaporanPublikasi();
+        });
+
+        function bukaUploadDokumentasi(id) {
+          document.getElementById('formUploadDokumentasi').action = '/laporan-publikasi/' + id + '/dokumentasi';
+          document.getElementById('modalUploadDokumentasi').classList.add('open');
+        }
+
+        function tutupUploadDokumentasi() {
+          document.getElementById('modalUploadDokumentasi').classList.remove('open');
+        }
+
+        document.getElementById('modalUploadDokumentasi').addEventListener('click', function (e) {
+          if (e.target === this) tutupUploadDokumentasi();
+        });
+      </script>
 
     </div>
 
@@ -1165,237 +905,6 @@
 })();
 </script>
 
-{{-- ===== ANALITIK PEMANTAUAN MEDIA SOSIAL (RINGKASAN) ===== --}}
-<script>
-(function () {
-  var canvasCheck = document.getElementById('chartAkunPlatform');
-  if (!canvasCheck || typeof Chart === 'undefined') return;
-
-  var css = getComputedStyle(document.documentElement);
-  var cGold = css.getPropertyValue('--gold-bright').trim() || '#f2c14e';
-  var cGreen = css.getPropertyValue('--green').trim() || '#3ddc84';
-  var cAmber = css.getPropertyValue('--amber').trim() || '#f2a93b';
-  var cRed = css.getPropertyValue('--red').trim() || '#e5484d';
-  var cMuted = css.getPropertyValue('--text-dim').trim() || '#7d8f87';
-  var cText = css.getPropertyValue('--text').trim() || '#e8efe9';
-  var cBorder = css.getPropertyValue('--border-soft').trim() || '#22302a';
-
-  var akunPlatform = @json($akunPerPlatform ?? []);
-  var statusAkun = @json($statusAkunDistribusi ?? []);
-  var isuPrioritas = @json($isuPerPrioritas ?? []);
-
-  var registry = {};
-
-  function wrapLabel(text, maxCharsPerLine) {
-    maxCharsPerLine = maxCharsPerLine || 14;
-    var words = String(text).split(' ');
-    var lines = [];
-    var current = '';
-    words.forEach(function (w) {
-      var test = current ? current + ' ' + w : w;
-      if (test.length > maxCharsPerLine && current) {
-        lines.push(current);
-        current = w;
-      } else {
-        current = test;
-      }
-    });
-    if (current) lines.push(current);
-    return lines;
-  }
-
-  function buildOptions(type, opts) {
-    opts = opts || {};
-    if (type === 'radar') {
-      return {
-        responsive: true,
-        maintainAspectRatio: false,
-        layout: { padding: 0 },
-        plugins: { legend: { display: false, position: 'bottom', labels: { color: cText, boxWidth: 9, padding: 10 } } },
-        scales: {
-          r: {
-            min: 0, max: opts.max || 100,
-            grid: { color: cBorder }, angleLines: { color: cBorder },
-            pointLabels: { color: cMuted, font: { size: 10 } },
-            ticks: { display: false, backdropColor: 'transparent' }
-          }
-        }
-      };
-    }
-    if (type === 'doughnut') {
-      return {
-        responsive: true,
-        maintainAspectRatio: false,
-        cutout: '62%',
-        plugins: { legend: { position: 'bottom', labels: { color: cText, boxWidth: 10, padding: 12 } } }
-      };
-    }
-    return {
-      indexAxis: opts.horizontal ? 'y' : 'x',
-      responsive: true,
-      maintainAspectRatio: false,
-      layout: { padding: { left: 4, right: 12, top: 8, bottom: 0 } },
-      plugins: { legend: { display: false } },
-      scales: {
-        x: opts.horizontal
-          ? { min: 0, grid: { color: cBorder }, ticks: { precision: 0 } }
-          : { offset: false, grid: { display: false }, ticks: { maxRotation: 0, minRotation: 0, autoSkip: false, font: { size: 10 } } },
-        y: opts.horizontal
-          ? { offset: false, grid: { display: false }, ticks: { autoSkip: false } }
-          : { min: 0, grid: { color: cBorder }, ticks: { precision: 0 } }
-      }
-    };
-  }
-
-  function renderChart(canvasId, type, rawLabels, values, colors, opts) {
-    var el = document.getElementById(canvasId);
-    if (!el) return;
-    if (registry[canvasId]) registry[canvasId].destroy();
-
-    var labels = (type !== 'doughnut' && !opts.horizontal)
-      ? rawLabels.map(function (l) { return wrapLabel(l, 14); })
-      : rawLabels;
-
-    var isFillType = (type === 'doughnut' || type === 'radar');
-    var fillColor = (type === 'radar') ? hexToRgba(opts.lineColor || cGold, 0.28) : colors;
-
-    var dataset = {
-      label: opts.label || '',
-      data: values,
-      backgroundColor: isFillType ? fillColor : colors,
-      borderColor: type === 'line' ? (opts.lineColor || cGold) : (type === 'radar' ? (opts.lineColor || cGold) : 'transparent'),
-      borderWidth: (type === 'line' || type === 'radar') ? 2 : 0,
-      borderRadius: (type === 'bar') ? 4 : 0,
-      maxBarThickness: opts.horizontal ? 34 : 44,
-      fill: type === 'radar' ? true : (type === 'line' ? false : undefined),
-      tension: 0,
-      pointBackgroundColor: (type === 'line' || type === 'radar') ? (opts.lineColor || cGold) : undefined,
-      pointRadius: type === 'line' ? 3 : undefined,
-    };
-
-    registry[canvasId] = new Chart(el, {
-      type: type,
-      data: { labels: labels, datasets: [dataset] },
-      options: buildOptions(type, opts)
-    });
-  }
-
-  function hexToRgba(hex, alpha) {
-    hex = (hex || '').replace('#', '');
-    if (hex.length === 3) hex = hex.split('').map(function (c) { return c + c; }).join('');
-    var r = parseInt(hex.substring(0, 2), 16) || 0;
-    var g = parseInt(hex.substring(2, 4), 16) || 0;
-    var b = parseInt(hex.substring(4, 6), 16) || 0;
-    return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
-  }
-
-  function drawAkunPlatform(type, data) {
-    var t = type === 'bar' ? 'doughnut' : type;
-    renderChart(
-      'chartAkunPlatform', t,
-      data.map(function (s) { return s.platform; }),
-      data.map(function (s) { return s.jumlah; }),
-      [cGold, cGreen, cAmber, cRed],
-      { label: 'Jumlah Akun' }
-    );
-  }
-
-  function drawStatusAkun(type, data) {
-    renderChart(
-      'chartStatusAkun', type,
-      data.map(function (s) { return s.label; }),
-      data.map(function (s) { return s.jumlah; }),
-      type === 'line' || type === 'radar' ? cGold : [cGreen, cAmber],
-      { label: 'Jumlah Akun', lineColor: cGold }
-    );
-  }
-
-  function drawIsuPrioritas(type, data) {
-    renderChart(
-      'chartIsuPrioritas', type,
-      data.map(function (p) { return p.label; }),
-      data.map(function (p) { return p.jumlah; }),
-      type === 'line' || type === 'radar' ? cGold : [cRed, cAmber, cMuted],
-      { label: 'Jumlah Isu', lineColor: cGold }
-    );
-  }
-
-  var DATE_RANGE_FACTOR = { '7d': 0.35, '30d': 0.7, '90d': 0.9, 'all': 1 };
-
-  function scaleFactor(arr, factor, keyValue) {
-    return arr.map(function (d) {
-      var c = Object.assign({}, d);
-      c[keyValue] = Math.max(0, Math.round(d[keyValue] * factor));
-      return c;
-    });
-  }
-
-  var typeFilterEl = document.getElementById('chartTypeFilterGlobal');
-  var dateFilterEl = document.getElementById('chartDateFilterGlobal');
-  var gridEl = document.getElementById('chartBoxGrid');
-
-  function redrawAll() {
-    var type = typeFilterEl ? typeFilterEl.value : 'bar';
-    var factor = DATE_RANGE_FACTOR[dateFilterEl ? dateFilterEl.value : 'all'] || 1;
-    if (gridEl) gridEl.classList.toggle('split-mode', type !== 'bar');
-
-    drawAkunPlatform(type, scaleFactor(akunPlatform, factor, 'jumlah'));
-    drawStatusAkun(type, scaleFactor(statusAkun, factor, 'jumlah'));
-    drawIsuPrioritas(type, scaleFactor(isuPrioritas, factor, 'jumlah'));
-  }
-
-  redrawAll();
-
-  if (typeFilterEl) typeFilterEl.addEventListener('change', redrawAll);
-  if (dateFilterEl) dateFilterEl.addEventListener('change', redrawAll);
-})();
-</script>
-
-{{-- ===== STATISTIK PERFORMA POSTING (tab Media Sosial) ===== --}}
-<script>
-(function () {
-  var canvas = document.getElementById('chartEngagementPosting');
-  if (!canvas || typeof Chart === 'undefined') return;
-
-  var css = getComputedStyle(document.documentElement);
-  var cGold = css.getPropertyValue('--gold-bright').trim() || '#f2c14e';
-  var cGreen = css.getPropertyValue('--green-bright').trim() || '#3ddc84';
-  var cAmber = css.getPropertyValue('--amber').trim() || '#f2a93b';
-  var cText = css.getPropertyValue('--text').trim() || '#e8efe9';
-  var cBorder = css.getPropertyValue('--border-soft').trim() || '#22302a';
-
-  
-  @php
-        $postinganChartData = $postinganTerbit->values()->map(function ($p) {
-            return ['judul' => $p->judul, 'likes' => $p->likes, 'komentar' => $p->komentar, 'share' => $p->share];
-        });
-    @endphp
-    var postingan = @json($postinganChartData);
-
-  if (!postingan.length) return;
-
-  new Chart(canvas, {
-    type: 'bar',
-    data: {
-      labels: postingan.map(function (p) { return p.judul; }),
-      datasets: [
-        { label: 'Like', data: postingan.map(function (p) { return p.likes; }), backgroundColor: cGold, borderRadius: 4, maxBarThickness: 34 },
-        { label: 'Komentar', data: postingan.map(function (p) { return p.komentar; }), backgroundColor: cGreen, borderRadius: 4, maxBarThickness: 34 },
-        { label: 'Share', data: postingan.map(function (p) { return p.share; }), backgroundColor: cAmber, borderRadius: 4, maxBarThickness: 34 }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { position: 'bottom', labels: { color: cText, boxWidth: 10, padding: 12 } } },
-      scales: {
-        x: { grid: { display: false }, ticks: { color: cText, font: { size: 10 }, maxRotation: 0, autoSkip: false } },
-        y: { min: 0, grid: { color: cBorder }, ticks: { color: cText, precision: 0 } }
-      }
-    }
-  });
-})();
-</script>
 
 @include('siberad.dashboards.partials.dash-script')
 </body>
