@@ -226,6 +226,7 @@
 
     
     <div class="content">
+      @include('siberad.dashboards.partials.pengumuman-banner')
 
       {{-- ===== RINGKASAN ===== --}}
       <section class="tab-panel active" data-tab-panel="dashboard">

@@ -220,6 +220,7 @@
     </div>
 
     <div class="content">
+      @include('siberad.dashboards.partials.pengumuman-banner')
 
       {{-- ===== DASHBOARD ===== --}}
       <section class="tab-panel active" data-tab-panel="dashboard">

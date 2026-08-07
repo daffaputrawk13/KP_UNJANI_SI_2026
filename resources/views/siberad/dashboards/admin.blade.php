@@ -124,6 +124,19 @@
         <div class="side-dropdown-menu" id="penggunaSubmenu">
           <a href="#" class="side-link side-sublink" data-tab-link="pengguna">Daftar Pengguna</a>
           <a href="#" class="side-link side-sublink" data-tab-link="reset-password">Permintaan Reset Password</a>
+          <a href="#" class="side-link side-sublink" data-tab-link="pengumuman">Pengumuman</a>
+        </div>
+      </div>
+
+      <div class="side-dropdown" id="monitoringDropdown">
+        <button type="button" class="side-link side-dropdown-toggle" id="monitoringToggle" aria-expanded="false" aria-controls="monitoringSubmenu">
+          <span class="dot"></span>
+          <span class="side-link-label">Monitoring</span>
+          <svg class="side-dropdown-arrow" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg>
+        </button>
+        <div class="side-dropdown-menu" id="monitoringSubmenu">
+          <a href="#" class="side-link side-sublink" data-tab-link="rekap-laporan">Rekap Laporan</a>
+          <a href="#" class="side-link side-sublink" data-tab-link="sesi-aktif">Sesi Aktif</a>
         </div>
       </div>
 
@@ -156,6 +169,7 @@
   (function () {
     var dropdowns = [
       { wrap: 'penggunaDropdown', toggle: 'penggunaToggle' },
+      { wrap: 'monitoringDropdown', toggle: 'monitoringToggle' },
       { wrap: 'sistemDropdown', toggle: 'sistemToggle' }
     ];
     dropdowns.forEach(function (cfg) {
@@ -256,6 +270,7 @@
 
     
     <div class="content">
+      @include('siberad.dashboards.partials.pengumuman-banner')
 
       {{-- ===== DASHBOARD ===== --}}
       <section class="tab-panel active" data-tab-panel="dashboard">
@@ -1166,6 +1181,159 @@
         </div>
       </section>
 
+      {{-- ===== PENGUMUMAN ===== --}}
+      <section class="tab-panel" data-tab-panel="pengumuman">
+        <div class="section-head">
+          <h2>Pengumuman</h2>
+          <p>Broadcast pesan ke seluruh satuan — tampil sebagai banner di halaman dashboard mereka.</p>
+        </div>
+
+        @if (session('status'))
+          <div class="notice">{{ session('status') }}</div>
+        @endif
+
+        <div class="panel">
+          <div class="panel-head"><div><h3>Buat Pengumuman Baru</h3></div></div>
+          <form method="POST" action="{{ route('admin.pengumuman.store') }}" class="form-grid" style="padding:22px;">
+            @csrf
+            <div class="form-field full">
+              <label for="pgmJudul">Judul</label>
+              <input id="pgmJudul" name="judul" type="text" maxlength="150" required>
+            </div>
+            <div class="form-field full">
+              <label for="pgmIsi">Isi Pengumuman</label>
+              <textarea id="pgmIsi" name="isi" rows="3" maxlength="2000" required></textarea>
+            </div>
+            <div class="form-field full">
+              <button class="btn btn-primary" type="submit">Publikasikan</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="panel" style="margin-top:22px;">
+          <div class="panel-head"><div><h3>Daftar Pengumuman</h3></div></div>
+          <div class="tbl-wrap" data-row-limit="8">
+            <table class="dtbl">
+              <thead><tr><th>Judul</th><th>Isi</th><th>Dibuat Oleh</th><th>Tanggal</th><th>Status</th><th>Aksi</th></tr></thead>
+              <tbody>
+                @forelse($daftarPengumuman as $p)
+                <tr>
+                  <td>{{ $p->judul }}</td>
+                  <td style="color:var(--text-muted);max-width:280px;">{{ \Illuminate\Support\Str::limit($p->isi, 80) }}</td>
+                  <td>{{ $p->pembuat?->name ?? '-' }}</td>
+                  <td>{{ $p->created_at->format('d M Y H:i') }}</td>
+                  <td><span class="badge {{ $p->aktif ? 'green' : '' }}">{{ $p->aktif ? 'Aktif' : 'Nonaktif' }}</span></td>
+                  <td>
+                    <div class="btn-row">
+                      <form method="POST" action="{{ route('admin.pengumuman.toggle', $p) }}">
+                        @csrf @method('PATCH')
+                        <button class="btn btn-ghost btn-sm" type="submit">{{ $p->aktif ? 'Nonaktifkan' : 'Aktifkan' }}</button>
+                      </form>
+                      <form method="POST" action="{{ route('admin.pengumuman.destroy', $p) }}" onsubmit="return confirm('Hapus pengumuman ini?');">
+                        @csrf @method('DELETE')
+                        <button class="btn btn-ghost-red btn-sm" type="submit">Hapus</button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+                @empty
+                <tr class="table-empty-row"><td colspan="6">Belum ada pengumuman.</td></tr>
+                @endforelse
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      {{-- ===== REKAP LAPORAN LINTAS SATLAK ===== --}}
+      <section class="tab-panel" data-tab-panel="rekap-laporan">
+        <div class="section-head">
+          <h2>Rekap Laporan</h2>
+          <p>Ringkasan jumlah &amp; status laporan tiap Satlak dalam satu tampilan.</p>
+        </div>
+
+        <div class="chart-box">
+          <div class="chart-mini">
+            <div class="chart-mini-head">
+              <h4>Total Laporan per Satlak</h4>
+              <p>Perbandingan volume laporan yang sudah dikirim tiap satuan pelaksana.</p>
+            </div>
+            <div class="chart-wrap" style="height:260px;">
+              <canvas id="chartRekapLaporan"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><div><h3>Detail per Satlak</h3></div></div>
+          <div class="tbl-wrap">
+            <table class="dtbl">
+              <thead><tr><th>Satlak</th><th>Total Laporan</th><th>Menunggu</th><th>Disetujui</th><th>Ditolak</th></tr></thead>
+              <tbody>
+                @forelse($rekapLaporanSatuan as $s)
+                <tr>
+                  <td>{{ $s->nama }} <span class="badge">{{ $s->kode }}</span></td>
+                  <td>{{ $s->total_laporan }}</td>
+                  <td><span class="badge amber">{{ $s->laporan_menunggu }}</span></td>
+                  <td><span class="badge green">{{ $s->laporan_disetujui }}</span></td>
+                  <td><span class="badge red">{{ $s->laporan_ditolak }}</span></td>
+                </tr>
+                @empty
+                <tr class="table-empty-row"><td colspan="5">Belum ada data Satlak.</td></tr>
+                @endforelse
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      {{-- ===== SESI LOGIN AKTIF ===== --}}
+      <section class="tab-panel" data-tab-panel="sesi-aktif">
+        <div class="section-head">
+          <h2>Sesi Login Aktif</h2>
+          <p>Pantau perangkat/browser yang sedang login, dan paksa logout kalau perlu.</p>
+        </div>
+
+        @if (session('status'))
+          <div class="notice">{{ session('status') }}</div>
+        @endif
+
+        <div class="panel">
+          <div class="tbl-wrap">
+            <table class="dtbl">
+              <thead><tr><th>Pengguna</th><th>IP Address</th><th>Perangkat / Browser</th><th>Terakhir Aktif</th><th>Aksi</th></tr></thead>
+              <tbody>
+                @forelse($sesiAktif as $s)
+                <tr>
+                  <td>
+                    {{ $s->user_name ?? 'Tamu (belum login)' }}
+                    @if($s->id === $sesiSayaId)
+                      <span class="badge">Sesi Anda</span>
+                    @endif
+                  </td>
+                  <td>{{ $s->ip_address ?? '-' }}</td>
+                  <td style="color:var(--text-muted);max-width:260px;">{{ \Illuminate\Support\Str::limit($s->user_agent, 60) }}</td>
+                  <td>{{ \Carbon\Carbon::createFromTimestamp($s->last_activity)->diffForHumans() }}</td>
+                  <td>
+                    @if($s->id !== $sesiSayaId)
+                    <form method="POST" action="{{ route('admin.sessions.destroy', $s->id) }}" onsubmit="return confirm('Paksa logout sesi ini?');">
+                      @csrf @method('DELETE')
+                      <button class="btn btn-ghost-red btn-sm" type="submit">Paksa Logout</button>
+                    </form>
+                    @else
+                      <span style="font-size:11.5px;color:var(--text-dim);">—</span>
+                    @endif
+                  </td>
+                </tr>
+                @empty
+                <tr class="table-empty-row"><td colspan="5">Tidak ada sesi aktif.</td></tr>
+                @endforelse
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
     </div>
 
       <script>
@@ -1581,6 +1749,34 @@
       [kelengkapan.sudah, kelengkapan.belum],
       [cGreen, cRed]
     );
+
+    // ===== Grafik 4: Rekap Total Laporan per Satlak =====
+    var rekapSatuan = @json($rekapLaporanSatuan);
+    var elRekap = document.getElementById('chartRekapLaporan');
+    if (elRekap) {
+      new Chart(elRekap, {
+        type: 'bar',
+        data: {
+          labels: rekapSatuan.map(function (s) { return s.kode; }),
+          datasets: [{
+            label: 'Total Laporan',
+            data: rekapSatuan.map(function (s) { return s.total_laporan; }),
+            backgroundColor: cGold,
+            borderRadius: 6,
+            maxBarThickness: 46
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { grid: { display: false } },
+            y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: 'rgba(255,255,255,.06)' } }
+          }
+        }
+      });
+    }
   })();
   </script>
 
