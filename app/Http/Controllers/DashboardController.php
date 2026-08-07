@@ -44,7 +44,7 @@ class DashboardController extends Controller
             'SATLAKAL' => $this->satlakAlmon($user, $satuan),
             'SATLAKSIBERSOS' => $this->satlakSibersos($user, $satuan),
             'SATLAKRINDAK' => $this->satlakRindak($user, $satuan),
-            'SATLAKBANGTEK' => $this->satlakBangtek($user, $satuan),
+            'SATLAKDUKTEK' => $this->satlakDuktek($user, $satuan),
             'BINFUNG' => $this->binfung($user, $satuan),
             'BINUM' => $this->binum($user, $satuan),
             'DIKLAT' => $this->diklat($user, $satuan),
@@ -149,7 +149,7 @@ class DashboardController extends Controller
             'SATLAKAL' => ['label' => 'Ada Insiden', 'class' => 'bad', 'update' => '10 menit lalu'],
             'SATLAKSIBERSOS' => ['label' => 'Siaga', 'class' => 'warn', 'update' => '35 menit lalu'],
             'SATLAKRINDAK' => ['label' => 'Normal', 'class' => 'ok', 'update' => '1 jam lalu'],
-            'SATLAKBANGTEK' => ['label' => 'Normal', 'class' => 'ok', 'update' => '2 jam lalu'],
+            'SATLAKDUKTEK' => ['label' => 'Normal', 'class' => 'ok', 'update' => '2 jam lalu'],
             'BINFUNG' => ['label' => 'Normal', 'class' => 'ok', 'update' => 'Hari ini'],
             'BINUM' => ['label' => 'Normal', 'class' => 'ok', 'update' => 'Hari ini'],
             'DIKLAT' => ['label' => 'Normal', 'class' => 'ok', 'update' => 'Hari ini'],
@@ -523,7 +523,7 @@ class DashboardController extends Controller
     /**
      * satlak Duktek (Dukungan Teknologi) — riset & pengembangan teknologi (AI, drone, dll).
      */
-    private function satlakBangtek($user, $satuan): View
+    private function satlakDuktek($user, $satuan): View
     {
         $proyekRiset = [
             ['nama' => 'Deteksi Anomali Jaringan berbasis AI', 'kategori' => 'AI / Machine Learning', 'progres' => 72, 'status' => 'Berjalan', 'status_class' => 'warn', 'target' => 'Sep 2026'],
@@ -554,7 +554,7 @@ class DashboardController extends Controller
             ->latest()
             ->get();
 
-        return view('siberad.dashboards.satlakbangtek', [
+        return view('siberad.dashboards.satlakduktek', [
             'user' => $user,
             'satuan' => $satuan,
             'proyekRiset' => $proyekRiset,
