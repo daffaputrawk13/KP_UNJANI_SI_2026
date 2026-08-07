@@ -274,27 +274,44 @@
 
       {{-- ===== DASHBOARD ===== --}}
       <section class="tab-panel active" data-tab-panel="dashboard">
-        <div class="section-head">
-          <h2>Ringkasan Sistem</h2>
-          <p>Kondisi akun pengguna dan satuan yang terdaftar di SIBERAD.</p>
+
+        <div class="dash-hero">
+          <div>
+            <div class="dash-hero-eyebrow">SIBERAD // Panel Admin</div>
+            <h2>Selamat datang, {{ explode(' ', $user->name)[0] }}</h2>
+            <p>{{ now()->translatedFormat('l, d F Y') }}</p>
+          </div>
         </div>
-        <div class="stat-grid">
-          <div class="stat-card">
+
+        <div class="kpi-grid">
+          <div class="stat-card kpi-card">
+            <div class="kpi-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
             <div class="lbl">Total Pengguna</div>
             <div class="val">{{ $stats['total_pengguna'] }}</div>
             <div class="sub">Akun terdaftar di sistem</div>
           </div>
-          <div class="stat-card">
+          <div class="stat-card kpi-card">
+            <div class="kpi-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+            </div>
             <div class="lbl">Total Satuan</div>
             <div class="val">{{ $stats['total_satuan'] }}</div>
             <div class="sub">Termasuk Admin</div>
           </div>
-          <div class="stat-card">
-            <div class="lbl">Permintaan Reset Password</div>
+          <div class="stat-card kpi-card">
+            <div class="kpi-icon" style="color:var(--amber);background:var(--amber-dim);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.5-2-3.4-2.3.9a7.6 7.6 0 0 0-2.6-1.5L14 2.5h-4l-.5 2.5a7.6 7.6 0 0 0-2.6 1.5l-2.3-.9-2 3.4 2 1.5a7.6 7.6 0 0 0 0 3l-2 1.5 2 3.4 2.3-.9a7.6 7.6 0 0 0 2.6 1.5l.5 2.5h4l.5-2.5a7.6 7.6 0 0 0 2.6-1.5l2.3.9 2-3.4Z"/></svg>
+            </div>
+            <div class="lbl">Reset Password</div>
             <div class="val" style="color:var(--amber);">{{ $stats['reset_password_pending'] }}</div>
             <div class="sub">Menunggu diverifikasi</div>
           </div>
-          <div class="stat-card">
+          <div class="stat-card kpi-card">
+            <div class="kpi-icon" style="color:{{ $stats['satuan_tanpa_pengguna'] > 0 ? 'var(--red)' : 'var(--green)' }};background:{{ $stats['satuan_tanpa_pengguna'] > 0 ? 'var(--red-dim)' : 'var(--green-dim)' }};">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
+            </div>
             <div class="lbl">Satuan Tanpa Pengguna</div>
             <div class="val" style="color:{{ $stats['satuan_tanpa_pengguna'] > 0 ? 'var(--red)' : 'var(--green)' }};">{{ $stats['satuan_tanpa_pengguna'] }}</div>
             <div class="sub">Perlu dibuatkan akun</div>
@@ -329,35 +346,54 @@
           </div>
         </div>
 
-        <div class="panel">
-          <div class="panel-head"><div><h3>Aktivitas Terbaru</h3><p>Aktivitas seputar akun dan data satuan.</p></div></div>
-          <div class="table-toolbar">
-            <div class="table-search-wrap">
-              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
-              <input type="text" class="table-search" data-table-search="tblAktivitas" placeholder="Cari kegiatan...">
-            </div>
-            <select class="table-filter" data-table-filter="tblAktivitas">
-              <option value="">Semua Status</option>
-              <option value="Menunggu">Menunggu</option>
-              <option value="Info">Info</option>
-              <option value="Selesai">Selesai</option>
-            </select>
+        <div class="panel activity-panel">
+          <div class="panel-head">
+            <div><h3>Aktivitas Terbaru</h3><p>5 aksi terakhir tercatat.</p></div>
+            <a href="#" class="btn btn-ghost btn-sm" data-tab-link="log-aktivitas">Lihat Semua</a>
           </div>
-          <div class="tbl-wrap" data-row-limit="5">
-            <table class="dtbl" id="tblAktivitas">
-              <thead><tr><th>Kegiatan</th><th>Waktu</th><th>Status</th></tr></thead>
-              <tbody>
-                @foreach($aktivitasTerbaru as $a)
-                <tr data-filter-value="{{ $a['status'] }}">
-                  <td>{{ $a['kegiatan'] }}</td>
-                  <td>{{ $a['waktu'] }}</td>
-                  <td><span class="status-dot {{ $a['status_class'] }}">{{ $a['status'] }}</span></td>
-                </tr>
-                @endforeach
-              </tbody>
-            </table>
-          </div>
+          <ul class="activity-feed">
+            @forelse($logAktivitas->take(5) as $log)
+            <li>
+              <span class="activity-dot"></span>
+              <div class="activity-body">
+                <div class="activity-text">{{ $log->deskripsi ?: $log->aksi }}</div>
+                <div class="activity-meta">{{ $log->nama_pengguna ?? 'Sistem' }} &middot; {{ $log->created_at?->diffForHumans() }}</div>
+              </div>
+            </li>
+            @empty
+            <li class="activity-empty">Belum ada aktivitas tercatat.</li>
+            @endforelse
+          </ul>
         </div>
+
+        <style>
+          .dash-hero{
+            display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:18px;
+            margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--border-soft);
+          }
+          .dash-hero-eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-bright);margin-bottom:8px;}
+          .dash-hero h2{font-family:var(--display);font-size:26px;font-weight:700;margin-bottom:6px;}
+          .dash-hero p{font-size:13px;color:var(--text-muted);}
+
+          .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:26px;}
+          @media(max-width:980px){.kpi-grid{grid-template-columns:repeat(2,1fr);}}
+          .kpi-card{padding-top:52px;}
+          .kpi-icon{
+            position:absolute;top:16px;left:16px;width:34px;height:34px;border-radius:9px;
+            display:flex;align-items:center;justify-content:center;
+            background:var(--gold-dim);color:var(--gold-bright);
+          }
+          .kpi-icon svg{width:17px;height:17px;}
+
+          .activity-panel{margin-top:22px;}
+          .activity-feed{list-style:none;padding:4px 22px 18px;margin:0;}
+          .activity-feed li{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border-soft);}
+          .activity-feed li:last-child{border-bottom:none;}
+          .activity-dot{width:7px;height:7px;border-radius:50%;background:var(--gold);margin-top:6px;flex-shrink:0;}
+          .activity-text{font-size:13px;color:var(--text);line-height:1.5;}
+          .activity-meta{font-size:11px;color:var(--text-dim);margin-top:3px;}
+          .activity-empty{padding:20px 0;text-align:center;color:var(--text-dim);font-size:12.5px;}
+        </style>
       </section>
 
       {{-- ===== KELOLA PENGGUNA ===== --}}

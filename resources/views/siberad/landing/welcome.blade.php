@@ -702,16 +702,16 @@
       <div class="login-crest"><img src="{{ asset('images/logo-pussiberad.jpg') }}" alt="Lambang Pussiberad"></div>
       <h3 id="loginTitle" class="login-title">Login Sistem</h3>
       <p class="login-sub">Masuk menggunakan akun personel yang terdaftar.</p>
-      <form class="login-form" id="loginForm" method="POST" action="{{ route('login') }}">
+      <form class="login-form" id="loginForm" method="POST" action="{{ route('login') }}" autocomplete="off">
         @csrf
         <label class="login-label" for="loginUser">NRP / Username</label>
-        <input class="login-input" id="loginUser" name="username" type="text" value="{{ old('username') }}" autocomplete="username" required>
+        <input class="login-input" id="loginUser" name="username" type="text" value="{{ old('username') }}" autocomplete="off" required>
         @error('username')
           <span class="login-error">{{ $message }}</span>
         @enderror
         <label class="login-label" for="loginPass">Password</label>
         <div class="login-field">
-          <input class="login-input" id="loginPass" name="password" type="password" autocomplete="current-password" required>
+          <input class="login-input" id="loginPass" name="password" type="password" autocomplete="new-password" required>
           <button class="field-toggle" type="button" data-target="loginPass" aria-label="Tampilkan Password">
             <svg class="icon-eye" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z"/><circle cx="12" cy="12" r="3.2"/></svg>
             <svg class="icon-eye-off" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18"/><path d="M10.6 5.1A10.9 10.9 0 0 1 12 5c7 0 10.5 7 10.5 7a13.6 13.6 0 0 1-3.2 4.1M6.6 6.6C3.5 8.5 1.5 12 1.5 12s3.5 7 10.5 7a10.6 10.6 0 0 0 4.2-.85"/><path d="M9.5 9.7a3.2 3.2 0 0 0 4.5 4.5"/></svg>

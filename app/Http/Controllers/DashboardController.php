@@ -48,9 +48,9 @@ class DashboardController extends Controller
             'ADMIN' => $this->admin($user, $satuan),
             'DANPUS' => $this->danpus($user, $satuan),
             'WADAN' => $this->wadan($user, $satuan),
-            'SATLAKAL' => $this->satlakKal($user, $satuan),
-            'SATLAKSIBERSOS' => $this->satlakSisos($user, $satuan),
-            'SATLAKRINDAK' => $this->satlakDak($user, $satuan),
+            'SATLAKKAL' => $this->satlakKal($user, $satuan),
+            'SATLAKSISOS' => $this->satlakSisos($user, $satuan),
+            'SATLAKDAK' => $this->satlakDak($user, $satuan),
             'SATLAKDUKTEK' => $this->satlakDuktek($user, $satuan),
             'BINFUNG' => $this->binfung($user, $satuan),
             'BINUM' => $this->binum($user, $satuan),
@@ -74,12 +74,6 @@ class DashboardController extends Controller
             ['satuan' => 'Satuan Pelaksanaan Siber Sosial', 'catatan' => 'Lupa kata sandi lama', 'tanggal' => '02 Agu 2026', 'status' => 'Menunggu', 'status_class' => 'amber'],
             ['satuan' => 'Pembinaan Materil', 'catatan' => 'Akun terkunci setelah beberapa kali salah input', 'tanggal' => '01 Agu 2026', 'status' => 'Menunggu', 'status_class' => 'amber'],
             ['satuan' => 'Pendidikan dan Latihan', 'catatan' => 'Pergantian operator baru', 'tanggal' => '29 Jul 2026', 'status' => 'Selesai', 'status_class' => 'green'],
-        ];
-
-        $aktivitasTerbaru = [
-            ['kegiatan' => 'Permintaan reset password baru dari Satuan Pelaksanaan Siber Sosial', 'waktu' => '3 jam lalu', 'status' => 'Menunggu', 'status_class' => 'amber'],
-            ['kegiatan' => 'Akun Wakil Komandan login dari perangkat baru', 'waktu' => 'Kemarin', 'status' => 'Info', 'status_class' => 'ok'],
-            ['kegiatan' => 'Data satuan Pembinaan Fungsi diperbarui', 'waktu' => '2 hari lalu', 'status' => 'Selesai', 'status_class' => 'green'],
         ];
 
         // ===== Data untuk grafik Dashboard =====
@@ -151,7 +145,6 @@ class DashboardController extends Controller
             'semuaPengguna' => $semuaPengguna,
             'semuaSatuan' => $semuaSatuan,
             'permintaanResetPassword' => $permintaanResetPassword,
-            'aktivitasTerbaru' => $aktivitasTerbaru,
             'distribusiPenggunaKategori' => $distribusiPenggunaKategori,
             'statusResetPassword' => $statusResetPassword,
             'kelengkapanAkunSatuan' => [
@@ -185,9 +178,9 @@ class DashboardController extends Controller
         $semuaSatuan = Satuan::where('kode', '!=', 'ADMIN')->orderBy('urutan')->get();
 
         $statusSatuan = [
-            'SATLAKAL' => ['label' => 'Ada Insiden', 'class' => 'bad', 'update' => '10 menit lalu'],
-            'SATLAKSIBERSOS' => ['label' => 'Siaga', 'class' => 'warn', 'update' => '35 menit lalu'],
-            'SATLAKRINDAK' => ['label' => 'Normal', 'class' => 'ok', 'update' => '1 jam lalu'],
+            'SATLAKKAL' => ['label' => 'Ada Insiden', 'class' => 'bad', 'update' => '10 menit lalu'],
+            'SATLAKSISOS' => ['label' => 'Siaga', 'class' => 'warn', 'update' => '35 menit lalu'],
+            'SATLAKDAK' => ['label' => 'Normal', 'class' => 'ok', 'update' => '1 jam lalu'],
             'SATLAKDUKTEK' => ['label' => 'Normal', 'class' => 'ok', 'update' => '2 jam lalu'],
             'BINFUNG' => ['label' => 'Normal', 'class' => 'ok', 'update' => 'Hari ini'],
             'BINUM' => ['label' => 'Normal', 'class' => 'ok', 'update' => 'Hari ini'],
@@ -673,7 +666,7 @@ class DashboardController extends Controller
 
         // Log dukungan teknis ke 3 Satlak operasional lain (Satuan Pelaksanaan
         // Penangkalan, Siber Sosial, Penindakan).
-        $satuanTujuanDukungan = Satuan::whereIn('kode', ['SATLAKAL', 'SATLAKSIBERSOS', 'SATLAKRINDAK'])
+        $satuanTujuanDukungan = Satuan::whereIn('kode', ['SATLAKKAL', 'SATLAKSISOS', 'SATLAKDAK'])
             ->orderBy('urutan')
             ->get();
         $dukunganTeknis = DukunganTeknisLog::with('satuanTujuan')
