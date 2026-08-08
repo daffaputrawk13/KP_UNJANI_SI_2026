@@ -12,26 +12,24 @@ use Illuminate\Support\Facades\Storage;
 
 class LaporanController extends Controller
 {
-    /**
-     * Simpan laporan baru dari satuan pengirim (mis. Satuan Pelaksanaan Dukungan Teknologi)
-     * dan kirim notifikasi database ke seluruh user yang terdaftar di DANPUS.
-     */
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
+            'tujuan_satuan_id' => ['required', 'integer', 'exists:satuans,id'],
             'proyek' => ['nullable', 'string', 'max:255'],
             'perihal' => ['required', 'string', 'max:255'],
-            'deskripsi' => ['required', 'string'],
+            'deskripsi' => ['required', 'string', 'max:10000'],
             'prioritas' => ['required', 'in:Tinggi,Sedang,Rendah'],
             'lampiran' => ['nullable', 'file', 'mimes:pdf', 'max:20480'],
         ]);
 
         $user = $request->user()->load('satuan');
         $satuanAsal = $user->satuan;
-
         abort_unless($satuanAsal, 403, 'Akun ini belum terhubung ke satuan manapun.');
 
-        $danpus = Satuan::where('kode', 'DANPUS')->firstOrFail();
+        $tujuan = Satuan::findOrFail($validated['tujuan_satuan_id']);
+        abort_if(strtoupper((string) $tujuan->kode) === 'ADMIN', 422, 'Laporan tidak dapat ditujukan ke Admin.');
+        abort_if((int) $tujuan->id === (int) $satuanAsal->id, 422, 'Tujuan laporan tidak boleh sama dengan satuan pengirim.');
 
         $lampiranPath = $request->hasFile('lampiran')
             ? $request->file('lampiran')->store('lampiran-laporan', 'public')
@@ -40,7 +38,7 @@ class LaporanController extends Controller
         $laporan = Laporan::create([
             'satuan_id' => $satuanAsal->id,
             'user_id' => $user->id,
-            'tujuan_satuan_id' => $danpus->id,
+            'tujuan_satuan_id' => $tujuan->id,
             'proyek' => $validated['proyek'] ?? null,
             'perihal' => $validated['perihal'],
             'deskripsi' => $validated['deskripsi'],
@@ -49,35 +47,54 @@ class LaporanController extends Controller
             'status' => 'Menunggu',
         ]);
 
-        // Kirim notifikasi ke seluruh akun yang terdaftar di satuan DANPUS,
-        // bukan cuma satu user — jaga-jaga kalau DANPUS punya lebih dari satu akun.
-        $penerima = User::where('satuan_id', $danpus->id)->get();
-        foreach ($penerima as $u) {
-            $u->notify(new LaporanBaruDiterima($laporan));
+        foreach (User::where('satuan_id', $tujuan->id)->get() as $penerima) {
+            $penerima->notify(new LaporanBaruDiterima($laporan));
         }
 
-        return back()->with('status', 'Laporan berhasil dikirim ke DANPUS.');
+        return back()->with('status', 'Laporan berhasil dikirim ke '.$tujuan->nama.'.');
     }
 
     /**
-     * Hapus laporan dari riwayat (dipakai tab "Riwayat Laporan" di dashboard
-     * DANPUS). Hanya user dari satuan tujuan laporan tersebut yang boleh
-     * menghapusnya — mencegah satuan lain menghapus laporan yang bukan
-     * ditujukan kepada mereka.
+     * Review dilakukan oleh satuan penerima agar alur tetap antar-satuan.
+     * Admin tidak menjadi bagian dari alur operasional laporan.
      */
+    public function updateStatus(Request $request, Laporan $laporan): RedirectResponse
+    {
+        $validated = $request->validate([
+            'status' => ['required', 'in:Disetujui,Ditolak,Revisi,Disetujui DANPUS,Ditolak DANPUS,Revisi DANPUS,Disetujui WADAN,Ditolak WADAN,Revisi WADAN'],
+        ]);
+
+        $user = $request->user()->load('satuan');
+        $satuan = $user->satuan;
+        abort_unless($satuan, 403, 'Akun belum terhubung ke satuan.');
+        abort_unless((int) $laporan->tujuan_satuan_id === (int) $satuan->id, 403, 'Anda bukan penerima laporan ini.');
+
+        $kode = strtoupper((string) $satuan->kode);
+        abort_unless(in_array($kode, ['DANPUS', 'WADAN'], true), 403, 'Akun ini tidak memiliki kewenangan review laporan.');
+
+        $aksi = strtolower((string) $validated['status']);
+        $validated['status'] = match ($kode) {
+            'DANPUS' => str_contains($aksi, 'setuj') ? 'Disetujui DANPUS' : (str_contains($aksi, 'tolak') ? 'Ditolak DANPUS' : 'Revisi DANPUS'),
+            'WADAN' => str_contains($aksi, 'setuj') ? 'Disetujui WADAN' : (str_contains($aksi, 'tolak') ? 'Ditolak WADAN' : 'Revisi WADAN'),
+            default => $validated['status'],
+        };
+
+        $laporan->update(['status' => $validated['status']]);
+
+        return back()->with('status', 'Status laporan berhasil diperbarui menjadi '.$laporan->status.'.');
+    }
+
     public function destroy(Request $request, Laporan $laporan): RedirectResponse
     {
         $user = $request->user()->load('satuan');
         $satuan = $user->satuan;
-
         abort_unless($satuan && $laporan->tujuan_satuan_id === $satuan->id, 403);
 
         if ($laporan->lampiran_path) {
             Storage::disk('public')->delete($laporan->lampiran_path);
         }
-
         $laporan->delete();
 
-        return back()->with('status', 'Laporan berhasil dihapus dari riwayat.');
+        return back()->with('status', 'Laporan berhasil dihapus dari riwayat penerimaan.');
     }
 }
