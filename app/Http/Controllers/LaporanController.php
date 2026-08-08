@@ -12,10 +12,6 @@ use Illuminate\Support\Facades\Storage;
 
 class LaporanController extends Controller
 {
-    /**
-     * Satu alur laporan untuk seluruh satuan. Tujuan laporan dibatasi pada
-     * satuan yang terdaftar di sistem; ADMIN tidak dapat menjadi tujuan laporan.
-     */
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
@@ -56,6 +52,36 @@ class LaporanController extends Controller
         }
 
         return back()->with('status', 'Laporan berhasil dikirim ke '.$tujuan->nama.'.');
+    }
+
+    /**
+     * Review dilakukan oleh satuan penerima agar alur tetap antar-satuan.
+     * Admin tidak menjadi bagian dari alur operasional laporan.
+     */
+    public function updateStatus(Request $request, Laporan $laporan): RedirectResponse
+    {
+        $validated = $request->validate([
+            'status' => ['required', 'in:Disetujui,Ditolak,Revisi,Disetujui DANPUS,Ditolak DANPUS,Revisi DANPUS,Disetujui WADAN,Ditolak WADAN,Revisi WADAN'],
+        ]);
+
+        $user = $request->user()->load('satuan');
+        $satuan = $user->satuan;
+        abort_unless($satuan, 403, 'Akun belum terhubung ke satuan.');
+        abort_unless((int) $laporan->tujuan_satuan_id === (int) $satuan->id, 403, 'Anda bukan penerima laporan ini.');
+
+        $kode = strtoupper((string) $satuan->kode);
+        abort_unless(in_array($kode, ['DANPUS', 'WADAN'], true), 403, 'Akun ini tidak memiliki kewenangan review laporan.');
+
+        $aksi = strtolower((string) $validated['status']);
+        $validated['status'] = match ($kode) {
+            'DANPUS' => str_contains($aksi, 'setuj') ? 'Disetujui DANPUS' : (str_contains($aksi, 'tolak') ? 'Ditolak DANPUS' : 'Revisi DANPUS'),
+            'WADAN' => str_contains($aksi, 'setuj') ? 'Disetujui WADAN' : (str_contains($aksi, 'tolak') ? 'Ditolak WADAN' : 'Revisi WADAN'),
+            default => $validated['status'],
+        };
+
+        $laporan->update(['status' => $validated['status']]);
+
+        return back()->with('status', 'Status laporan berhasil diperbarui menjadi '.$laporan->status.'.');
     }
 
     public function destroy(Request $request, Laporan $laporan): RedirectResponse
