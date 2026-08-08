@@ -28,11 +28,6 @@ class DashboardController extends Controller
         return $this->pelaporan($user, $satuan, $kode);
     }
 
-    /**
-     * Dashboard Admin dipertahankan sebagai pengelola sistem.
-     * Fokus refactor berlaku pada dashboard satuan/pimpinan, bukan menu
-     * administrasi teknis yang memang dibutuhkan untuk menjaga sistem.
-     */
     private function admin($user, $satuan): View
     {
         $semuaPengguna = User::with('satuan')->orderBy('name')->get();
@@ -88,18 +83,13 @@ class DashboardController extends Controller
         ]);
     }
 
-    /**
-     * Semua role non-admin memakai alur yang sama: kirim laporan, pantau status,
-     * lihat riwayat, dan menerima laporan bila perannya memang berfungsi sebagai
-     * koordinator/pimpinan. Duktek mendapat panel tambahan untuk memantau tiga Satlak.
-     */
     private function pelaporan($user, $satuan, ?string $kode): View
     {
         abort_unless($satuan, 403, 'Akun belum terhubung ke satuan.');
 
         $laporanTerkirim = Laporan::with('tujuanSatuan')->where('satuan_id', $satuan->id)->latest()->get();
         $laporanMasuk = Laporan::with('satuan')->where('tujuan_satuan_id', $satuan->id)->latest()->get();
-        $tujuan = Satuan::where('kode', '!=', 'ADMIN')->orderBy('urutan')->get();
+        $tujuan = Satuan::where('kode', '!=', 'ADMIN')->where('id', '!=', $satuan->id)->orderBy('urutan')->get();
         $defaultDanpus = $tujuan->firstWhere('kode', 'DANPUS');
 
         $mode = $kode === 'SATLAKDUKTEK' ? 'duktek' : 'standar';
