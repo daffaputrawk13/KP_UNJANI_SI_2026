@@ -6,11 +6,6 @@
 <title>Satuan Pelaksanaan Penangkalan — SIBERAD</title>
 <link rel="icon" type="image/jpeg" href="{{ asset('images/logo-pussiberad.jpg') }}">
 @include('siberad.dashboards.partials.dash-styles')
-{{-- Library untuk fitur "Export PDF/Excel" pada tab Laporan Periodik.
-     Hanya dimuat di dashboard Satuan Pelaksanaan Penangkalan karena fitur ini spesifik di sini. --}}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
 
@@ -99,19 +94,16 @@
       <div class="side-dropdown" id="laporanDropdown">
         <button type="button" class="side-link side-dropdown-toggle" id="laporanToggle" aria-expanded="false" aria-controls="laporanSubmenu">
           <span class="dot"></span>
-          <span class="side-link-label">Laporan</span>
+          <span class="side-link-label">Laporan Kegiatan</span>
           <svg class="side-dropdown-arrow" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg>
         </button>
         <div class="side-dropdown-menu" id="laporanSubmenu">
-          <a href="#" class="side-link side-sublink" data-tab-link="tambah-laporan">Buat Laporan Monitoring &amp; Recovery</a>
+          <a href="#" class="side-link side-sublink" data-tab-link="tambah-laporan">Buat Laporan</a>
           <a href="#" class="side-link side-sublink" data-tab-link="draft-laporan">Draft Laporan</a>
           <a href="#" class="side-link side-sublink" data-tab-link="status-laporan">Status Laporan</a>
           <a href="#" class="side-link side-sublink" data-tab-link="riwayat-laporan">Riwayat Laporan</a>
         </div>
       </div>
-
-      <a href="#" class="side-link" data-tab-link="monitoring-sistem"><span class="dot"></span>Monitoring Sistem</a>
-      <a href="#" class="side-link" data-tab-link="laporan-periodik"><span class="dot"></span>Laporan Periodik</a>
     </nav>
     <div class="side-foot">
       <form class="logout logout-form" method="POST" action="{{ route('logout') }}">
@@ -256,46 +248,55 @@
         </div>
 
         <div class="section-head">
-          <h2>Ringkasan Pemantauan</h2>
-          <p>Status aset/website yang dipantau Satuan Pelaksanaan Penangkalan hari ini.</p>
+          <h2>Ringkasan Laporan Kegiatan</h2>
+          <p>Rekap laporan kegiatan pemantauan &amp; pemulihan Satuan Pelaksanaan Penangkalan ke DANPUS.</p>
         </div>
         <div class="stat-grid">
           <div class="stat-card">
-            <div class="lbl">Total Aset Dipantau</div>
-            <div class="val">{{ $stats['total_aset'] }}</div>
-            <div class="sub">Website & layanan digital</div>
+            <div class="lbl">Total Laporan</div>
+            <div class="val">{{ $statsLaporanMonitoring['total'] }}</div>
+            <div class="sub">Draft &amp; terkirim</div>
           </div>
           <div class="stat-card">
-            <div class="lbl">Status Normal</div>
-            <div class="val" style="color:var(--green);">{{ $stats['normal'] }}</div>
-            <div class="sub">Berjalan baik</div>
+            <div class="lbl">Draft</div>
+            <div class="val" style="color:var(--text-muted);">{{ $statsLaporanMonitoring['draft'] }}</div>
+            <div class="sub">Belum dikirim ke DANPUS</div>
           </div>
           <div class="stat-card">
-            <div class="lbl">Sedang Diserang</div>
-            <div class="val" style="color:var(--red);">{{ $stats['diserang'] }}</div>
-            <div class="sub">Butuh penanganan segera</div>
+            <div class="lbl">Menunggu Verifikasi</div>
+            <div class="val" style="color:var(--amber);">{{ $statsLaporanMonitoring['dikirim'] }}</div>
+            <div class="sub">Sudah dikirim, belum diputuskan</div>
           </div>
           <div class="stat-card">
-            <div class="lbl">Dalam Pemulihan</div>
-            <div class="val" style="color:var(--amber);">{{ $stats['pemulihan'] }}</div>
-            <div class="sub">Sedang ditangani</div>
+            <div class="lbl">Disetujui DANPUS</div>
+            <div class="val" style="color:var(--green-bright);">{{ $statsLaporanMonitoring['disetujui'] }}</div>
+            <div class="sub">Laporan yang sudah disetujui</div>
           </div>
         </div>
 
         <div class="panel">
-          <div class="panel-head"><div><h3>Insiden Terbaru</h3><p>Serangan atau gangguan yang baru terdeteksi.</p></div></div>
+          <div class="panel-head"><div><h3>Laporan Kegiatan Terbaru</h3><p>5 laporan kegiatan pemantauan &amp; pemulihan terakhir yang dibuat.</p></div></div>
           <div class="tbl-wrap">
             <table class="dtbl">
-              <thead><tr><th>Aset</th><th>Jenis Gangguan</th><th>Terdeteksi</th><th>Status</th></tr></thead>
+              <thead><tr><th>Jenis Kegiatan</th><th>Tanggal Kegiatan</th><th>Dibuat</th><th>Status</th></tr></thead>
               <tbody>
-                @foreach($insidenTerbaru as $i)
+                @forelse($semuaLaporanMonitoring->take(5) as $l)
                 <tr>
-                  <td>{{ $i['aset'] }}</td>
-                  <td>{{ $i['jenis'] }}</td>
-                  <td>{{ $i['waktu'] }}</td>
-                  <td><span class="status-dot {{ $i['status_class'] }}">{{ $i['status'] }}</span></td>
+                  <td>{{ $l->jenis_kegiatan }}</td>
+                  <td>{{ $l->tanggal_kegiatan?->translatedFormat('d M Y') ?? '—' }}</td>
+                  <td>{{ $l->created_at->translatedFormat('d M Y') }}</td>
+                  <td>
+                    <span class="badge {{ match($l->status) {
+                      'Disetujui' => 'green',
+                      'Ditolak' => 'red',
+                      'Direvisi' => 'amber',
+                      default => '',
+                    } }}">{{ $l->status }}</span>
+                  </td>
                 </tr>
-                @endforeach
+                @empty
+                <tr><td colspan="4" style="text-align:center;color:var(--text-muted);">Belum ada laporan kegiatan.</td></tr>
+                @endforelse
               </tbody>
             </table>
           </div>
@@ -305,8 +306,8 @@
       {{-- ===== LAPORAN › TAMBAH LAPORAN ===== --}}
       <section class="tab-panel" data-tab-panel="tambah-laporan">
         <div class="section-head">
-          <h2>Buat Laporan Monitoring &amp; Recovery</h2>
-          <p>Laporkan insiden dan tindakan pemulihan aset digital ke DANPUS. Bisa disimpan sebagai draft dulu atau langsung dikirim.</p>
+          <h2>Buat Laporan</h2>
+          <p>Laporkan kegiatan pemantauan &amp; pemulihan ke DANPUS. Bisa disimpan sebagai draft dulu atau langsung dikirim.</p>
         </div>
         <div class="panel">
           @if(session('status'))
@@ -318,46 +319,27 @@
           <form class="form-grid" method="POST" action="{{ route('laporan-monitoring.store') }}" enctype="multipart/form-data" style="padding:22px;">
             @csrf
             <div class="form-field">
-              <label for="asetTambahLaporan">Aset / Website Terdampak</label>
-              <select id="asetTambahLaporan" name="aset">
-                <option value="">— Pilih aset —</option>
-                @foreach($asetMonitoring as $a)
-                  <option value="{{ $a['nama'] }}">{{ $a['nama'] }}</option>
-                @endforeach
+              <label for="jenisKegiatanTambahLaporan">Jenis Kegiatan</label>
+              <select id="jenisKegiatanTambahLaporan" name="jenis_kegiatan" required>
+                <option value="">— Pilih jenis kegiatan —</option>
+                <option value="Pemantauan Rutin">Pemantauan Rutin</option>
+                <option value="Pemulihan Sistem">Pemulihan Sistem</option>
+                <option value="Pemeliharaan">Pemeliharaan</option>
+                <option value="Patroli Siber">Patroli Siber</option>
                 <option value="Lainnya">Lainnya</option>
               </select>
             </div>
             <div class="form-field">
-              <label for="jenisInsidenTambahLaporan">Jenis Insiden</label>
-              <select id="jenisInsidenTambahLaporan" name="jenis_insiden">
-                <option value="">— Pilih jenis —</option>
-                <option value="DDoS Attack">DDoS Attack</option>
-                <option value="Defacement">Defacement</option>
-                <option value="SQL Injection">SQL Injection</option>
-                <option value="Malware">Malware</option>
-                <option value="Percobaan Akses Ilegal">Percobaan Akses Ilegal</option>
-                <option value="Lainnya">Lainnya</option>
-              </select>
-            </div>
-            <div class="form-field">
-              <label for="prioritasTambahLaporan">Prioritas</label>
-              <select id="prioritasTambahLaporan" name="prioritas" required>
-                <option value="Tinggi">Tinggi</option>
-                <option value="Sedang" selected>Sedang</option>
-                <option value="Rendah">Rendah</option>
-              </select>
-            </div>
-            <div class="form-field">
-              <label for="perihalTambahLaporan">Perihal</label>
-              <input id="perihalTambahLaporan" name="perihal" type="text" placeholder="Contoh: Percobaan akses ilegal terdeteksi" required>
+              <label for="tanggalKegiatanTambahLaporan">Tanggal Kegiatan</label>
+              <input id="tanggalKegiatanTambahLaporan" name="tanggal_kegiatan" type="date" required>
             </div>
             <div class="form-field full">
-              <label for="deskripsiTambahLaporan">Deskripsi / Kronologi Kejadian</label>
-              <textarea id="deskripsiTambahLaporan" name="deskripsi" rows="4" placeholder="Jelaskan kronologi dan dampak insiden..." required></textarea>
+              <label for="ringkasanKegiatanTambahLaporan">Ringkasan Kegiatan</label>
+              <textarea id="ringkasanKegiatanTambahLaporan" name="ringkasan_kegiatan" rows="4" placeholder="Jelaskan kegiatan pemantauan/pemulihan yang dilakukan..." required></textarea>
             </div>
             <div class="form-field full">
-              <label for="tindakanTambahLaporan">Tindakan Monitoring &amp; Recovery</label>
-              <textarea id="tindakanTambahLaporan" name="tindakan" rows="3" placeholder="Jelaskan tindakan mitigasi/pemulihan yang sudah/akan dilakukan..."></textarea>
+              <label for="hasilTambahLaporan">Hasil</label>
+              <textarea id="hasilTambahLaporan" name="hasil" rows="3" placeholder="Jelaskan hasil/capaian dari kegiatan ini..." required></textarea>
             </div>
             <div class="form-field full">
               <label for="lampiranTambahLaporan">Upload Lampiran (Foto, PDF, Dokumen)</label>
@@ -381,18 +363,19 @@
         <div class="panel">
           <div class="tbl-wrap">
             <table class="dtbl">
-              <thead><tr><th>Perihal</th><th>Aset</th><th>Status</th><th>Lampiran</th><th>Dibuat</th><th>Aksi</th></tr></thead>
+              <thead><tr><th>Jenis Kegiatan</th><th>Tanggal Kegiatan</th><th>Status</th><th>Lampiran</th><th>Dibuat</th><th>Aksi</th></tr></thead>
               <tbody>
                 @forelse($draftLaporanMonitoring as $d)
                 <tr>
-                  <td>{{ $d->perihal }}</td>
-                  <td>{{ $d->aset ?? '—' }}</td>
+                  <td>{{ $d->jenis_kegiatan }}</td>
+                  <td>{{ $d->tanggal_kegiatan?->translatedFormat('d M Y') ?? '—' }}</td>
                   <td><span class="badge {{ $d->status === 'Direvisi' ? 'amber' : '' }}">{{ $d->status }}</span></td>
                   <td>{{ $d->lampiran->count() }} file</td>
                   <td>{{ $d->created_at->translatedFormat('d M Y') }}</td>
                   <td>
                     <div class="btn-row">
                       <button class="btn btn-ghost btn-sm" type="button" onclick="bukaDetailLaporanMonitoring({{ $d->id }})">Detail</button>
+                      <button class="btn btn-ghost btn-sm" type="button" onclick="bukaEditLaporanMonitoring({{ $d->id }})">Edit</button>
                       <button class="btn btn-ghost btn-sm" type="button" onclick="bukaUploadLampiran({{ $d->id }})">+ Lampiran</button>
                       <form method="POST" action="{{ route('laporan-monitoring.kirim', $d) }}" style="display:inline;">
                         @csrf
@@ -425,12 +408,12 @@
         <div class="panel">
           <div class="tbl-wrap">
             <table class="dtbl">
-              <thead><tr><th>Aset</th><th>Perihal</th><th>Tanggal Kirim</th><th>Status</th><th>Detail</th></tr></thead>
+              <thead><tr><th>Jenis Kegiatan</th><th>Tanggal Kegiatan</th><th>Tanggal Kirim</th><th>Status</th><th>Detail</th></tr></thead>
               <tbody>
                 @forelse($statusLaporanMonitoring as $s)
                 <tr>
-                  <td>{{ $s->aset ?? '—' }}</td>
-                  <td>{{ $s->perihal }}</td>
+                  <td>{{ $s->jenis_kegiatan }}</td>
+                  <td>{{ $s->tanggal_kegiatan?->translatedFormat('d M Y') ?? '—' }}</td>
                   <td>{{ $s->tanggal_kirim?->translatedFormat('d M Y') ?? '—' }}</td>
                   <td>
                     <span class="status-dot {{ match($s->status) {
@@ -460,12 +443,12 @@
         <div class="panel">
           <div class="tbl-wrap">
             <table class="dtbl">
-              <thead><tr><th>Perihal</th><th>Aset</th><th>Dibuat</th><th>Status</th><th>Detail</th></tr></thead>
+              <thead><tr><th>Jenis Kegiatan</th><th>Tanggal Kegiatan</th><th>Dibuat</th><th>Status</th><th>Detail</th></tr></thead>
               <tbody>
                 @forelse($semuaLaporanMonitoring as $r)
                 <tr>
-                  <td>{{ $r->perihal }}</td>
-                  <td>{{ $r->aset ?? '—' }}</td>
+                  <td>{{ $r->jenis_kegiatan }}</td>
+                  <td>{{ $r->tanggal_kegiatan?->translatedFormat('d M Y') ?? '—' }}</td>
                   <td>{{ $r->created_at->translatedFormat('d M Y') }}</td>
                   <td>
                     <span class="badge {{ match($r->status) {
@@ -491,19 +474,17 @@
         <div class="modal-box" style="max-width:560px;">
           <div class="modal-head">
             <div>
-              <h3 id="dlmPerihal">-</h3>
-              <p id="dlmAset" style="margin:2px 0 0;font-size:12.5px;color:var(--text-muted);">-</p>
+              <h3 id="dlmJenisKegiatan">-</h3>
+              <p id="dlmTanggalKegiatan" style="margin:2px 0 0;font-size:12.5px;color:var(--text-muted);">-</p>
             </div>
             <button type="button" class="modal-close" onclick="tutupDetailLaporanMonitoring()">&times;</button>
           </div>
           <div class="modal-body">
             <div class="detail-grid">
               <div class="detail-item"><span class="detail-label">Status</span><span id="dlmStatus">-</span></div>
-              <div class="detail-item"><span class="detail-label">Prioritas</span><span id="dlmPrioritas">-</span></div>
-              <div class="detail-item"><span class="detail-label">Jenis Insiden</span><span id="dlmJenis">-</span></div>
               <div class="detail-item"><span class="detail-label">Tanggal Kirim</span><span id="dlmTanggal">-</span></div>
-              <div class="detail-item full"><span class="detail-label">Deskripsi</span><span id="dlmDeskripsi">-</span></div>
-              <div class="detail-item full"><span class="detail-label">Tindakan Monitoring &amp; Recovery</span><span id="dlmTindakan">-</span></div>
+              <div class="detail-item full"><span class="detail-label">Ringkasan Kegiatan</span><span id="dlmRingkasan">-</span></div>
+              <div class="detail-item full"><span class="detail-label">Hasil</span><span id="dlmHasil">-</span></div>
               <div class="detail-item full" id="dlmCatatanWrap" style="display:none;">
                 <span class="detail-label">Catatan DANPUS</span>
                 <span id="dlmCatatan" style="color:var(--gold-bright);"></span>
@@ -513,6 +494,52 @@
                 <div id="dlmLampiran" class="btn-row" style="flex-wrap:wrap;">-</div>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {{-- ===== MODAL: EDIT / REVISI LAPORAN ===== --}}
+      <div class="modal-overlay" id="modalEditLaporanMonitoring">
+        <div class="modal-box" style="max-width:560px;">
+          <div class="modal-head">
+            <div><h3>Edit Laporan</h3></div>
+            <button type="button" class="modal-close" onclick="tutupEditLaporanMonitoring()">&times;</button>
+          </div>
+          <div class="modal-body">
+            <form method="POST" id="formEditLaporanMonitoring" class="form-grid">
+              @csrf @method('PATCH')
+              <div class="form-field">
+                <label for="elmJenisKegiatan">Jenis Kegiatan</label>
+                <select id="elmJenisKegiatan" name="jenis_kegiatan" required>
+                  <option value="">— Pilih jenis kegiatan —</option>
+                  <option value="Pemantauan Rutin">Pemantauan Rutin</option>
+                  <option value="Pemulihan Sistem">Pemulihan Sistem</option>
+                  <option value="Pemeliharaan">Pemeliharaan</option>
+                  <option value="Patroli Siber">Patroli Siber</option>
+                  <option value="Lainnya">Lainnya</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label for="elmTanggalKegiatan">Tanggal Kegiatan</label>
+                <input id="elmTanggalKegiatan" name="tanggal_kegiatan" type="date" required>
+              </div>
+              <div class="form-field full">
+                <label for="elmRingkasan">Ringkasan Kegiatan</label>
+                <textarea id="elmRingkasan" name="ringkasan_kegiatan" rows="4" required></textarea>
+              </div>
+              <div class="form-field full">
+                <label for="elmHasil">Hasil</label>
+                <textarea id="elmHasil" name="hasil" rows="3" required></textarea>
+              </div>
+              <div class="form-field full">
+                <label for="elmLampiran">Tambah Lampiran (opsional)</label>
+                <input id="elmLampiran" name="lampiran[]" type="file" multiple accept="image/*,.pdf,.doc,.docx">
+                <span class="form-hint">Bisa pilih beberapa file sekaligus. Maks. 20 MB per file.</span>
+              </div>
+              <div class="form-field full" style="display:flex;justify-content:flex-end;">
+                <button class="btn btn-primary" type="submit">Simpan Perubahan</button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
@@ -561,14 +588,12 @@
         function bukaDetailLaporanMonitoring(id) {
           const l = laporanMonitoringData[id];
           if (!l) return;
-          document.getElementById('dlmPerihal').textContent = l.perihal;
-          document.getElementById('dlmAset').textContent = l.aset;
+          document.getElementById('dlmJenisKegiatan').textContent = l.jenis_kegiatan;
+          document.getElementById('dlmTanggalKegiatan').textContent = l.tanggal_kegiatan;
           document.getElementById('dlmStatus').textContent = l.status;
-          document.getElementById('dlmPrioritas').textContent = l.prioritas;
-          document.getElementById('dlmJenis').textContent = l.jenis_insiden;
           document.getElementById('dlmTanggal').textContent = l.tanggal;
-          document.getElementById('dlmDeskripsi').textContent = l.deskripsi;
-          document.getElementById('dlmTindakan').textContent = l.tindakan;
+          document.getElementById('dlmRingkasan').textContent = l.ringkasan_kegiatan;
+          document.getElementById('dlmHasil').textContent = l.hasil;
 
           const catatanWrap = document.getElementById('dlmCatatanWrap');
           if (l.catatan_danpus) {
@@ -598,6 +623,26 @@
           if (e.target === this) tutupDetailLaporanMonitoring();
         });
 
+        function bukaEditLaporanMonitoring(id) {
+          const l = laporanMonitoringData[id];
+          if (!l) return;
+          const form = document.getElementById('formEditLaporanMonitoring');
+          form.action = '/laporan-monitoring/' + id;
+          document.getElementById('elmJenisKegiatan').value = l.jenis_kegiatan;
+          document.getElementById('elmTanggalKegiatan').value = l.tanggal_kegiatan_raw || '';
+          document.getElementById('elmRingkasan').value = l.ringkasan_kegiatan;
+          document.getElementById('elmHasil').value = l.hasil;
+          document.getElementById('modalEditLaporanMonitoring').classList.add('open');
+        }
+
+        function tutupEditLaporanMonitoring() {
+          document.getElementById('modalEditLaporanMonitoring').classList.remove('open');
+        }
+
+        document.getElementById('modalEditLaporanMonitoring').addEventListener('click', function (e) {
+          if (e.target === this) tutupEditLaporanMonitoring();
+        });
+
         function bukaUploadLampiran(id) {
           document.getElementById('formUploadLampiran').action = '/laporan-monitoring/' + id + '/lampiran';
           document.getElementById('modalUploadLampiran').classList.add('open');
@@ -610,260 +655,6 @@
         document.getElementById('modalUploadLampiran').addEventListener('click', function (e) {
           if (e.target === this) tutupUploadLampiran();
         });
-      </script>
-
-      {{-- ===== MONITORING SISTEM ===== --}}
-      <section class="tab-panel" data-tab-panel="monitoring-sistem">
-        <div class="section-head">
-          <h2>Monitoring Sistem</h2>
-          <p>Pemakaian resource server dan uptime untuk setiap aset/website yang dipantau Satuan Pelaksanaan Penangkalan.</p>
-        </div>
-
-        <div class="stat-grid">
-          <div class="stat-card">
-            <div class="lbl">Rata-rata CPU</div>
-            <div class="val">{{ $resourceSummary['avg_cpu'] }}%</div>
-            <div class="sub">Seluruh aset dipantau</div>
-          </div>
-          <div class="stat-card">
-            <div class="lbl">Rata-rata RAM</div>
-            <div class="val">{{ $resourceSummary['avg_ram'] }}%</div>
-            <div class="sub">Seluruh aset dipantau</div>
-          </div>
-          <div class="stat-card">
-            <div class="lbl">Rata-rata Storage</div>
-            <div class="val">{{ $resourceSummary['avg_storage'] }}%</div>
-            <div class="sub">Seluruh aset dipantau</div>
-          </div>
-          <div class="stat-card">
-            <div class="lbl">Rata-rata Uptime (30 Hari)</div>
-            <div class="val" style="color:var(--green);">{{ $resourceSummary['avg_uptime_30h'] }}%</div>
-            <div class="sub">Seluruh aset dipantau</div>
-          </div>
-        </div>
-
-        <div class="panel">
-          <div class="panel-head">
-            <div><h3>Pemakaian Resource per Aset</h3><p>CPU, RAM, Storage, dan trafik jaringan (prototype — belum ditarik dari agent monitoring nyata).</p></div>
-          </div>
-          <div class="gauge-grid">
-            @foreach($asetMonitoring as $a)
-            @php
-              $cpuClass = $a['cpu'] >= 80 ? 'bad' : ($a['cpu'] >= 60 ? 'warn' : 'ok');
-              $ramClass = $a['ram'] >= 80 ? 'bad' : ($a['ram'] >= 60 ? 'warn' : 'ok');
-              $storClass = $a['storage'] >= 80 ? 'bad' : ($a['storage'] >= 60 ? 'warn' : 'ok');
-            @endphp
-            <div class="gauge-card">
-              <div class="gauge-card-head">
-                <div>
-                  <div class="gauge-card-name">{{ $a['nama'] }}</div>
-                  <div class="gauge-card-url">{{ $a['url'] }}</div>
-                </div>
-                <span class="status-dot {{ $a['status_class'] }}">{{ $a['status'] }}</span>
-              </div>
-
-              <div class="meter">
-                <div class="meter-row"><span>CPU</span><span>{{ $a['cpu'] }}%</span></div>
-                <div class="progress-bar"><div class="progress-fill {{ $cpuClass }}" style="width:{{ $a['cpu'] }}%"></div></div>
-              </div>
-              <div class="meter">
-                <div class="meter-row"><span>RAM</span><span>{{ $a['ram'] }}%</span></div>
-                <div class="progress-bar"><div class="progress-fill {{ $ramClass }}" style="width:{{ $a['ram'] }}%"></div></div>
-              </div>
-              <div class="meter">
-                <div class="meter-row"><span>Storage</span><span>{{ $a['storage'] }}%</span></div>
-                <div class="progress-bar"><div class="progress-fill {{ $storClass }}" style="width:{{ $a['storage'] }}%"></div></div>
-              </div>
-
-              <div class="meter-foot">
-                <span>Trafik Jaringan: <b>{{ $a['network'] }} Mbps</b></span>
-                <span>Cek terakhir: {{ $a['cek_terakhir'] }}</span>
-              </div>
-            </div>
-            @endforeach
-          </div>
-        </div>
-
-        <div class="panel">
-          <div class="panel-head">
-            <div><h3>Uptime &amp; Waktu Respons</h3><p>Ketersediaan layanan dalam 24 jam dan 30 hari terakhir.</p></div>
-          </div>
-          <div class="tbl-wrap">
-            <table class="dtbl">
-              <thead><tr><th>Aset</th><th>Uptime 24 Jam</th><th>Uptime 30 Hari</th><th>Rata-rata Respons</th><th>Status</th></tr></thead>
-              <tbody>
-                @foreach($asetMonitoring as $a)
-                <tr>
-                  <td>{{ $a['nama'] }}</td>
-                  <td>{{ number_format($a['uptime_24h'], 2) }}%</td>
-                  <td>{{ number_format($a['uptime_30h'], 2) }}%</td>
-                  <td>{{ $a['avg_response'] }} ms</td>
-                  <td><span class="status-dot {{ $a['status_class'] }}">{{ $a['status'] }}</span></td>
-                </tr>
-                @endforeach
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      {{-- ===== LAPORAN PERIODIK ===== --}}
-      <section class="tab-panel" data-tab-panel="laporan-periodik">
-        <div class="section-head">
-          <h2>Laporan Monitoring Periodik</h2>
-          <p>Rekap insiden dan uptime dalam periode harian, mingguan, dan bulanan. Bisa diexport ke PDF atau Excel.</p>
-        </div>
-
-        <div class="panel">
-          <div class="panel-head">
-            <div><h3>Rekap Periodik</h3><p>Pilih periode di bawah, lalu export laporannya.</p></div>
-            <div class="period-toggle">
-              <button type="button" class="btn btn-primary btn-sm" data-period-tab="harian">Harian</button>
-              <button type="button" class="btn btn-sm" data-period-tab="mingguan">Mingguan</button>
-              <button type="button" class="btn btn-sm" data-period-tab="bulanan">Bulanan</button>
-            </div>
-          </div>
-
-          <div class="btn-row" style="margin-bottom:18px;">
-            <button type="button" class="btn btn-sm" id="btnExportPdfPeriodik">
-              <svg viewBox="0 0 24 24" width="14" height="14" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path></svg>
-              Export PDF
-            </button>
-            <button type="button" class="btn btn-sm" id="btnExportExcelPeriodik">
-              <svg viewBox="0 0 24 24" width="14" height="14" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M8 8l8 8M16 8l-8 8"></path></svg>
-              Export Excel
-            </button>
-          </div>
-
-          <div class="tbl-wrap">
-            <table class="dtbl" id="tabelLaporanPeriodik" data-active-period="harian">
-              <thead><tr><th>Periode</th><th>Total Insiden</th><th>Diselesaikan</th><th>Rata-rata Waktu Tangani</th><th>Uptime</th></tr></thead>
-              <tbody id="periodeHarian">
-                @foreach($laporanPeriodik['harian'] as $row)
-                <tr>
-                  <td>{{ $row['periode'] }}</td>
-                  <td>{{ $row['total_insiden'] }}</td>
-                  <td>{{ $row['diselesaikan'] }}</td>
-                  <td>{{ $row['rata_waktu'] }}</td>
-                  <td>{{ $row['uptime'] }}</td>
-                </tr>
-                @endforeach
-              </tbody>
-              <tbody id="periodeMingguan" style="display:none;">
-                @foreach($laporanPeriodik['mingguan'] as $row)
-                <tr>
-                  <td>{{ $row['periode'] }}</td>
-                  <td>{{ $row['total_insiden'] }}</td>
-                  <td>{{ $row['diselesaikan'] }}</td>
-                  <td>{{ $row['rata_waktu'] }}</td>
-                  <td>{{ $row['uptime'] }}</td>
-                </tr>
-                @endforeach
-              </tbody>
-              <tbody id="periodeBulanan" style="display:none;">
-                @foreach($laporanPeriodik['bulanan'] as $row)
-                <tr>
-                  <td>{{ $row['periode'] }}</td>
-                  <td>{{ $row['total_insiden'] }}</td>
-                  <td>{{ $row['diselesaikan'] }}</td>
-                  <td>{{ $row['rata_waktu'] }}</td>
-                  <td>{{ $row['uptime'] }}</td>
-                </tr>
-                @endforeach
-              </tbody>
-            </table>
-          </div>
-          <p class="form-hint" style="margin-top:12px;">
-            Prototype — data rekap masih statis. Export mengambil data dari tabel periode yang sedang aktif.
-          </p>
-        </div>
-      </section>
-
-      <script>
-      (function () {
-        // ===== Toggle periode Harian/Mingguan/Bulanan =====
-        var periodBtns = document.querySelectorAll('[data-period-tab]');
-        var bodies = {
-          harian: document.getElementById('periodeHarian'),
-          mingguan: document.getElementById('periodeMingguan'),
-          bulanan: document.getElementById('periodeBulanan')
-        };
-        var tabelPeriodik = document.getElementById('tabelLaporanPeriodik');
-
-        periodBtns.forEach(function (btn) {
-          btn.addEventListener('click', function () {
-            var period = btn.getAttribute('data-period-tab');
-            periodBtns.forEach(function (b) { b.classList.remove('btn-primary'); });
-            btn.classList.add('btn-primary');
-            Object.keys(bodies).forEach(function (key) {
-              if (bodies[key]) bodies[key].style.display = (key === period) ? '' : 'none';
-            });
-            if (tabelPeriodik) tabelPeriodik.setAttribute('data-active-period', period);
-          });
-        });
-
-        // ===== Ambil baris tabel dari periode yang sedang aktif =====
-        function ambilDataPeriodikAktif() {
-          var period = (tabelPeriodik && tabelPeriodik.getAttribute('data-active-period')) || 'harian';
-          var tbody = bodies[period];
-          var rows = [];
-          if (tbody) {
-            tbody.querySelectorAll('tr').forEach(function (tr) {
-              var sel = [];
-              tr.querySelectorAll('td').forEach(function (td) { sel.push(td.textContent.trim()); });
-              rows.push(sel);
-            });
-          }
-          return { period: period, rows: rows };
-        }
-
-        var HEADER_PERIODIK = ['Periode', 'Total Insiden', 'Diselesaikan', 'Rata-rata Waktu Tangani', 'Uptime'];
-
-        // ===== Export Excel (SheetJS) =====
-        var btnExcel = document.getElementById('btnExportExcelPeriodik');
-        if (btnExcel) {
-          btnExcel.addEventListener('click', function () {
-            if (typeof XLSX === 'undefined') {
-              alert('Pustaka export Excel belum termuat (periksa koneksi internet), coba lagi.');
-              return;
-            }
-            var data = ambilDataPeriodikAktif();
-            var ws = XLSX.utils.aoa_to_sheet([HEADER_PERIODIK].concat(data.rows));
-            var wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'Laporan ' + data.period);
-            XLSX.writeFile(wb, 'laporan-monitoring-satlakkal-' + data.period + '.xlsx');
-          });
-        }
-
-        // ===== Export PDF (jsPDF + autoTable) =====
-        var btnPdf = document.getElementById('btnExportPdfPeriodik');
-        if (btnPdf) {
-          btnPdf.addEventListener('click', function () {
-            if (typeof window.jspdf === 'undefined') {
-              alert('Pustaka export PDF belum termuat (periksa koneksi internet), coba lagi.');
-              return;
-            }
-            var data = ambilDataPeriodikAktif();
-            var doc = new window.jspdf.jsPDF();
-            var namaPeriode = data.period.charAt(0).toUpperCase() + data.period.slice(1);
-
-            doc.setFontSize(14);
-            doc.text('Laporan Monitoring — Satuan Pelaksanaan Penangkalan', 14, 16);
-            doc.setFontSize(10);
-            doc.text('Periode: ' + namaPeriode + '  |  Dicetak: ' + new Date().toLocaleString('id-ID'), 14, 23);
-
-            doc.autoTable({
-              startY: 29,
-              head: [HEADER_PERIODIK],
-              body: data.rows,
-              styles: { fontSize: 9 },
-              headStyles: { fillColor: [212, 175, 55], textColor: [36, 26, 5] }
-            });
-
-            doc.save('laporan-monitoring-satlakkal-' + data.period + '.pdf');
-          });
-        }
-      })();
       </script>
 
       <script>

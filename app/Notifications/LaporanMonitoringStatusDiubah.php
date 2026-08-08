@@ -25,16 +25,16 @@ class LaporanMonitoringStatusDiubah extends Notification
         $status = $this->laporanMonitoring->status;
 
         $pesan = match ($status) {
-            'Disetujui' => "Laporan \"{$this->laporanMonitoring->perihal}\" telah disetujui DANPUS.",
-            'Ditolak' => "Laporan \"{$this->laporanMonitoring->perihal}\" ditolak DANPUS.",
-            'Direvisi' => "Laporan \"{$this->laporanMonitoring->perihal}\" perlu direvisi. Silakan periksa catatan DANPUS.",
-            default => "Status laporan \"{$this->laporanMonitoring->perihal}\" diperbarui menjadi {$status}.",
+            'Disetujui' => "Laporan \"{$this->laporanMonitoring->jenis_kegiatan}\" telah disetujui DANPUS.",
+            'Ditolak' => "Laporan \"{$this->laporanMonitoring->jenis_kegiatan}\" ditolak DANPUS.",
+            'Direvisi' => "Laporan \"{$this->laporanMonitoring->jenis_kegiatan}\" perlu direvisi. Silakan periksa catatan DANPUS.",
+            default => "Status laporan \"{$this->laporanMonitoring->jenis_kegiatan}\" diperbarui menjadi {$status}.",
         };
 
         return [
             'laporan_monitoring_id' => $this->laporanMonitoring->id,
             'status' => $status,
-            'perihal' => $this->laporanMonitoring->perihal,
+            'jenis_kegiatan' => $this->laporanMonitoring->jenis_kegiatan,
             'pesan' => $pesan,
         ];
     }

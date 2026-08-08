@@ -358,38 +358,11 @@ class DashboardController extends Controller
      */
     private function satlakKal($user, $satuan): View
     {
-        // Data pemakaian resource (CPU/RAM/Storage/Network) & uptime masih mock
-        // (belum ditarik dari agent monitoring sungguhan) — akan disambungkan ke
-        // database/monitoring service pada iterasi berikutnya.
-        $asetMonitoring = [
-            [
-                'nama' => 'Portal Utama Pussiberad', 'url' => 'pussiberad.mil.id', 'status' => 'Diserang', 'status_class' => 'bad', 'cek_terakhir' => '2 menit lalu',
-                'cpu' => 92, 'ram' => 81, 'storage' => 64, 'network' => 340.0,
-                'uptime_24h' => 97.20, 'uptime_30h' => 99.10, 'avg_response' => 850,
-            ],
-            [
-                'nama' => 'Portal PPID', 'url' => 'ppid.pussiberad.mil.id', 'status' => 'Normal', 'status_class' => 'ok', 'cek_terakhir' => '5 menit lalu',
-                'cpu' => 18, 'ram' => 34, 'storage' => 45, 'network' => 6.2,
-                'uptime_24h' => 100.00, 'uptime_30h' => 99.95, 'avg_response' => 120,
-            ],
-            [
-                'nama' => 'Sistem Layanan Internal', 'url' => 'sli.pussiberad.mil.id', 'status' => 'Dalam Pemulihan', 'status_class' => 'warn', 'cek_terakhir' => '12 menit lalu',
-                'cpu' => 55, 'ram' => 62, 'storage' => 58, 'network' => 15.8,
-                'uptime_24h' => 94.50, 'uptime_30h' => 98.70, 'avg_response' => 410,
-            ],
-            [
-                'nama' => 'Portal Data Kodim', 'url' => 'data-kodim.mil.id', 'status' => 'Normal', 'status_class' => 'ok', 'cek_terakhir' => '20 menit lalu',
-                'cpu' => 22, 'ram' => 40, 'storage' => 51, 'network' => 4.1,
-                'uptime_24h' => 100.00, 'uptime_30h' => 99.98, 'avg_response' => 95,
-            ],
-            [
-                'nama' => 'Email Gateway', 'url' => 'mail.pussiberad.mil.id', 'status' => 'Normal', 'status_class' => 'ok', 'cek_terakhir' => '25 menit lalu',
-                'cpu' => 15, 'ram' => 28, 'storage' => 38, 'network' => 3.5,
-                'uptime_24h' => 100.00, 'uptime_30h' => 100.00, 'avg_response' => 80,
-            ],
-        ];
+        // Fitur "Monitoring Sistem" (pemakaian resource CPU/RAM/Storage) sudah
+        // dihapus — Satuan Pelaksanaan Penangkalan sekarang fokus murni ke
+        // Laporan Kegiatan Pemantauan & Pemulihan (lihat di bawah).
 
-        // ===== Laporan Monitoring & Recovery ke DANPUS (REAL, dari DB) =====
+        // ===== Laporan Kegiatan Pemantauan & Pemulihan ke DANPUS (REAL, dari DB) =====
         // Fitur inti Satuan Pelaksanaan Penangkalan: Buat Laporan, Draft, Riwayat, Status, Upload
         // Lampiran, dan Detail Laporan (semua berbasis tabel ini).
         $semuaLaporanMonitoring = LaporanMonitoring::where('satuan_id', $satuan->id)
@@ -406,14 +379,15 @@ class DashboardController extends Controller
         // @json() akan membuat hasil kompilasinya rusak (ParseError).
         $laporanMonitoringData = $semuaLaporanMonitoring->keyBy('id')->map(function ($l) {
             return [
-                'aset' => $l->aset ?? '—',
-                'jenis_insiden' => $l->jenis_insiden ?? '—',
-                'perihal' => $l->perihal,
+                'jenis_kegiatan' => $l->jenis_kegiatan,
+                'tanggal_kegiatan' => $l->tanggal_kegiatan?->translatedFormat('d M Y') ?? '—',
+                // Format ISO (YYYY-MM-DD) dipakai khusus untuk prefill input
+                // type="date" di form edit — tidak ditampilkan langsung.
+                'tanggal_kegiatan_raw' => $l->tanggal_kegiatan?->format('Y-m-d'),
                 'status' => $l->status,
-                'prioritas' => $l->prioritas,
                 'tanggal' => $l->tanggal_kirim?->translatedFormat('d M Y H:i') ?? '—',
-                'deskripsi' => $l->deskripsi,
-                'tindakan' => $l->tindakan ?? '—',
+                'ringkasan_kegiatan' => $l->ringkasan_kegiatan,
+                'hasil' => $l->hasil,
                 'catatan_danpus' => $l->catatan_danpus,
                 'lampiran' => $l->lampiran->map(fn ($d) => [
                     'nama' => $d->nama_file,
@@ -430,7 +404,6 @@ class DashboardController extends Controller
             'user' => $user,
             'satuan' => $satuan,
             'notifikasi' => $notifikasi,
-            'asetMonitoring' => $asetMonitoring,
 
             'semuaLaporanMonitoring' => $semuaLaporanMonitoring,
             'draftLaporanMonitoring' => $draftLaporanMonitoring,
@@ -442,57 +415,9 @@ class DashboardController extends Controller
                 'dikirim' => $semuaLaporanMonitoring->where('status', 'Dikirim')->count(),
                 'disetujui' => $semuaLaporanMonitoring->where('status', 'Disetujui')->count(),
             ],
-            'stats' => [
-                'total_aset' => count($asetMonitoring),
-                'normal' => 3,
-                'diserang' => 1,
-                'pemulihan' => 1,
-            ],
-            // Ringkasan resource lintas-aset untuk kartu statistik di tab
-            // "Monitoring Sistem". Dihitung sederhana dari $asetMonitoring di atas.
-            'resourceSummary' => [
-                'avg_cpu' => (int) round(array_sum(array_column($asetMonitoring, 'cpu')) / count($asetMonitoring)),
-                'avg_ram' => (int) round(array_sum(array_column($asetMonitoring, 'ram')) / count($asetMonitoring)),
-                'avg_storage' => (int) round(array_sum(array_column($asetMonitoring, 'storage')) / count($asetMonitoring)),
-                'total_network' => round(array_sum(array_column($asetMonitoring, 'network')), 1),
-                'avg_uptime_30h' => round(array_sum(array_column($asetMonitoring, 'uptime_30h')) / count($asetMonitoring), 2),
-            ],
-            'insidenTerbaru' => [
-                ['aset' => 'Portal Utama Pussiberad', 'jenis' => 'DDoS Attack', 'waktu' => '2 menit lalu', 'status' => 'Diserang', 'status_class' => 'bad'],
-                ['aset' => 'Sistem Layanan Internal', 'jenis' => 'Percobaan SQL Injection', 'waktu' => '1 jam lalu', 'status' => 'Dalam Pemulihan', 'status_class' => 'warn'],
-            ],
-            'logInsiden' => [
-                ['aset' => 'Portal Utama Pussiberad', 'jenis' => 'DDoS Attack', 'waktu' => '02 Agu 2026, 09:14', 'tindakan' => 'Mitigasi traffic & blokir IP mencurigakan', 'status' => 'Berlangsung', 'status_class' => 'amber'],
-                ['aset' => 'Sistem Layanan Internal', 'jenis' => 'Percobaan SQL Injection', 'waktu' => '02 Agu 2026, 08:02', 'tindakan' => 'Patch celah & restart layanan', 'status' => 'Dalam Pemulihan', 'status_class' => 'amber'],
-                ['aset' => 'Portal Data Kodim', 'jenis' => 'Defacement', 'waktu' => '28 Jul 2026, 14:40', 'tindakan' => 'Restore dari backup, perkuat firewall', 'status' => 'Pulih', 'status_class' => 'green'],
-            ],
-            'laporanPiket' => [
-                ['aset' => 'Portal Utama Pussiberad', 'perihal' => 'Serangan DDoS pada portal utama', 'pelapor' => 'Piket Satuan Pelaksanaan Penangkalan', 'tanggal' => '02 Agu 2026', 'prioritas' => 'Tinggi', 'prioritas_class' => 'bad'],
-                ['aset' => 'Sistem Layanan Internal', 'perihal' => 'Percobaan SQL Injection terdeteksi', 'pelapor' => 'Piket Satuan Pelaksanaan Penangkalan', 'tanggal' => '02 Agu 2026', 'prioritas' => 'Sedang', 'prioritas_class' => 'warn'],
-            ],
-            // Rekap periodik (harian/mingguan/bulanan) untuk tab "Laporan Periodik".
-            // Sumber data sementara masih statis; nanti diganti agregat query dari
-            // tabel laporan/insiden begitu monitoring tersambung ke database.
-            'laporanPeriodik' => [
-                'harian' => [
-                    ['periode' => '02 Agu 2026', 'total_insiden' => 2, 'diselesaikan' => 1, 'rata_waktu' => '45 menit', 'uptime' => '97.20%'],
-                    ['periode' => '01 Agu 2026', 'total_insiden' => 1, 'diselesaikan' => 1, 'rata_waktu' => '20 menit', 'uptime' => '100.00%'],
-                    ['periode' => '31 Jul 2026', 'total_insiden' => 0, 'diselesaikan' => 0, 'rata_waktu' => '-', 'uptime' => '100.00%'],
-                    ['periode' => '30 Jul 2026', 'total_insiden' => 1, 'diselesaikan' => 1, 'rata_waktu' => '32 menit', 'uptime' => '99.80%'],
-                ],
-                'mingguan' => [
-                    ['periode' => 'Minggu 5 (29 Jul – 04 Agu 2026)', 'total_insiden' => 4, 'diselesaikan' => 3, 'rata_waktu' => '38 menit', 'uptime' => '98.85%'],
-                    ['periode' => 'Minggu 4 (22 – 28 Jul 2026)', 'total_insiden' => 2, 'diselesaikan' => 2, 'rata_waktu' => '25 menit', 'uptime' => '99.60%'],
-                    ['periode' => 'Minggu 3 (15 – 21 Jul 2026)', 'total_insiden' => 3, 'diselesaikan' => 3, 'rata_waktu' => '29 menit', 'uptime' => '99.40%'],
-                ],
-                'bulanan' => [
-                    ['periode' => 'Agustus 2026', 'total_insiden' => 4, 'diselesaikan' => 3, 'rata_waktu' => '38 menit', 'uptime' => '98.85%'],
-                    ['periode' => 'Juli 2026', 'total_insiden' => 9, 'diselesaikan' => 9, 'rata_waktu' => '31 menit', 'uptime' => '99.42%'],
-                    ['periode' => 'Juni 2026', 'total_insiden' => 6, 'diselesaikan' => 6, 'rata_waktu' => '27 menit', 'uptime' => '99.55%'],
-                ],
-            ],
         ]);
     }
+
 
     /**
      * Satuan Pelaksanaan Siber Sosial — pengelolaan & pemantauan media sosial di daerah.

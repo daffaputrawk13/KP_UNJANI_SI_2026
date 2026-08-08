@@ -23,12 +23,10 @@ class LaporanMonitoringController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'aset' => ['nullable', 'string', 'max:255'],
-            'jenis_insiden' => ['nullable', 'string', 'max:100'],
-            'perihal' => ['required', 'string', 'max:255'],
-            'deskripsi' => ['required', 'string'],
-            'tindakan' => ['nullable', 'string'],
-            'prioritas' => ['required', 'in:Tinggi,Sedang,Rendah'],
+            'jenis_kegiatan' => ['required', 'string', 'max:100'],
+            'tanggal_kegiatan' => ['required', 'date'],
+            'ringkasan_kegiatan' => ['required', 'string'],
+            'hasil' => ['required', 'string'],
             'aksi' => ['required', 'in:draft,kirim'],
             'lampiran' => ['nullable', 'array'],
             'lampiran.*' => ['file', 'mimes:jpg,jpeg,png,pdf,doc,docx', 'max:20480'],
@@ -46,12 +44,10 @@ class LaporanMonitoringController extends Controller
             'satuan_id' => $satuanAsal->id,
             'user_id' => $user->id,
             'tujuan_satuan_id' => $danpus->id,
-            'aset' => $validated['aset'] ?? null,
-            'jenis_insiden' => $validated['jenis_insiden'] ?? null,
-            'perihal' => $validated['perihal'],
-            'deskripsi' => $validated['deskripsi'],
-            'tindakan' => $validated['tindakan'] ?? null,
-            'prioritas' => $validated['prioritas'],
+            'jenis_kegiatan' => $validated['jenis_kegiatan'],
+            'tanggal_kegiatan' => $validated['tanggal_kegiatan'],
+            'ringkasan_kegiatan' => $validated['ringkasan_kegiatan'],
+            'hasil' => $validated['hasil'],
             'status' => $dikirim ? 'Dikirim' : 'Draft',
             'tanggal_kirim' => $dikirim ? now() : null,
         ]);
@@ -77,23 +73,19 @@ class LaporanMonitoringController extends Controller
         $this->pastikanBisaDiedit($request, $laporanMonitoring);
 
         $validated = $request->validate([
-            'aset' => ['nullable', 'string', 'max:255'],
-            'jenis_insiden' => ['nullable', 'string', 'max:100'],
-            'perihal' => ['required', 'string', 'max:255'],
-            'deskripsi' => ['required', 'string'],
-            'tindakan' => ['nullable', 'string'],
-            'prioritas' => ['required', 'in:Tinggi,Sedang,Rendah'],
+            'jenis_kegiatan' => ['required', 'string', 'max:100'],
+            'tanggal_kegiatan' => ['required', 'date'],
+            'ringkasan_kegiatan' => ['required', 'string'],
+            'hasil' => ['required', 'string'],
             'lampiran' => ['nullable', 'array'],
             'lampiran.*' => ['file', 'mimes:jpg,jpeg,png,pdf,doc,docx', 'max:20480'],
         ]);
 
         $laporanMonitoring->update([
-            'aset' => $validated['aset'] ?? null,
-            'jenis_insiden' => $validated['jenis_insiden'] ?? null,
-            'perihal' => $validated['perihal'],
-            'deskripsi' => $validated['deskripsi'],
-            'tindakan' => $validated['tindakan'] ?? null,
-            'prioritas' => $validated['prioritas'],
+            'jenis_kegiatan' => $validated['jenis_kegiatan'],
+            'tanggal_kegiatan' => $validated['tanggal_kegiatan'],
+            'ringkasan_kegiatan' => $validated['ringkasan_kegiatan'],
+            'hasil' => $validated['hasil'],
         ]);
 
         $this->simpanLampiran($request, $laporanMonitoring, $request->user()->id);

@@ -15,12 +15,10 @@ class LaporanMonitoring extends Model
         'satuan_id',
         'user_id',
         'tujuan_satuan_id',
-        'aset',
-        'jenis_insiden',
-        'perihal',
-        'deskripsi',
-        'tindakan',
-        'prioritas',
+        'jenis_kegiatan',
+        'tanggal_kegiatan',
+        'ringkasan_kegiatan',
+        'hasil',
         'status',
         'catatan_danpus',
         'tanggal_kirim',
@@ -29,6 +27,7 @@ class LaporanMonitoring extends Model
     protected function casts(): array
     {
         return [
+            'tanggal_kegiatan' => 'date',
             'tanggal_kirim' => 'datetime',
         ];
     }

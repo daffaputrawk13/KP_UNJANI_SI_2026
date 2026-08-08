@@ -32,6 +32,6 @@ class DanpusLaporanMonitoringController extends Controller
 
         $laporanMonitoring->user->notify(new LaporanMonitoringStatusDiubah($laporanMonitoring));
 
-        return back()->with('status', "Laporan monitoring \"{$laporanMonitoring->perihal}\" telah diperbarui menjadi {$validated['status']}.");
+        return back()->with('status', "Laporan kegiatan \"{$laporanMonitoring->jenis_kegiatan}\" telah diperbarui menjadi {$validated['status']}.");
     }
 }

@@ -377,8 +377,8 @@
       {{-- ===== LAPORAN MONITORING & RECOVERY (SATLAKKAL) ===== --}}
       <section class="tab-panel" data-tab-panel="laporan-monitoring">
         <div class="section-head">
-          <h2>Laporan Monitoring &amp; Recovery</h2>
-          <p>Laporan insiden/pemulihan aset digital yang dikirim Satuan Pelaksanaan Penangkalan, menunggu keputusan DANPUS.</p>
+          <h2>Laporan Kegiatan Pemantauan &amp; Pemulihan</h2>
+          <p>Laporan kegiatan pemantauan/pemulihan yang dikirim Satuan Pelaksanaan Penangkalan, menunggu keputusan DANPUS.</p>
         </div>
         <div class="panel">
           @if(session('status'))
@@ -386,13 +386,12 @@
           @endif
           <div class="tbl-wrap">
             <table class="dtbl">
-              <thead><tr><th>Aset</th><th>Perihal</th><th>Prioritas</th><th>Tanggal Kirim</th><th>Aksi</th></tr></thead>
+              <thead><tr><th>Jenis Kegiatan</th><th>Tanggal Kegiatan</th><th>Tanggal Kirim</th><th>Aksi</th></tr></thead>
               <tbody>
                 @forelse($laporanMonitoringMasuk as $lm)
                 <tr>
-                  <td>{{ $lm->aset ?? '—' }}</td>
-                  <td>{{ $lm->perihal }}</td>
-                  <td><span class="status-dot {{ match($lm->prioritas) { 'Tinggi' => 'bad', 'Sedang' => 'warn', default => 'ok' } }}">{{ $lm->prioritas }}</span></td>
+                  <td>{{ $lm->jenis_kegiatan }}</td>
+                  <td>{{ $lm->tanggal_kegiatan?->translatedFormat('d M Y') ?? '—' }}</td>
                   <td>{{ $lm->tanggal_kirim?->translatedFormat('d M Y H:i') ?? '—' }}</td>
                   <td>
                     <div class="btn-row">
@@ -407,7 +406,7 @@
                   </td>
                 </tr>
                 @empty
-                <tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:20px;">Belum ada laporan monitoring yang menunggu keputusan.</td></tr>
+                <tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:20px;">Belum ada laporan kegiatan yang menunggu keputusan.</td></tr>
                 @endforelse
               </tbody>
             </table>
