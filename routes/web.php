@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\AkunMedsosController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\CaptchaController;
 use App\Http\Controllers\DanpusLaporanMonitoringController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DukunganTeknisController;
@@ -45,6 +46,9 @@ Route::get('/', function () {
 Route::get('/login', function () {
     return redirect('/');
 });
+
+// Gambar captcha untuk form login — di-generate ulang tiap kali diminta.
+Route::get('/captcha/image', [CaptchaController::class, 'image'])->name('captcha.image');
 
 Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login');
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');

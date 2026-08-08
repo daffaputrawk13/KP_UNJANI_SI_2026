@@ -349,6 +349,16 @@
     margin-top:-12px;margin-bottom:14px;
   }
   .login-submit{border:none;cursor:pointer;justify-content:center;margin-top:4px;width:100%;}
+  .captcha-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+  .captcha-img{height:50px;border-radius:8px;border:1px solid var(--border);flex-shrink:0;}
+  .captcha-refresh{
+    width:38px;height:38px;flex-shrink:0;border-radius:8px;cursor:pointer;
+    background:var(--bg-deep);border:1px solid var(--border);color:var(--text-muted);
+    display:flex;align-items:center;justify-content:center;
+    transition:border-color .2s ease,color .2s ease,transform .2s ease;
+  }
+  .captcha-refresh svg{width:16px;height:16px;}
+  .captcha-refresh:hover{border-color:var(--gold);color:var(--gold-bright);transform:rotate(90deg);}
   .login-foot{
     margin-top:20px;padding-top:16px;border-top:1px solid var(--border-soft);
     font-family:var(--mono);font-size:10.5px;color:var(--text-dim);
@@ -720,6 +730,17 @@
         @error('password')
           <span class="login-error">{{ $message }}</span>
         @enderror
+        <label class="login-label" for="loginCaptcha">Captcha</label>
+        <div class="captcha-row">
+          <img id="captchaImg" class="captcha-img" src="{{ route('captcha.image') }}?t={{ microtime(true) }}" alt="Kode captcha">
+          <button class="captcha-refresh" type="button" id="captchaRefresh" aria-label="Muat ulang captcha">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 4v5h-5"/></svg>
+          </button>
+        </div>
+        <input class="login-input" id="loginCaptcha" name="captcha" type="text" autocomplete="off" placeholder="Ketik kode di atas" required>
+        @error('captcha')
+          <span class="login-error">{{ $message }}</span>
+        @enderror
         <button class="btn btn-primary login-submit" type="submit">Masuk</button>
       </form>
       <div class="login-foot">
@@ -1003,6 +1024,15 @@
       btn.setAttribute('aria-label', isHidden ? 'Sembunyikan' : 'Tampilkan');
     });
   });
+
+  // ---------- muat ulang gambar captcha ----------
+  const captchaImg = document.getElementById('captchaImg');
+  const captchaRefresh = document.getElementById('captchaRefresh');
+  if (captchaRefresh && captchaImg) {
+    captchaRefresh.addEventListener('click', () => {
+      captchaImg.src = '{{ route('captcha.image') }}?t=' + Date.now();
+    });
+  }
 
   @if ($errors->any())
     openLogin();

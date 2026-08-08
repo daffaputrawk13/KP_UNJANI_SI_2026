@@ -21,7 +21,20 @@ class AuthenticatedSessionController extends Controller
         $credentials = $request->validate([
             'username' => ['required', 'string'],
             'password' => ['required', 'string'],
+            'captcha' => ['required', 'string'],
         ]);
+
+        // Dibandingkan case-insensitive — gambar captcha memang campur huruf
+        // besar/kecil untuk noise visual, tapi mengetik ulang case yang pas
+        // terlalu menyulitkan pengguna.
+        $captchaBenar = strcasecmp($credentials['captcha'], (string) $request->session()->get('captcha_code')) === 0;
+        $request->session()->forget('captcha_code');
+
+        if (! $captchaBenar) {
+            throw ValidationException::withMessages([
+                'captcha' => 'Kode captcha salah.',
+            ]);
+        }
 
         if (! Auth::attempt([
             'username' => $credentials['username'],
