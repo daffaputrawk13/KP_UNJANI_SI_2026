@@ -30,9 +30,9 @@ class Satuan extends Model
      */
     public const MODUL_HAK_AKSES = [
         'laporan' => 'Kirim & Kelola Laporan',
-        'medsos' => 'Manajemen Media Sosial',
-        'personel' => 'Administrasi Personel',
-        'monitoring' => 'Monitoring Aset/Sistem',
+        'medsos' => 'Pelaporan Publikasi',
+        'personel' => 'Pelaporan Administrasi Personel',
+        'monitoring' => 'Monitoring Laporan & Aktivitas',
         'notifikasi' => 'Notifikasi',
     ];
 
